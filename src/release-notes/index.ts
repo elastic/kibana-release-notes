@@ -1,0 +1,1 @@
+export { ReleaseNotesPage } from './page';

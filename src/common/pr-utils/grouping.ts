@@ -1,0 +1,97 @@
+import { PrItem } from '../../common';
+import { Config } from '../../config';
+
+export interface ReleaseNoteGroups<T> {
+  fixes: T;
+  enhancements: T;
+  features: T;
+  deprecation: T;
+  breaking: T;
+  missingLabel: T;
+}
+
+export type GroupedByArea = [areas: { [areaTitle: string]: PrItem[] }, ungrouped: PrItem[]];
+
+export interface AreaGroup {
+  title: string;
+  prs: PrItem[];
+}
+
+export function groupByArea(prs: PrItem[], { areas }: Config): GroupedByArea {
+  // TODO: How to handle/track PRs in multiple areas.
+  const grouped = prs.reduce<{ unknown: PrItem[]; areas: { [title: string]: PrItem[] } }>(
+    (grouped, pr) => {
+      const area = areas.find(
+        ({ labels }) => labels && pr.labels.some(({ name }) => labels.includes(name))
+      );
+      if (area) {
+        grouped.areas[area.title] = grouped.areas[area.title] ?? [];
+        grouped.areas[area.title].push(pr);
+      } else {
+        grouped.unknown.push(pr);
+      }
+      return grouped;
+    },
+    { unknown: [], areas: {} }
+  );
+  return [grouped.areas, grouped.unknown];
+}
+
+interface GroupPrOptions {
+  includeFeaturesInEnhancements?: boolean;
+}
+
+/**
+ * Groups a list of specified PRs according to the release_note labels they have.
+ * Will return an object of the different groups pointing to an array of PRs with that label.
+ */
+export function groupPrs(prs: PrItem[], options: GroupPrOptions = {}): ReleaseNoteGroups<PrItem[]> {
+  const groups = prs.reduce<ReleaseNoteGroups<PrItem[]>>(
+    (groups, pr) => {
+      // If the pr has no release_note label at all (should usually not happen)
+      // it will be added to the missingLabel group, so we can warn about that in the UI.
+      if (!pr.labels.some((label) => label.name.startsWith('release_note:'))) {
+        groups.missingLabel.push(pr);
+        return groups;
+      }
+
+      for (const label of pr.labels) {
+        switch (label.name) {
+          case 'release_note:fix':
+            groups.fixes.push(pr);
+            break;
+          case 'release_note:enhancement':
+            groups.enhancements.push(pr);
+            break;
+          case 'release_note:deprecation':
+            groups.deprecation.push(pr);
+            break;
+          case 'release_note:breaking':
+            groups.breaking.push(pr);
+            break;
+          case 'release_note:feature':
+            groups.features.push(pr);
+            // We treat the feature label slightly different, so that it will be also grouped
+            // into the enhancement category (for the "all changes list", that doesn't list
+            // features), unless it also has another release_note label on it that will then define
+            // its group.
+            if (
+              options.includeFeaturesInEnhancements &&
+              // Check if there's any release_note: label other than release_note:feature
+              !pr.labels.some(
+                ({ name }) => name.startsWith('release_note:') && name !== 'release_note:feature'
+              )
+            ) {
+              groups.enhancements.push(pr);
+            }
+            break;
+        }
+      }
+
+      return groups;
+    },
+    { fixes: [], enhancements: [], features: [], deprecation: [], breaking: [], missingLabel: [] }
+  );
+
+  return groups;
+}
