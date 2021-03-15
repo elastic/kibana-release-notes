@@ -6,7 +6,7 @@ interface AreaDefinition {
   title: string;
   labels?: readonly string[];
   options?: {
-    bracketHandling?: 'strip' | 'keep';
+    bracketHandling?: 'strip' | 'keep' | 'visualizations';
     textOverwriteTemplate?: string;
   };
 }
@@ -16,8 +16,8 @@ export interface Config {
   areas: readonly AreaDefinition[];
   templates: {
     pages: {
-      allChanges: string;
       releaseNotes: string;
+      patchReleaseNotes: string;
     };
     prs: {
       breaking?: string;
@@ -37,7 +37,6 @@ const configSubject$ = new BehaviorSubject<Config>(
 );
 
 configSubject$.subscribe((newConfig) => {
-  debugger;
   if (JSON.stringify(newConfig) === JSON.stringify(defaultConfig)) {
     localStorage.removeItem(CONFIG_KEY);
   } else {

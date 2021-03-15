@@ -44,7 +44,7 @@ export const config = {
     {
       title: 'Platform',
       labels: [
-        'Team:Platform',
+        'Team:Core',
         'Feature:Plugins',
         'Feature:New Platform',
         'Project:i18n',
@@ -123,8 +123,9 @@ export const config = {
       labels: ['Feature:Embedding', 'Feature:SharingURLs'],
     },
     {
-      title: 'Visualizations',
+      title: 'Lens & Visualizations',
       labels: [
+        'Feature:Lens',
         'Feature:Timelion',
         'Feature:TSVB',
         'Feature:Coordinate Map',
@@ -147,6 +148,9 @@ export const config = {
         'Feature:New Feature',
         'Feature:MetricVis',
       ],
+      options: {
+        bracketHandling: 'visualizations',
+      },
     },
     {
       title: 'Elastic Security',
@@ -181,10 +185,6 @@ export const config = {
       labels: ['Team:apm'],
     },
     {
-      title: 'Lens',
-      labels: ['Feature:Lens'],
-    },
-    {
       title: 'Alerting',
       labels: ['Feature:Alerting', 'Team:Alerting Services', 'Feature:Actions'],
     },
@@ -196,42 +196,13 @@ export const config = {
       title: 'Data ingest',
       labels: ['Ingest', 'Feature:Ingest Node Pipelines'],
     },
+    {
+      title: 'Fleet',
+      labels: ['Team:Fleet'],
+    },
   ],
   templates: {
     pages: {
-      allChanges: `[[enhancements-and-bug-fixes-v{{version}}]]
-{{^isPatchRelease}}=== Enhancements and bug fixes{{/isPatchRelease}}{{#isPatchRelease}}=== {kib} {{version}}{{/isPatchRelease}}
-
-The {{version}} release includes the following {{#prs.enhancements}}enhancements and {{/prs.enhancements}}bug fixes.
-
-{{#prs.breaking}}
-[float]
-[[breaking-v{{version}}]]
-=== Breaking
-{{{prs.breaking}}}
-
-{{/prs.breaking}}
-{{#prs.deprecations}}
-[float]
-[[deprecation-v{{version}}]]
-=== Deprecations
-{{{prs.deprecations}}}
-
-{{/prs.deprecations}}
-{{#prs.enhancements}}
-[float]
-[[enhancement-v{{version}}]]
-=== Enhancements
-{{{prs.enhancements}}}
-
-{{/prs.enhancements}}
-{{#prs.fixes}}
-[float]
-[[fixes-v{{version}}]]
-=== Bug Fixes
-{{{prs.fixes}}}
-{{/prs.fixes}}
-      `,
       releaseNotes: `[[release-notes-{{version}}]]
 == {kib} {{version}}
 
@@ -273,6 +244,72 @@ you make the necessary updates after you upgrade to {{version}}.
 For more information about the new features introduced in {{version}}, refer to !!TODO!!.
 
 For detailed information about the {{version}} release, refer to <<enhancements-and-bug-fixes-v{{version}},Enhancements and bug fixes>>.
+
+[[enhancements-and-bug-fixes-v{{version}}]]
+{{^isPatchRelease}}=== Enhancements and bug fixes{{/isPatchRelease}}{{#isPatchRelease}}=== {kib} {{version}}{{/isPatchRelease}}
+
+The {{version}} release includes the following {{#prs.enhancements}}enhancements and {{/prs.enhancements}}bug fixes.
+
+{{#prs.breaking}}
+[float]
+[[breaking-v{{version}}]]
+=== Breaking
+{{{prs.breaking}}}
+
+{{/prs.breaking}}
+{{#prs.deprecations}}
+[float]
+[[deprecation-v{{version}}]]
+=== Deprecations
+{{{prs.deprecations}}}
+
+{{/prs.deprecations}}
+{{#prs.enhancements}}
+[float]
+[[enhancement-v{{version}}]]
+=== Enhancements
+{{{prs.enhancements}}}
+
+{{/prs.enhancements}}
+{{#prs.fixes}}
+[float]
+[[fixes-v{{version}}]]
+=== Bug Fixes
+{{{prs.fixes}}}
+{{/prs.fixes}}
+      `,
+      patchReleaseNotes: `[[release-notes-{{version}}]]
+== {kib} {{version}}
+
+The {{version}} release includes the following bug fixes.
+
+{{#prs.breaking}}
+[float]
+[[breaking-v{{version}}]]
+=== Breaking
+{{{prs.breaking}}}
+
+{{/prs.breaking}}
+{{#prs.deprecations}}
+[float]
+[[deprecation-v{{version}}]]
+=== Deprecations
+{{{prs.deprecations}}}
+
+{{/prs.deprecations}}
+{{#prs.enhancements}}
+[float]
+[[enhancement-v{{version}}]]
+=== Enhancements
+{{{prs.enhancements}}}
+
+{{/prs.enhancements}}
+{{#prs.fixes}}
+[float]
+[[fixes-v{{version}}]]
+=== Bug Fixes
+{{{prs.fixes}}}
+{{/prs.fixes}}
       `,
     },
     prs: {
@@ -282,7 +319,7 @@ For detailed information about the {{version}} release, refer to <<enhancements-
 [%collapsible]
 ====
 *Details* +
-!!TODO!!
+!!TODO!! For more information, refer to {kibana-pull}{{number}}[#{{number}}]
 
 *Impact* +
 !!TODO!!
@@ -294,7 +331,7 @@ For detailed information about the {{version}} release, refer to <<enhancements-
 [%collapsible]
 ====
 *Details* +
-!!TODO!!
+!!TODO!! For more information, refer to {kibana-pull}{{number}}[#{{number}}]
 
 *Impact* +
 !!TODO!!

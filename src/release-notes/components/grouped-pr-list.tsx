@@ -31,7 +31,7 @@ export const GroupedPrList: FC<Props> = memo(({ groupedPrs, groups }) => {
             )}
             <ul>
               {prs.map((pr) => (
-                <li key={pr.node_id}>
+                <li key={pr.id}>
                   <Pr pr={pr} showTransformedTitle={true} normalizeOptions={group.options} />
                 </li>
               ))}

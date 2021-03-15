@@ -1,5 +1,5 @@
-import { EuiTabs, EuiTab, EuiFlexGroup, EuiFlexItem, EuiCallOut, EuiCode } from '@elastic/eui';
-import { FC, useMemo, useState } from 'react';
+import { EuiFlexGroup, EuiFlexItem, EuiCallOut, EuiCode } from '@elastic/eui';
+import { FC, useMemo } from 'react';
 import { groupByArea, groupPrs, PrItem } from '../common';
 import semver from 'semver';
 import {
@@ -19,9 +19,6 @@ export const ReleaseNoteOutput: FC<Props> = ({ prs, version: ver }) => {
   const config = useConfig();
   const version = ver.replace(/^v(.*)$/, '$1');
   const isPatchVersion = semver.patch(version) !== 0;
-  const [tab, setTab] = useState<'releaseNotes' | 'allChanges'>(() =>
-    isPatchVersion ? 'allChanges' : 'releaseNotes'
-  );
 
   const renderedGroups = useMemo(() => {
     const grouped = groupPrs(prs, { includeFeaturesInEnhancements: true });
@@ -50,8 +47,8 @@ export const ReleaseNoteOutput: FC<Props> = ({ prs, version: ver }) => {
   const asciidoc = useMemo(
     () =>
       renderPageAsAsciidoc(
-        tab === 'allChanges'
-          ? config.templates.pages.allChanges
+        isPatchVersion
+          ? config.templates.pages.patchReleaseNotes
           : config.templates.pages.releaseNotes,
         {
           version,
@@ -61,11 +58,10 @@ export const ReleaseNoteOutput: FC<Props> = ({ prs, version: ver }) => {
         }
       ).trim(),
     [
-      config.templates.pages.allChanges,
+      config.templates.pages.patchReleaseNotes,
       config.templates.pages.releaseNotes,
       isPatchVersion,
       renderedGroups,
-      tab,
       version,
     ]
   );
@@ -86,20 +82,6 @@ export const ReleaseNoteOutput: FC<Props> = ({ prs, version: ver }) => {
           ></EuiCallOut>
         </EuiFlexItem>
       )}
-      <EuiFlexItem grow={false}>
-        <EuiTabs size="s">
-          <EuiTab
-            disabled={isPatchVersion}
-            isSelected={tab === 'releaseNotes'}
-            onClick={() => setTab('releaseNotes')}
-          >
-            Release Notes
-          </EuiTab>
-          <EuiTab isSelected={tab === 'allChanges'} onClick={() => setTab('allChanges')}>
-            All Changes
-          </EuiTab>
-        </EuiTabs>
-      </EuiFlexItem>
       <EuiFlexItem>
         <MonacoEditor height="100%" options={{ readOnly: true }} value={asciidoc} />
       </EuiFlexItem>

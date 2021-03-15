@@ -101,7 +101,7 @@ export const UncategorizedPr: FC<UncategorizedPrProps> = memo(({ pr }) => {
         {filteredLables.length > 0 && (
           <EuiBadgeGroup>
             {filteredLables.map((label) => (
-              <LabelBadge key={label.node_id} label={label} />
+              <LabelBadge key={label.id} label={label} />
             ))}
           </EuiBadgeGroup>
         )}

@@ -44,7 +44,7 @@ export const PrepareReleaseNotes: FC<Props> = ({ prs }) => {
           <EuiSpacer size="m" />
           <ul>
             {groupedPrs.missingLabel.map((pr) => (
-              <li key={pr.node_id}>
+              <li key={pr.id}>
                 <Pr pr={pr} showAuthor={true} />
               </li>
             ))}
@@ -68,7 +68,7 @@ export const PrepareReleaseNotes: FC<Props> = ({ prs }) => {
           </EuiCallOut>
           <EuiSpacer size="m" />
           {unknownPrs.map((pr) => (
-            <React.Fragment key={pr.node_id}>
+            <React.Fragment key={pr.id}>
               <UncategorizedPr pr={pr} />
               <EuiSpacer size="s" />
             </React.Fragment>
@@ -82,7 +82,7 @@ export const PrepareReleaseNotes: FC<Props> = ({ prs }) => {
           </h2>
           <ul>
             {groupedPrs.breaking.map((pr) => (
-              <li key={pr.node_id}>
+              <li key={pr.id}>
                 <Pr pr={pr} />
               </li>
             ))}
@@ -96,7 +96,7 @@ export const PrepareReleaseNotes: FC<Props> = ({ prs }) => {
           </h2>
           <ul>
             {groupedPrs.deprecation.map((pr) => (
-              <li key={pr.node_id}>
+              <li key={pr.id}>
                 <Pr pr={pr} />
               </li>
             ))}

@@ -6,6 +6,19 @@ function capitalize([first, ...rest]: string): string {
   return `${first.toUpperCase()}${rest.join('')}`;
 }
 
+const VISUALIZE_TOOLS = ['lens', 'tsvb', 'vislib', 'timelion', 'vega'];
+
+function visualizationBracketHandling(title: string): string {
+  const match = title.match(/\s*\[([^\]]+)\]\s*(.*)/i);
+  if (!match) {
+    return title;
+  }
+  if (VISUALIZE_TOOLS.includes(match[1].toLowerCase())) {
+    return `${match[2]} in *${match[1]}*`;
+  }
+  return match[2];
+}
+
 /**
  * This function will normalize the title of a PR, i.e. applies all modifications to it
  * every PR should get (no matter a specific config). These include:
@@ -23,6 +36,8 @@ export function normalizeTitle(
 
   if (options.bracketHandling === 'strip' || !options.bracketHandling) {
     normalized = normalized.replace(/\s*\[[^\]]+\]\s*/gi, ' ');
+  } else if (options.bracketHandling === 'visualizations') {
+    normalized = visualizationBracketHandling(normalized);
   }
 
   return capitalize(
