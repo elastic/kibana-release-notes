@@ -10,12 +10,12 @@ describe('extraction tools', () => {
     });
 
     it('should remove linked issue numbers', () => {
-      expect(normalizeTitle('Add a new feature (#7213)')).toBe('Add a new feature');
+      expect(normalizeTitle('Add a new feature (#7213)')).toBe('Adds a new feature');
       expect(normalizeTitle('#123 fixing bug')).toBe('Fixing bug');
     });
 
     it('should remove trailing/leading non word characters', () => {
-      expect(normalizeTitle(' - Fix something: ')).toBe('Fix something');
+      expect(normalizeTitle(' - Fix something: ')).toBe('Fixes something');
     });
 
     it('should strip all bracket content', () => {
@@ -42,7 +42,7 @@ describe('extraction tools', () => {
 
     it('should handle visualization brackets correctly', () => {
       expect(normalizeTitle('[TSVB] Add feature xyz', { bracketHandling: 'visualizations' })).toBe(
-        'Add feature xyz in *TSVB*'
+        'Adds feature xyz in *TSVB*'
       );
       // Does only handle known visualization tools
       expect(normalizeTitle('[Tool] An unknown tool', { bracketHandling: 'visualizations' })).toBe(
@@ -51,7 +51,16 @@ describe('extraction tools', () => {
       // It does not duplicate an already existing "in {tool}"
       expect(
         normalizeTitle('[TSVB] Add runtime fields to TSVB', { bracketHandling: 'visualizations' })
-      ).toBe('Add runtime fields to *TSVB*');
+      ).toBe('Adds runtime fields to *TSVB*');
+    });
+
+    it('should handle add/fix at the beginning', () => {
+      expect(normalizeTitle('Add something to add a new thing')).toBe(
+        'Adds something to add a new thing'
+      );
+      expect(normalizeTitle('fix something to fix a new thing')).toBe(
+        'Fixes something to fix a new thing'
+      );
     });
   });
 
