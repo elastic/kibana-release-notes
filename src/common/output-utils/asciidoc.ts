@@ -1,7 +1,7 @@
 import Mustache from 'mustache';
 import { Config } from '../../config';
 import { PrItem } from '../github-service';
-import { GroupedByArea, NormalizeOptions, normalizeTitle } from '../pr-utils';
+import { extractReleaseNotes, GroupedByArea, NormalizeOptions } from '../pr-utils';
 
 export function renderPageAsAsciidoc(template: string, context: unknown): string {
   return Mustache.render(template, context);
@@ -26,9 +26,12 @@ export function renderPrAsAsciidoc(
     ? (config.templates.prs[type] as string)
     : config.templates.prs._other_;
 
+  const releaseNote = extractReleaseNotes(pr, normalizeOptions);
+
   return Mustache.render(template, {
-    title: normalizeTitle(pr.title, normalizeOptions),
+    title: releaseNote.title,
     number: pr.number,
+    details: releaseNote.type === 'releaseNoteDetails' ? releaseNote.details : undefined,
   });
 }
 

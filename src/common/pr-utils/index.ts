@@ -1,2 +1,3 @@
 export * from './grouping';
-export * from './extracting';
+export { normalizeTitle, extractReleaseNotes } from './extracting';
+export type { NormalizeOptions, ReleaseNoteDetails } from './extracting';

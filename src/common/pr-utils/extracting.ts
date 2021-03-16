@@ -1,4 +1,5 @@
 import { Config } from '../../config';
+import { PrItem } from '../github-service';
 
 export type NormalizeOptions = Config['areas'][number]['options'];
 
@@ -26,10 +27,7 @@ function visualizationBracketHandling(title: string): string {
  * - Stripping of all versions in brackets
  * - All issue numbers mentioned in the title
  */
-export function normalizeTitle(
-  title: string,
-  options: NormalizeOptions = { bracketHandling: 'strip' }
-): string {
+export function normalizeTitle(title: string, options: NormalizeOptions = {}): string {
   let normalized = title
     .replace(/\s*\[\d+\.\d+(\.\d+)?\]\s*/gi, ' ')
     .replace(/\s*\(?#\d{2,}\)?\s*/g, ' ');
@@ -51,4 +49,43 @@ export function normalizeTitle(
       // Trim the title
       .trim()
   );
+}
+
+/**
+ * Finds and retrieves the actual "release note" details from a PR description (in markdown format).
+ * It will look for:
+ * - paragraphs beginning with release note (or slight variations of that) and the sentence till the end of line.
+ */
+export function findReleaseNote(markdown: string): string | undefined {
+  const match = markdown.match(/(?:\n|^)\s*release[\s-]?notes?[\s\W]+(.*?)(?:(\r?\n|\r){2}|$)/is);
+  return match?.[1] ?? undefined;
+}
+
+export type ReleaseNoteDetails =
+  | { type: 'title'; title: string }
+  | { type: 'releaseNoteTitle'; title: string; originalTitle: string }
+  | { type: 'releaseNoteDetails'; title: string; details: string };
+
+export function extractReleaseNotes(
+  pr: PrItem,
+  options: NormalizeOptions = { bracketHandling: 'strip' }
+): ReleaseNoteDetails {
+  const releaseNote = findReleaseNote(pr.body);
+
+  // If the PR did not have any release note in its description just return the normalized title.
+  if (!releaseNote) {
+    return { type: 'title', title: normalizeTitle(pr.title, options) };
+  }
+
+  // If the release note details in the PR is too long we'll handle it as a description, and not replace
+  // the title with it, but put it additionally in the release note, so tech writers can compress it.
+  if (releaseNote.length > 120 || releaseNote.includes('\n')) {
+    return {
+      type: 'releaseNoteDetails',
+      title: normalizeTitle(pr.title, options),
+      details: releaseNote,
+    };
+  }
+
+  return { type: 'releaseNoteTitle', title: releaseNote, originalTitle: pr.title };
 }

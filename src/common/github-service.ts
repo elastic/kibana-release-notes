@@ -42,7 +42,7 @@ class GitHubService {
 
     // return tags;
 
-    return ['v7.11.2', 'v7.12.0', 'v8.0.0'];
+    return ['v7.11.2', 'v7.12.0', 'v7.12.1', 'v7.13.0'];
   }
 
   public getPrsForVersion(

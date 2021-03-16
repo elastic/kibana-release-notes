@@ -337,7 +337,8 @@ The {{version}} release includes the following bug fixes.
 !!TODO!!
 ====
       `,
-      _other_: '* {{{title}}} {kibana-pull}{{number}}[#{{number}}]',
+      _other_:
+        '* {{{title}}} {kibana-pull}{{number}}[#{{number}}]{{#details}}\n////\n!!TODO!! The above PR had a lengthy release note description:\n{{{details}}}\n////{{/details}}',
     },
     prGroup: `{{{groupTitle}}}::\n{{{prs}}}`,
   },
