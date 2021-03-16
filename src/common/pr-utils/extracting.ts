@@ -89,5 +89,5 @@ export function extractReleaseNotes(
     };
   }
 
-  return { type: 'releaseNoteTitle', title: releaseNote, originalTitle: pr.title };
+  return { type: 'releaseNoteTitle', title: normalizeTitle(releaseNote), originalTitle: pr.title };
 }
