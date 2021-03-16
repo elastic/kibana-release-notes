@@ -34,6 +34,10 @@ describe('extraction tools', () => {
     it('should capitalize the first letter', () => {
       expect(normalizeTitle('adds a new feature')).toBe('Adds a new feature');
     });
+
+    it('should strip of points at the end of the release note', () => {
+      expect(normalizeTitle('Adds a new feature to Lens.')).toBe('Adds a new feature to Lens');
+    });
   });
 
   describe('findReleaseNotes', () => {

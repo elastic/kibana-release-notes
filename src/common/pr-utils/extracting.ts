@@ -44,6 +44,8 @@ export function normalizeTitle(title: string, options: NormalizeOptions = {}): s
       // in the front/end
       .replace(/^[\s-:]*/g, '')
       .replace(/[\s-:]+$/g, '')
+      // Replace any periods at the end of the entry
+      .replace(/[.]+$/g, '')
       // Replace duplicate whitespace (most likely introduced by some removal above) by a single space
       .replace(/\s{2,}/g, ' ')
       // Trim the title
