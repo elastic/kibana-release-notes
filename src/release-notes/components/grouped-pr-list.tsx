@@ -1,5 +1,5 @@
 import { EuiCallOut } from '@elastic/eui';
-import { FC, memo } from 'react';
+import { FC, memo, useMemo } from 'react';
 import { Pr, PrItem } from '../../common';
 import { Config } from '../../config';
 
@@ -9,9 +9,12 @@ interface Props {
 }
 
 export const GroupedPrList: FC<Props> = memo(({ groupedPrs, groups }) => {
+  const sortedGroups = useMemo(() => [...groups].sort((a, b) => a.title.localeCompare(b.title)), [
+    groups,
+  ]);
   return (
     <>
-      {groups.map((group) => {
+      {sortedGroups.map((group) => {
         const prs = groupedPrs[group.title];
         if (!prs) {
           return null;
