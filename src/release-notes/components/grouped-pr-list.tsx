@@ -1,19 +1,20 @@
 import { EuiCallOut } from '@elastic/eui';
-import { FC, memo, useMemo } from 'react';
+import { FC, Fragment, memo, useMemo } from 'react';
 import { Pr, PrItem } from '../../common';
 import { Config } from '../../config';
 
 interface Props {
   groupedPrs: { [group: string]: PrItem[] };
   groups: Config['areas'];
+  keyPrefix: string;
 }
 
-export const GroupedPrList: FC<Props> = memo(({ groupedPrs, groups }) => {
+export const GroupedPrList: FC<Props> = memo(({ groupedPrs, groups, keyPrefix }) => {
   const sortedGroups = useMemo(() => [...groups].sort((a, b) => a.title.localeCompare(b.title)), [
     groups,
   ]);
   return (
-    <>
+    <div>
       {sortedGroups.map((group) => {
         const prs = groupedPrs[group.title];
         if (!prs) {
@@ -21,7 +22,7 @@ export const GroupedPrList: FC<Props> = memo(({ groupedPrs, groups }) => {
         }
 
         return (
-          <>
+          <Fragment key={`${keyPrefix}-${group.title}`}>
             <h3>{group.title}</h3>
             {group.options?.textOverwriteTemplate && (
               <EuiCallOut
@@ -39,9 +40,9 @@ export const GroupedPrList: FC<Props> = memo(({ groupedPrs, groups }) => {
                 </li>
               ))}
             </ul>
-          </>
+          </Fragment>
         );
       })}
-    </>
+    </div>
   );
 });

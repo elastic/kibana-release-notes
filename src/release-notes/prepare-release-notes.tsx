@@ -28,7 +28,11 @@ export const PrepareReleaseNotes: FC<Props> = ({ prs }) => {
     groupedPrs.fixes,
   ]);
 
-  const unknownPrs = [...unknownFeature, ...unknownEnhancements, ...unknownFixes];
+  const unknownPrs = [...unknownFeature, ...unknownEnhancements, ...unknownFixes].filter(
+    // Deduplicate list, since a PR could have had multiple release_note labels
+    (pr, index, arr) =>
+      !arr.some((otherPr, otherIndex) => otherIndex !== index && otherPr.id === pr.id)
+  );
 
   return (
     <EuiText>
@@ -82,7 +86,7 @@ export const PrepareReleaseNotes: FC<Props> = ({ prs }) => {
           </h2>
           <ul>
             {groupedPrs.breaking.map((pr) => (
-              <li key={pr.id}>
+              <li key={`breaking-${pr.id}`}>
                 <Pr pr={pr} />
               </li>
             ))}
@@ -96,7 +100,7 @@ export const PrepareReleaseNotes: FC<Props> = ({ prs }) => {
           </h2>
           <ul>
             {groupedPrs.deprecation.map((pr) => (
-              <li key={pr.id}>
+              <li key={`deprecation-${pr.id}`}>
                 <Pr pr={pr} />
               </li>
             ))}
@@ -108,7 +112,7 @@ export const PrepareReleaseNotes: FC<Props> = ({ prs }) => {
           <h2>
             Features (<EuiCode>release_note:feature</EuiCode>)
           </h2>
-          <GroupedPrList groupedPrs={featurePrs} groups={config.areas} />
+          <GroupedPrList groupedPrs={featurePrs} groups={config.areas} keyPrefix="features" />
         </>
       )}
       {Object.keys(enhancementPrs).length > 0 && (
@@ -116,7 +120,11 @@ export const PrepareReleaseNotes: FC<Props> = ({ prs }) => {
           <h2>
             Enhancements (<EuiCode>release_note:enhancements</EuiCode>)
           </h2>
-          <GroupedPrList groupedPrs={enhancementPrs} groups={config.areas} />
+          <GroupedPrList
+            groupedPrs={enhancementPrs}
+            groups={config.areas}
+            keyPrefix="enhancements"
+          />
         </>
       )}
       {Object.keys(fixesPr).length > 0 && (
@@ -124,7 +132,7 @@ export const PrepareReleaseNotes: FC<Props> = ({ prs }) => {
           <h2>
             Bug fixes (<EuiCode>release_note:fix</EuiCode>)
           </h2>
-          <GroupedPrList groupedPrs={fixesPr} groups={config.areas} />
+          <GroupedPrList groupedPrs={fixesPr} groups={config.areas} keyPrefix="fixes" />
         </>
       )}
     </EuiText>
