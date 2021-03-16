@@ -1,4 +1,5 @@
-import { normalizeTitle, findReleaseNote } from './extracting';
+import { PrItem } from '../github-service';
+import { normalizeTitle, findReleaseNote, extractReleaseNotes } from './extracting';
 
 describe('extraction tools', () => {
   describe('normalizeTitle', () => {
@@ -37,6 +38,20 @@ describe('extraction tools', () => {
 
     it('should strip of points at the end of the release note', () => {
       expect(normalizeTitle('Adds a new feature to Lens.')).toBe('Adds a new feature to Lens');
+    });
+
+    it('should handle visualization brackets correctly', () => {
+      expect(normalizeTitle('[TSVB] Add feature xyz', { bracketHandling: 'visualizations' })).toBe(
+        'Add feature xyz in *TSVB*'
+      );
+      // Does only handle known visualization tools
+      expect(normalizeTitle('[Tool] An unknown tool', { bracketHandling: 'visualizations' })).toBe(
+        'An unknown tool'
+      );
+      // It does not duplicate an already existing "in {tool}"
+      expect(
+        normalizeTitle('[TSVB] Add runtime fields to TSVB', { bracketHandling: 'visualizations' })
+      ).toBe('Add runtime fields to *TSVB*');
     });
   });
 
@@ -82,6 +97,25 @@ Next paragraph
       expect(findReleaseNote('Release Notes - This is the extracted sentence.')).toBe(
         'This is the extracted sentence.'
       );
+    });
+  });
+
+  describe('extractReleaseNotes', () => {
+    it('should work for complex visualizations example', () => {
+      const actual = extractReleaseNotes(
+        {
+          title: '[TSVB] Adds feature to TSVB (#123)',
+          body: `
+      Some paragraphs explaining the features.
+
+      Release Notes: Adds cool feature
+      `,
+        } as PrItem,
+        { bracketHandling: 'visualizations' }
+      );
+
+      expect(actual.type).toBe('releaseNoteTitle');
+      expect(actual.title).toBe('Adds cool feature in *TSVB*');
     });
   });
 });

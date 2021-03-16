@@ -9,13 +9,26 @@ function capitalize([first, ...rest]: string): string {
 
 const VISUALIZE_TOOLS = ['lens', 'tsvb', 'vislib', 'timelion', 'vega'];
 
-function visualizationBracketHandling(title: string): string {
-  const match = title.match(/\s*\[([^\]]+)\]\s*(.*)/i);
+const VISUALIZE_TITLE_REGEXP = new RegExp(`(in|to) (${VISUALIZE_TOOLS.join('|')})`, 'i');
+
+function createVisualizationTitle(title: string, tool: string): string {
+  if (VISUALIZE_TITLE_REGEXP.test(title)) {
+    return title.replace(VISUALIZE_TITLE_REGEXP, '$1 *$2*');
+  }
+  return `${title} in *${tool}*`;
+}
+
+function visualizationBracketHandling(title: string, originalTitle?: string): string {
+  const match = title.match(/^\s*\[([^\]]+)\]\s*(.*)/i);
+  const originalBrackets = originalTitle?.match(/^\s*\[([^\]]+)\]/i);
   if (!match) {
+    if (originalBrackets && VISUALIZE_TOOLS.includes(originalBrackets[1].toLowerCase())) {
+      return createVisualizationTitle(title, originalBrackets[1]);
+    }
     return title;
   }
   if (VISUALIZE_TOOLS.includes(match[1].toLowerCase())) {
-    return `${match[2]} in *${match[1]}*`;
+    return createVisualizationTitle(match[2], match[1]);
   }
   return match[2];
 }
@@ -27,7 +40,11 @@ function visualizationBracketHandling(title: string): string {
  * - Stripping of all versions in brackets
  * - All issue numbers mentioned in the title
  */
-export function normalizeTitle(title: string, options: NormalizeOptions = {}): string {
+export function normalizeTitle(
+  title: string,
+  options: NormalizeOptions = {},
+  originalTitle?: string
+): string {
   let normalized = title
     .replace(/\s*\[\d+\.\d+(\.\d+)?\]\s*/gi, ' ')
     .replace(/\s*\(?#\d{2,}\)?\s*/g, ' ');
@@ -35,7 +52,7 @@ export function normalizeTitle(title: string, options: NormalizeOptions = {}): s
   if (options.bracketHandling === 'strip' || !options.bracketHandling) {
     normalized = normalized.replace(/\s*\[[^\]]+\]\s*/gi, ' ');
   } else if (options.bracketHandling === 'visualizations') {
-    normalized = visualizationBracketHandling(normalized);
+    normalized = visualizationBracketHandling(normalized, originalTitle);
   }
 
   return capitalize(
@@ -60,7 +77,7 @@ export function normalizeTitle(title: string, options: NormalizeOptions = {}): s
  */
 export function findReleaseNote(markdown: string): string | undefined {
   const match = markdown.match(/(?:\n|^)\s*release[\s-]?notes?[\s\W]+(.*?)(?:(\r?\n|\r){2}|$)/is);
-  return match?.[1] ?? undefined;
+  return match?.[1].trim() ?? undefined;
 }
 
 export type ReleaseNoteDetails =
@@ -89,5 +106,9 @@ export function extractReleaseNotes(
     };
   }
 
-  return { type: 'releaseNoteTitle', title: normalizeTitle(releaseNote), originalTitle: pr.title };
+  return {
+    type: 'releaseNoteTitle',
+    title: normalizeTitle(releaseNote, options, pr.title),
+    originalTitle: pr.title,
+  };
 }
