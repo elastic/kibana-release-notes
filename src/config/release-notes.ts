@@ -112,6 +112,8 @@ export const config = {
         'Feature:Highlight',
         'Feature:KQL',
         'Feature:Rollups',
+        'Feature:Search',
+        'Project:AsyncSearch',
       ],
     },
     {
@@ -154,7 +156,14 @@ export const config = {
     },
     {
       title: 'Elastic Security',
-      labels: ['Team:SIEM', 'Team:SecuritySolution'],
+      labels: [
+        'Team:SIEM',
+        'Team:SecuritySolution',
+        'Team: SecuritySolution',
+        'Team:Threat Hunting',
+        'Team:Detections and Resp',
+        'Team:Asset Management',
+      ],
       options: {
         textOverwriteTemplate:
           'For the Elastic Security {{version}} release information, refer to {security-guide}/release-notes.html[_Elastic Security Solution Release Notes_].',

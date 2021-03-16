@@ -7,7 +7,7 @@ function capitalize([first, ...rest]: string): string {
   return `${first.toUpperCase()}${rest.join('')}`;
 }
 
-const VISUALIZE_TOOLS = ['lens', 'tsvb', 'vislib', 'timelion', 'vega'];
+const VISUALIZE_TOOLS = ['lens', 'tsvb', 'vislib', 'timelion', 'vega', 'visualize'];
 
 const VISUALIZE_TITLE_REGEXP = new RegExp(`(in|to) (${VISUALIZE_TOOLS.join('|')})`, 'i');
 
