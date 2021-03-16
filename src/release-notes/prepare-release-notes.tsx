@@ -87,7 +87,7 @@ export const PrepareReleaseNotes: FC<Props> = ({ prs }) => {
           <ul>
             {groupedPrs.breaking.map((pr) => (
               <li key={`breaking-${pr.id}`}>
-                <Pr pr={pr} />
+                <Pr pr={pr} showTransformedTitle={true} />
               </li>
             ))}
           </ul>
@@ -101,7 +101,7 @@ export const PrepareReleaseNotes: FC<Props> = ({ prs }) => {
           <ul>
             {groupedPrs.deprecation.map((pr) => (
               <li key={`deprecation-${pr.id}`}>
-                <Pr pr={pr} />
+                <Pr pr={pr} showTransformedTitle={true} />
               </li>
             ))}
           </ul>

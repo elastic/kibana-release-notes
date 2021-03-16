@@ -67,6 +67,9 @@ export function normalizeTitle(
       .replace(/\s{2,}/g, ' ')
       // Trim the title
       .trim()
+      // Put a trailing add/fix into 3rd person singular
+      .replace(/^add\s/i, 'Adds ')
+      .replace(/^fix\s/i, 'Fixes ')
   );
 }
 
