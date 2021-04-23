@@ -5,6 +5,7 @@ import {
   EuiFieldText,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiLoadingSpinner,
   EuiPageTemplate,
   EuiText,
 } from '@elastic/eui';
@@ -36,20 +37,29 @@ export const VersionSelection: FC<Props> = ({ onVersionSelected }) => {
         title={<h2>Select a version</h2>}
         body={
           <EuiFlexGroup direction="column" responsive={false} alignItems="center">
-            <EuiFlexItem grow={false}>
-              <EuiFlexGroup wrap={true} justifyContent="center">
-                {labels?.map((label) => (
-                  <EuiFlexItem grow={false} key={label}>
-                    <EuiButton fill size="s" onClick={() => onVersionSelected(label)}>
-                      {label}
-                    </EuiButton>
-                  </EuiFlexItem>
-                ))}
-              </EuiFlexGroup>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              <EuiText size="m">or enter a version</EuiText>
-            </EuiFlexItem>
+            {!labels && (
+              <EuiFlexItem>
+                <EuiLoadingSpinner size="l" />
+              </EuiFlexItem>
+            )}
+            {Boolean(labels?.length) && (
+              <>
+                <EuiFlexItem grow={false}>
+                  <EuiFlexGroup wrap={true} justifyContent="center">
+                    {labels?.map((label) => (
+                      <EuiFlexItem grow={false} key={label}>
+                        <EuiButton fill size="s" onClick={() => onVersionSelected(label)}>
+                          {label}
+                        </EuiButton>
+                      </EuiFlexItem>
+                    ))}
+                  </EuiFlexGroup>
+                </EuiFlexItem>
+                <EuiFlexItem grow={false}>
+                  <EuiText size="m">or enter a version</EuiText>
+                </EuiFlexItem>
+              </>
+            )}
             <EuiFlexItem grow={false}>
               <form onSubmit={onSubmitManualLabel}>
                 <EuiFlexGroup gutterSize="xs">

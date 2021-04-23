@@ -1,8 +1,8 @@
 import { Octokit } from '@octokit/rest';
 import { Endpoints } from '@octokit/types';
-// import { GITHUB_OWNER, GITHUB_REPO } from './constants';
+import { GITHUB_OWNER, GITHUB_REPO } from './constants';
 import { getOctokit } from './github';
-import semver from 'semver';
+import semver, { SemVer } from 'semver';
 import parseLinkHeader from 'parse-link-header';
 import { Observable, Subject } from 'rxjs';
 
@@ -31,18 +31,32 @@ class GitHubService {
   constructor(private octokit: Octokit) {}
 
   public async getUpcomingReleaseVersions(): Promise<string[]> {
-    // const response = await this.octokit.repos.listReleases({
-    //   owner: GITHUB_OWNER,
-    //   repo: GITHUB_REPO,
-    // });
+    const response = await this.octokit.repos.listReleases({
+      owner: GITHUB_OWNER,
+      repo: GITHUB_REPO,
+      per_page: 10,
+    });
 
-    // const tags = response.data
-    //   .map((release) => semver.clean(release.tag_name))
-    //   .filter((tag): tag is string => !!tag);
+    const tags = response.data
+      .map((release) => semver.parse(release.tag_name))
+      .filter((tag): tag is SemVer => !!tag);
 
-    // return tags;
+    if (!tags.length) {
+      return [];
+    }
 
-    return ['v7.11.2', 'v7.12.0', 'v7.12.1', 'v7.13.0'];
+    const latestVersion = tags.sort((v1, v2) => v2.compare(v1))[0];
+    const previousPatch = tags.find(
+      (version) =>
+        version.major === latestVersion.major && version.minor === latestVersion.minor - 1
+    );
+
+    return [
+      ...[previousPatch ? [previousPatch.inc('patch')] : []],
+      latestVersion.inc('patch').format(),
+      latestVersion.inc('minor').format(),
+      latestVersion.inc('major').format(),
+    ].map((v) => `v${v}`);
   }
 
   public getPrsForVersion(
@@ -53,7 +67,7 @@ class GitHubService {
     //       to somehow filter out previously released PRs (with older version labels) already in the query
     const labelExclusions = excludedLabels.map((label) => `-label:"${label}"`).join(' ');
     const options = this.octokit.search.issuesAndPullRequests.endpoint.merge({
-      q: `repo:elastic/kibana label:${version} is:pr is:merged ${labelExclusions}`,
+      q: `repo:${GITHUB_OWNER}/${GITHUB_REPO} label:${version} is:pr is:merged ${labelExclusions}`,
       per_page: 100,
     });
 
