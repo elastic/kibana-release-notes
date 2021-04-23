@@ -224,10 +224,14 @@ For information about the {kib} {{version}} release, review the following inform
 [[breaking-changes-{{version}}]]
 === Breaking changes
 
-Breaking changes can prevent your application from optiomal operation and performance.
+Breaking changes can prevent your application from optimal operation and performance.
 Before you upgrade to {{version}}, review the breaking changes, then mitigate the impact to your application.
 
+// tag::notable-breaking-changes[]
+
 {{{prs.breaking}}}
+
+// end::notable-breaking-changes[]
 
 {{/prs.breaking}}
 {{#prs.deprecations}}
@@ -250,14 +254,12 @@ you make the necessary updates after you upgrade to {{version}}.
 {{{prs.features}}}
 {{/prs.features}}
 
-For more information about the new features introduced in {{version}}, refer to !!TODO!!.
-
-For detailed information about the {{version}} release, refer to <<enhancements-and-bug-fixes-v{{version}},Enhancements and bug fixes>>.
+For more information about the features introduced in {{version}}, refer to <<whats-new,What's new in {{minorVersion}}>>.
 
 [[enhancements-and-bug-fixes-v{{version}}]]
 {{^isPatchRelease}}=== Enhancements and bug fixes{{/isPatchRelease}}{{#isPatchRelease}}=== {kib} {{version}}{{/isPatchRelease}}
 
-The {{version}} release includes the following {{#prs.enhancements}}enhancements and {{/prs.enhancements}}bug fixes.
+For detailed information about the {{version}} release, review the enhancements and bug fixes.
 
 {{#prs.breaking}}
 [float]
@@ -292,20 +294,6 @@ The {{version}} release includes the following {{#prs.enhancements}}enhancements
 
 The {{version}} release includes the following bug fixes.
 
-{{#prs.breaking}}
-[float]
-[[breaking-v{{version}}]]
-=== Breaking
-{{{prs.breaking}}}
-
-{{/prs.breaking}}
-{{#prs.deprecations}}
-[float]
-[[deprecation-v{{version}}]]
-=== Deprecations
-{{{prs.deprecations}}}
-
-{{/prs.deprecations}}
 {{#prs.enhancements}}
 [float]
 [[enhancement-v{{version}}]]

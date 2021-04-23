@@ -52,6 +52,7 @@ export const ReleaseNoteOutput: FC<Props> = ({ prs, version: ver }) => {
           : config.templates.pages.releaseNotes,
         {
           version,
+          minorVersion: version.replace(/\.\d+$/, ''),
           prs: renderedGroups,
           nextMajorVersion: `${semver.major(version) + 1}.0.0`,
           isPatchRelease: isPatchVersion,
