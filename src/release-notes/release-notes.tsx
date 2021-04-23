@@ -34,20 +34,20 @@ export const ReleaseNotes: FC<Props> = ({ version, onVersionChange }) => {
   const [prs, setPrs] = useState<PrItem[]>([]);
   const [step, setStep] = useState<'prepare' | 'generate'>('prepare');
 
-  const loadPrs = useCallback(() => {
+  const loadPrs = useCallback(async () => {
     setLoading(true);
     setProgress(undefined);
-    subscriptionRef.current = github
-      .getPrsForVersion(version, config.excludedLabels)
-      .subscribe((status) => {
-        if (status.type === 'complete') {
-          setLoading(false);
-          setProgress(100);
-          setPrs(status.items);
-        } else {
-          setProgress(status.percentage);
-        }
-      });
+    subscriptionRef.current = (
+      await github.getPrsForVersion(version, config.excludedLabels)
+    ).subscribe((status) => {
+      if (status.type === 'complete') {
+        setLoading(false);
+        setProgress(100);
+        setPrs(status.items);
+      } else {
+        setProgress(status.percentage);
+      }
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(config.excludedLabels), github, version]);
 

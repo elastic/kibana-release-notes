@@ -1,6 +1,6 @@
 import { Octokit } from '@octokit/rest';
 import { Endpoints } from '@octokit/types';
-import { GITHUB_OWNER, GITHUB_REPO } from './constants';
+import { GITHUB_OWNER, GITHUB_REPO, KIBANA_REPO_ID } from './constants';
 import { getOctokit } from './github';
 import semver, { SemVer } from 'semver';
 import parseLinkHeader from 'parse-link-header';
@@ -59,13 +59,31 @@ class GitHubService {
     ].map((v) => `v${v}`);
   }
 
-  public getPrsForVersion(
+  public async getPrsForVersion(
     version: string,
     excludedLabels: readonly string[] = []
-  ): Observable<Progress<PrItem>> {
-    // TODO: this won't work out for major versions, since they have too many PRs using their label, need
-    //       to somehow filter out previously released PRs (with older version labels) already in the query
-    const labelExclusions = excludedLabels.map((label) => `-label:"${label}"`).join(' ');
+  ): Promise<Observable<Progress<PrItem>>> {
+    const semVer = semver.parse(version);
+
+    let excludedVersions: string[] = [];
+
+    if (semVer && semVer.patch === 0 && semVer.minor === 0) {
+      // If we're loading a major version we need some special logic to exclude all PRs that
+      // already have been part of the previous major version. Therefore we're getting all previous
+      // major label and exclude them in the search.
+      const labelsQuery = this.octokit.search.labels.endpoint.merge({
+        q: `v${semVer.major - 1}`,
+        repository_id: KIBANA_REPO_ID,
+      });
+
+      excludedVersions = (await this.octokit.paginate<Label>(labelsQuery)).map(
+        (label) => label.name
+      );
+    }
+
+    const labelExclusions = [...excludedLabels, ...excludedVersions]
+      .map((label) => `-label:"${label}"`)
+      .join(' ');
     const options = this.octokit.search.issuesAndPullRequests.endpoint.merge({
       q: `repo:${GITHUB_OWNER}/${GITHUB_REPO} label:${version} is:pr is:merged ${labelExclusions}`,
       per_page: 100,
