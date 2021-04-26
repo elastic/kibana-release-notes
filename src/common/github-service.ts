@@ -85,7 +85,7 @@ class GitHubService {
       .map((label) => `-label:"${label}"`)
       .join(' ');
     const options = this.octokit.search.issuesAndPullRequests.endpoint.merge({
-      q: `repo:${GITHUB_OWNER}/${GITHUB_REPO} label:${version} is:pr is:merged ${labelExclusions}`,
+      q: `repo:${GITHUB_OWNER}/${GITHUB_REPO} label:${version} is:pr is:merged base:master ${labelExclusions}`,
       per_page: 100,
     });
 
