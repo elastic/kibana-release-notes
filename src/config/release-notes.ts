@@ -27,6 +27,8 @@ export const config = {
         'Feature:CCR',
         'Feature:ILM',
         'Feature:Transforms',
+        'Feature:Search',
+        'Project:AsyncSearch',
       ],
     },
     {
@@ -92,7 +94,7 @@ export const config = {
     },
     {
       title: 'Dashboard',
-      labels: ['Feature:Dashboard', 'Feature:Drilldowns'],
+      labels: ['Feature:Dashboard', 'Feature:Drilldowns', 'Project:TimeToVisualize'],
     },
     {
       title: 'Discover',
@@ -164,6 +166,9 @@ export const config = {
         'Team:Detections and Resp',
         'Team:Asset Management',
         'Team:Onboarding and Lifecycle Mgt',
+        'Feature:Timeline',
+        'Feature:Detection Rules',
+        'Feature:Detection Alerts',
       ],
       options: {
         textOverwriteTemplate:
