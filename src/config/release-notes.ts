@@ -163,6 +163,7 @@ export const config = {
         'Team:Threat Hunting',
         'Team:Detections and Resp',
         'Team:Asset Management',
+        'Team:Onboarding and Lifecycle Mgt',
       ],
       options: {
         textOverwriteTemplate:
