@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { BehaviorSubject } from 'rxjs';
-import { config as defaultConfig } from './release-notes';
+import { kibanaTemplate } from './templates/kibana';
+import { securityTemplate } from './templates/security';
 
 interface AreaDefinition {
   title: string;
@@ -12,12 +13,13 @@ interface AreaDefinition {
 }
 
 export interface Config {
+  template: string;
   excludedLabels: readonly string[];
   areas: readonly AreaDefinition[];
   templates: {
     pages: {
       releaseNotes: string;
-      patchReleaseNotes: string;
+      patchReleaseNotes?: string;
     };
     prs: {
       breaking?: string;
@@ -28,24 +30,35 @@ export interface Config {
   };
 }
 
+const TEMPLATE_KEY = 'releaseNotes.template';
 const CONFIG_KEY = 'releaseNotes.config';
 
 const configSubject$ = new BehaviorSubject<Config>(
   localStorage.getItem(CONFIG_KEY)
     ? JSON.parse(localStorage.getItem(CONFIG_KEY) ?? '')
-    : defaultConfig
+    : getTemplate(localStorage.getItem(TEMPLATE_KEY) ?? 'kibana')
 );
 
 configSubject$.subscribe((newConfig) => {
-  if (JSON.stringify(newConfig) === JSON.stringify(defaultConfig)) {
+  if (JSON.stringify(newConfig) === JSON.stringify(getTemplate(newConfig.template))) {
     localStorage.removeItem(CONFIG_KEY);
   } else {
     localStorage.setItem(CONFIG_KEY, JSON.stringify(newConfig));
   }
 });
 
-export function getDefaultConfig(): Config {
-  return defaultConfig;
+export function getTemplate(key?: string): Config {
+  switch (key) {
+    case 'security':
+      return securityTemplate;
+    case 'kibana':
+    default:
+      return kibanaTemplate;
+  }
+}
+
+export function hasConfigChanges(): boolean {
+  return localStorage.getItem(CONFIG_KEY) !== null;
 }
 
 export function getConfig(): Config {
@@ -68,11 +81,8 @@ export function setConfig(newConfig: Config): Config {
   return newConfig;
 }
 
-export function hasConfigOverwrite(): boolean {
-  return localStorage.getItem(CONFIG_KEY) !== null;
-}
-
-export function resetConfigOverwrite(): void {
+export function resetConfigOverwrite(template: 'kibana' | 'security'): void {
   localStorage.removeItem(CONFIG_KEY);
-  configSubject$.next(defaultConfig);
+  localStorage.setItem(TEMPLATE_KEY, template);
+  configSubject$.next(getTemplate(template));
 }

@@ -40,6 +40,12 @@ export const ReleaseNoteOutput: FC<Props> = ({ prs, version: ver }) => {
         config,
         version
       ),
+      enhancementsAndFixes: renderGroupedByArea(
+        groupByArea([...grouped.enhancements, ...grouped.fixes], config),
+        'enhancement',
+        config,
+        version
+      ),
       missingReleaseNoteLabel: grouped.missingLabel,
     };
   }, [config, prs, version]);
@@ -48,7 +54,7 @@ export const ReleaseNoteOutput: FC<Props> = ({ prs, version: ver }) => {
     () =>
       renderPageAsAsciidoc(
         isPatchVersion
-          ? config.templates.pages.patchReleaseNotes
+          ? config.templates.pages.patchReleaseNotes ?? config.templates.pages.releaseNotes
           : config.templates.pages.releaseNotes,
         {
           version,

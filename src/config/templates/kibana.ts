@@ -1,4 +1,8 @@
-export const config = {
+import type { Config } from '../config';
+import { securityLabels } from './security';
+
+export const kibanaTemplate: Config = {
+  template: 'kibana',
   excludedLabels: ['release_note:skip', 'Team:Docs', 'reverted', 'backport'],
   areas: [
     {
@@ -158,18 +162,7 @@ export const config = {
     },
     {
       title: 'Elastic Security',
-      labels: [
-        'Team:SIEM',
-        'Team:SecuritySolution',
-        'Team: SecuritySolution',
-        'Team:Threat Hunting',
-        'Team:Detections and Resp',
-        'Team:Asset Management',
-        'Team:Onboarding and Lifecycle Mgt',
-        'Feature:Timeline',
-        'Feature:Detection Rules',
-        'Feature:Detection Alerts',
-      ],
+      labels: securityLabels,
       options: {
         textOverwriteTemplate:
           'For the Elastic Security {{version}} release information, refer to {security-guide}/release-notes.html[_Elastic Security Solution Release Notes_].',

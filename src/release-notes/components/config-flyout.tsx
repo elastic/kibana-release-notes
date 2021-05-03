@@ -7,6 +7,8 @@ import {
   EuiTitle,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiContextMenu,
+  EuiPopover,
 } from '@elastic/eui';
 import { useState } from 'react';
 import type { FC } from 'react';
@@ -14,8 +16,8 @@ import MonacoEditor, { DiffEditor } from '@monaco-editor/react';
 import {
   Config,
   getConfig,
-  getDefaultConfig,
-  hasConfigOverwrite,
+  getTemplate,
+  hasConfigChanges,
   resetConfigOverwrite,
   setConfig,
 } from '../../config';
@@ -32,6 +34,7 @@ export const ConfigFlyout: FC<Props> = ({ onSaved, onClose }) => {
   );
   const [isValid, setValid] = useState(true);
   const [viewChanges, setViewChanged] = useState(false);
+  const [isTemplatePopoverOpen, setTemplatePopoverOpen] = useState(false);
 
   const onViewChanges = (): void => {
     setViewChanged(!viewChanges);
@@ -41,8 +44,9 @@ export const ConfigFlyout: FC<Props> = ({ onSaved, onClose }) => {
     onSaved(setConfig(JSON.parse(configString)));
   };
 
-  const onReset = (): void => {
-    resetConfigOverwrite();
+  const onLoadTemplate = (template: 'kibana' | 'security'): void => {
+    resetConfigOverwrite(template);
+    setTemplatePopoverOpen(false);
     setConfigString(JSON.stringify(getConfig(), null, 2));
   };
 
@@ -50,7 +54,7 @@ export const ConfigFlyout: FC<Props> = ({ onSaved, onClose }) => {
     <EuiFlyout onClose={onClose}>
       <EuiFlyoutHeader style={{ marginBottom: '8px' }}>
         <EuiTitle size="m">
-          <h2>Config</h2>
+          <h2>Config {hasConfigChanges() && <>(changed)</>}</h2>
         </EuiTitle>
       </EuiFlyoutHeader>
       {!viewChanges ? (
@@ -67,7 +71,7 @@ export const ConfigFlyout: FC<Props> = ({ onSaved, onClose }) => {
         />
       ) : (
         <DiffEditor
-          original={JSON.stringify(getDefaultConfig(), null, 2)}
+          original={JSON.stringify(getTemplate(JSON.parse(configString).template), null, 2)}
           modified={configString}
           language="json"
           options={{ readOnly: true, renderSideBySide: false }}
@@ -80,22 +84,54 @@ export const ConfigFlyout: FC<Props> = ({ onSaved, onClose }) => {
               Save
             </EuiButton>
           </EuiFlexItem>
-          {hasConfigOverwrite() && (
-            <EuiFlexItem grow={false}>
-              <EuiFlexGroup>
-                <EuiFlexItem grow={false}>
-                  <EuiButtonEmpty iconType="trash" onClick={onReset}>
-                    Reset to default config
-                  </EuiButtonEmpty>
-                </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiFlexGroup>
+              <EuiFlexItem grow={false}>
+                <EuiPopover
+                  button={
+                    <EuiButtonEmpty
+                      onClick={() => setTemplatePopoverOpen(!isTemplatePopoverOpen)}
+                      iconType="folderOpen"
+                    >
+                      Load template
+                    </EuiButtonEmpty>
+                  }
+                  panelPaddingSize="none"
+                  isOpen={isTemplatePopoverOpen}
+                  closePopover={() => setTemplatePopoverOpen(false)}
+                  anchorPosition="upLeft"
+                >
+                  <EuiContextMenu
+                    initialPanelId={0}
+                    panels={[
+                      {
+                        id: 0,
+                        items: [
+                          {
+                            name: 'Kibana',
+                            icon: 'logoKibana',
+                            onClick: () => onLoadTemplate('kibana'),
+                          },
+                          {
+                            name: 'Security',
+                            icon: 'logoSecurity',
+                            onClick: () => onLoadTemplate('security'),
+                          },
+                        ],
+                      },
+                    ]}
+                  />
+                </EuiPopover>
+              </EuiFlexItem>
+              {hasConfigChanges() && (
                 <EuiFlexItem grow={false}>
                   <EuiButtonEmpty iconType={viewChanges ? 'pencil' : 'eye'} onClick={onViewChanges}>
                     {viewChanges ? 'Edit config' : 'View changes'}
                   </EuiButtonEmpty>
                 </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiFlexItem>
-          )}
+              )}
+            </EuiFlexGroup>
+          </EuiFlexItem>
         </EuiFlexGroup>
       </EuiFlyoutFooter>
     </EuiFlyout>
