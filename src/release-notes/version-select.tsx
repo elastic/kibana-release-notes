@@ -11,6 +11,7 @@ import {
 } from '@elastic/eui';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { getGitHubService } from '../common';
+import { ConfigFlyout } from './components';
 
 interface Props {
   onVersionSelected: (version: string) => void;
@@ -21,6 +22,7 @@ export const VersionSelection: FC<Props> = ({ onVersionSelected }) => {
 
   const [labels, setLabels] = useState<string[]>();
   const [manualLabel, setManualLabel] = useState<string>('');
+  const [showConfigFlyout, setShowConfigFlyout] = useState(false);
 
   useEffect(() => {
     github.getUpcomingReleaseVersions().then((labels) => setLabels(labels));
@@ -33,6 +35,12 @@ export const VersionSelection: FC<Props> = ({ onVersionSelected }) => {
 
   return (
     <EuiPageTemplate template="centeredBody">
+      {showConfigFlyout && (
+        <ConfigFlyout
+          onClose={() => setShowConfigFlyout(false)}
+          onSaved={() => setShowConfigFlyout(false)}
+        />
+      )}
       <EuiEmptyPrompt
         title={<h2>Select a version</h2>}
         body={
@@ -83,6 +91,13 @@ export const VersionSelection: FC<Props> = ({ onVersionSelected }) => {
           </EuiFlexGroup>
         }
       />
+      <EuiFlexGroup justifyContent="flexEnd">
+        <EuiFlexItem grow={false}>
+          <EuiButtonEmpty size="s" onClick={() => setShowConfigFlyout(true)} iconType="gear">
+            Configuration
+          </EuiButtonEmpty>
+        </EuiFlexItem>
+      </EuiFlexGroup>
     </EuiPageTemplate>
   );
 };
