@@ -27,6 +27,7 @@ export const kibanaTemplate: Config = {
         'Feature:Index Management',
         'Feature:Snapshot and Restore',
         'Team:Elasticsearch UI',
+        'Team:Stack Management',
         'Feature:FieldFormatters',
         'Feature:CCR',
         'Feature:ILM',
