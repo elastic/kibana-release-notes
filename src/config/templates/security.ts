@@ -18,6 +18,7 @@ export const securityLabels = [
 export const securityTemplate: Config = {
   template: 'security',
   excludedLabels: [
+    'backport',
     'release_note:skip',
     'Team:KibanaApp',
     'Team:AppServices',
