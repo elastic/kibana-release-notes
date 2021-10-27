@@ -38,6 +38,7 @@ class GitHubService {
     });
 
     const tags = response.data
+      .filter((release) => !release.prerelease)
       .map((release) => semver.parse(release.tag_name))
       .filter((tag): tag is SemVer => !!tag);
 
