@@ -21,6 +21,7 @@ export const kibanaTemplate: Config = {
         'Feature:Search Profiler',
         'Feature:watcher',
         'Feature:Index Patterns',
+        'Feature:Data Views',
         'Feature:Kibana Management',
         'Feature:Dev Tools',
         'Feature:Inspector',
