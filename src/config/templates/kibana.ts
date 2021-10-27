@@ -34,6 +34,7 @@ export const kibanaTemplate: Config = {
         'Feature:Transforms',
         'Feature:Search',
         'Project:AsyncSearch',
+        'Feature:Upgrade Assistant',
       ],
     },
     {

@@ -11,6 +11,7 @@ export const securityLabels = [
   'Team:Detections and Resp',
   'Team:Asset Management',
   'Team:Onboarding and Lifecycle Mgt',
+  'Team:Security Solution Platform',
   'Feature:Timeline',
   'Feature:Detection Rules',
   'Feature:Detection Alerts',
