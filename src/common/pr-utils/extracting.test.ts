@@ -90,6 +90,21 @@ Next paragraph
       ).toBe('This release note details is spanning\nmultiple lines, but all should be extracted.');
     });
 
+    it('should extract from using a release note header', () => {
+      expect(
+        findReleaseNote(`
+          ## Summary
+          This is the short summary of the PR.
+          
+          ## Release Note
+          Extract this please
+          
+          ### Checklist
+          A regular PR checklist
+      `)
+      ).toBe('Extract this please');
+    });
+
     it('should extract different variations of the label release notes', () => {
       expect(findReleaseNote('Release Notes: This is the extracted sentence.')).toBe(
         'This is the extracted sentence.'

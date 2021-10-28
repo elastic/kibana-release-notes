@@ -79,7 +79,9 @@ export function normalizeTitle(
  * - paragraphs beginning with release note (or slight variations of that) and the sentence till the end of line.
  */
 export function findReleaseNote(markdown: string): string | undefined {
-  const match = markdown.match(/(?:\n|^)\s*release[\s-]?notes?[\s\W]+(.*?)(?:(\r?\n|\r){2}|$)/is);
+  const match = markdown.match(
+    /(?:\n|^)\s*#*\s*release[\s-]?notes?[\s\W]+(.*?)(?:(\r?\n|\r){2}|$|((\r?\n|\r)\s*#+))/is
+  );
   return match?.[1].trim() ?? undefined;
 }
 
