@@ -197,6 +197,7 @@ export const kibanaTemplate: Config = {
     {
       title: 'APM',
       labels: ['Team:apm'],
+      priority: 100,
     },
     {
       title: 'Alerting',
