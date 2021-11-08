@@ -4,10 +4,14 @@ export const securityLabels = [
   'Team:SIEM',
   'Team:SecuritySolution',
   'Team: SecuritySolution',
+  'Team:Endpoint Response',
   'Team:Threat Hunting',
+  'Team:Threat HuntingCases',
+  'Team:Threat Hunting:Investigations',
   'Team:Detections and Resp',
   'Team:Asset Management',
   'Team:Onboarding and Lifecycle Mgt',
+  'Team:Security Solution Platform',
   'Feature:Timeline',
   'Feature:Detection Rules',
   'Feature:Detection Alerts',
@@ -18,6 +22,7 @@ export const securityLabels = [
 export const securityTemplate: Config = {
   template: 'security',
   excludedLabels: [
+    'backport',
     'release_note:skip',
     'Team:KibanaApp',
     'Team:AppServices',

@@ -38,6 +38,7 @@ class GitHubService {
     });
 
     const tags = response.data
+      .filter((release) => !release.prerelease)
       .map((release) => semver.parse(release.tag_name))
       .filter((tag): tag is SemVer => !!tag);
 
@@ -65,6 +66,10 @@ class GitHubService {
   ): Promise<Observable<Progress<PrItem>>> {
     const semVer = semver.parse(version);
 
+    if (!semVer) {
+      throw new Error('Invalid version entered');
+    }
+
     let excludedVersions: string[] = [];
 
     if (semVer && semVer.patch === 0 && semVer.minor === 0) {
@@ -85,7 +90,7 @@ class GitHubService {
       .map((label) => `-label:"${label}"`)
       .join(' ');
     const options = this.octokit.search.issuesAndPullRequests.endpoint.merge({
-      q: `repo:${GITHUB_OWNER}/${GITHUB_REPO} label:${version} is:pr is:merged base:master ${labelExclusions}`,
+      q: `repo:${GITHUB_OWNER}/${GITHUB_REPO} label:${version} is:pr is:merged base:master base:${semVer.major}.x base:${semVer.major}.${semVer.minor} ${labelExclusions}`,
       per_page: 100,
     });
 

@@ -21,6 +21,7 @@ export const kibanaTemplate: Config = {
         'Feature:Search Profiler',
         'Feature:watcher',
         'Feature:Index Patterns',
+        'Feature:Data Views',
         'Feature:Kibana Management',
         'Feature:Dev Tools',
         'Feature:Inspector',
@@ -34,6 +35,7 @@ export const kibanaTemplate: Config = {
         'Feature:Transforms',
         'Feature:Search',
         'Project:AsyncSearch',
+        'Feature:Upgrade Assistant',
       ],
     },
     {
@@ -174,6 +176,10 @@ export const kibanaTemplate: Config = {
       labels: ['Team:Code'],
     },
     {
+      title: 'Observability Home',
+      labels: ['Feature:Observability Home'],
+    },
+    {
       title: 'Infrastructure',
       labels: ['Feature:Infra UI', 'Feature:Service Maps'],
     },
@@ -192,6 +198,7 @@ export const kibanaTemplate: Config = {
     {
       title: 'APM',
       labels: ['Team:apm'],
+      priority: 100,
     },
     {
       title: 'Alerting',

@@ -21,14 +21,16 @@ export function groupByArea(prs: PrItem[], { areas }: Config): GroupedByArea {
   // TODO: How to handle/track PRs in multiple areas.
   const grouped = prs.reduce<{ unknown: PrItem[]; areas: { [title: string]: PrItem[] } }>(
     (grouped, pr) => {
-      const area = areas.find(
+      const matchingAreas = areas.filter(
         ({ labels }) => labels && pr.labels.some(({ name }) => labels.includes(name))
       );
-      if (area) {
+
+      if (matchingAreas.length === 0) {
+        grouped.unknown.push(pr);
+      } else {
+        const [area] = matchingAreas.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0));
         grouped.areas[area.title] = grouped.areas[area.title] ?? [];
         grouped.areas[area.title].push(pr);
-      } else {
-        grouped.unknown.push(pr);
       }
       return grouped;
     },
