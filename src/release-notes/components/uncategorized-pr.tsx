@@ -41,7 +41,7 @@ const LabelBadge: FC<{ label: Label }> = memo(({ label }) => {
       const newConfig = cloneDeep(config);
       const option = selectedOptions.find((option) => option.checked === 'on');
       const area = newConfig.areas.find((area) => area.title === option?.label);
-      if (area) {
+      if (area && label.name) {
         area.labels = [...(area.labels || []), label.name];
         setPopoverVisible(false);
         setConfig(newConfig);
@@ -88,7 +88,7 @@ export const UncategorizedPr: FC<UncategorizedPrProps> = memo(({ pr }) => {
   const filteredLables = useMemo(
     () =>
       pr.labels.filter(
-        ({ name }) => !name.startsWith('release_note:') && !name.match(/^v\d+\.\d+\.\d+$/)
+        ({ name }) => name && !name.startsWith('release_note:') && !name.match(/^v\d+\.\d+\.\d+$/)
       ),
     [pr.labels]
   );

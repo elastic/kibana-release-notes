@@ -23,7 +23,7 @@ export const Pr: FC<PrProps> = memo(
         </EuiLink>{' '}
         {showAuthor && (
           <>
-            by <em>{pr.user.login}</em>
+            by <em>{pr.user?.login}</em>
           </>
         )}
         ){' '}

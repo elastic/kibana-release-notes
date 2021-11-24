@@ -94,7 +94,7 @@ export function extractReleaseNotes(
   pr: PrItem,
   options: NormalizeOptions = { bracketHandling: 'strip' }
 ): ReleaseNoteDetails {
-  const releaseNote = findReleaseNote(pr.body);
+  const releaseNote = findReleaseNote(pr.body ?? '');
 
   // If the PR did not have any release note in its description just return the normalized title.
   if (!releaseNote) {

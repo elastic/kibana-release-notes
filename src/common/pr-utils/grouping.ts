@@ -22,7 +22,7 @@ export function groupByArea(prs: PrItem[], { areas }: Config): GroupedByArea {
   const grouped = prs.reduce<{ unknown: PrItem[]; areas: { [title: string]: PrItem[] } }>(
     (grouped, pr) => {
       const matchingAreas = areas.filter(
-        ({ labels }) => labels && pr.labels.some(({ name }) => labels.includes(name))
+        ({ labels }) => labels && pr.labels.some(({ name }) => name && labels.includes(name))
       );
 
       if (matchingAreas.length === 0) {
@@ -52,7 +52,7 @@ export function groupPrs(prs: PrItem[], options: GroupPrOptions = {}): ReleaseNo
     (groups, pr) => {
       // If the pr has no release_note label at all (should usually not happen)
       // it will be added to the missingLabel group, so we can warn about that in the UI.
-      if (!pr.labels.some((label) => label.name.startsWith('release_note:'))) {
+      if (!pr.labels.some((label) => label.name?.startsWith('release_note:'))) {
         groups.missingLabel.push(pr);
         return groups;
       }
@@ -81,7 +81,8 @@ export function groupPrs(prs: PrItem[], options: GroupPrOptions = {}): ReleaseNo
               options.includeFeaturesInEnhancements &&
               // Check if there's any release_note: label other than release_note:feature
               !pr.labels.some(
-                ({ name }) => name.startsWith('release_note:') && name !== 'release_note:feature'
+                ({ name }) =>
+                  name && name.startsWith('release_note:') && name !== 'release_note:feature'
               )
             ) {
               groups.enhancements.push(pr);

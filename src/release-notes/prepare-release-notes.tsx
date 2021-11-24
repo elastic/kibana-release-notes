@@ -13,20 +13,20 @@ export const PrepareReleaseNotes: FC<Props> = ({ prs }) => {
   const config = useConfig();
   const groupedPrs = useMemo(() => groupPrs(prs), [prs]);
 
-  const [featurePrs, unknownFeature] = useMemo(() => groupByArea(groupedPrs.features, config), [
-    config,
-    groupedPrs.features,
-  ]);
+  const [featurePrs, unknownFeature] = useMemo(
+    () => groupByArea(groupedPrs.features, config),
+    [config, groupedPrs.features]
+  );
 
   const [enhancementPrs, unknownEnhancements] = useMemo(
     () => groupByArea(groupedPrs.enhancements, config),
     [config, groupedPrs.enhancements]
   );
 
-  const [fixesPr, unknownFixes] = useMemo(() => groupByArea(groupedPrs.fixes, config), [
-    config,
-    groupedPrs.fixes,
-  ]);
+  const [fixesPr, unknownFixes] = useMemo(
+    () => groupByArea(groupedPrs.fixes, config),
+    [config, groupedPrs.fixes]
+  );
 
   const unknownPrs = [...unknownFeature, ...unknownEnhancements, ...unknownFixes].filter(
     // Deduplicate list, since a PR could have had multiple release_note labels

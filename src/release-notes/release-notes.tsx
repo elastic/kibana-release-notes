@@ -10,8 +10,8 @@ import {
   EuiFlexItem,
   EuiButtonEmpty,
 } from '@elastic/eui';
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { getGitHubService, PrItem } from '../common';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { PrItem, useGitHubService } from '../common';
 import { useConfig } from '../config/config';
 import { GenerateSidebar, PrepareSidebar } from './sidebars';
 import { Subscription } from 'rxjs';
@@ -26,7 +26,7 @@ interface Props {
 
 export const ReleaseNotes: FC<Props> = ({ version, onVersionChange }) => {
   const subscriptionRef = useRef<Subscription>();
-  const github = useMemo(() => getGitHubService(), []);
+  const [github, errorHandler] = useGitHubService();
   const config = useConfig();
   const [showConfigFlyout, setShowConfigFlyout] = useState(false);
   const [isLoading, setLoading] = useState(true);
@@ -37,17 +37,23 @@ export const ReleaseNotes: FC<Props> = ({ version, onVersionChange }) => {
   const loadPrs = useCallback(async () => {
     setLoading(true);
     setProgress(undefined);
-    subscriptionRef.current = (
-      await github.getPrsForVersion(version, config.excludedLabels)
-    ).subscribe((status) => {
-      if (status.type === 'complete') {
-        setLoading(false);
-        setProgress(100);
-        setPrs(status.items);
-      } else {
-        setProgress(status.percentage);
-      }
-    });
+    try {
+      subscriptionRef.current = (
+        await github.getPrsForVersion(version, config.excludedLabels)
+      ).subscribe((status) => {
+        if (status.type === 'complete') {
+          setLoading(false);
+          setProgress(100);
+          setPrs(status.items);
+        } else {
+          setProgress(status.percentage);
+        }
+      });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e: any) {
+      console.log('run into error?');
+      errorHandler(e);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(config.excludedLabels), github, version]);
 

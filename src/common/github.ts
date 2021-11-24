@@ -6,8 +6,6 @@ export interface TokenValidated {
   scopes: string[];
 }
 
-let octokit: Octokit;
-
 export async function validateToken(token: string): Promise<TokenValidated> {
   const octokit = new Octokit({ auth: token });
   const response = await octokit.users.getAuthenticated();
@@ -19,9 +17,5 @@ export async function validateToken(token: string): Promise<TokenValidated> {
 }
 
 export function getOctokit(): Octokit {
-  if (!octokit) {
-    octokit = new Octokit({ auth: localStorage.getItem(GITHUB_TOKEN) });
-    // TODO: Retrying plugin
-  }
-  return octokit;
+  return new Octokit({ auth: localStorage.getItem(GITHUB_TOKEN) });
 }

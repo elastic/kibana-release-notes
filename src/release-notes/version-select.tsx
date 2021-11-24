@@ -9,8 +9,8 @@ import {
   EuiPageTemplate,
   EuiText,
 } from '@elastic/eui';
-import { FC, useEffect, useMemo, useState } from 'react';
-import { getGitHubService } from '../common';
+import { FC, useEffect, useState } from 'react';
+import { useGitHubService } from '../common';
 import { ConfigFlyout } from './components';
 
 interface Props {
@@ -18,15 +18,18 @@ interface Props {
 }
 
 export const VersionSelection: FC<Props> = ({ onVersionSelected }) => {
-  const github = useMemo(() => getGitHubService(), []);
+  const [github, errorHandler] = useGitHubService();
 
   const [labels, setLabels] = useState<string[]>();
   const [manualLabel, setManualLabel] = useState<string>('');
   const [showConfigFlyout, setShowConfigFlyout] = useState(false);
 
   useEffect(() => {
-    github.getUpcomingReleaseVersions().then((labels) => setLabels(labels));
-  }, [github]);
+    github.getUpcomingReleaseVersions().then(
+      (labels) => setLabels(labels),
+      (e) => errorHandler(e)
+    );
+  }, [errorHandler, github]);
 
   const onSubmitManualLabel = (ev: React.FormEvent): void => {
     ev.preventDefault();
@@ -42,6 +45,7 @@ export const VersionSelection: FC<Props> = ({ onVersionSelected }) => {
         />
       )}
       <EuiEmptyPrompt
+        hasBorder={false}
         title={<h2>Select a version</h2>}
         body={
           <EuiFlexGroup direction="column" responsive={false} alignItems="center">

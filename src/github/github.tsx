@@ -1,4 +1,5 @@
 import {
+  EuiCallOut,
   EuiCode,
   EuiFieldPassword,
   EuiLink,
@@ -6,12 +7,14 @@ import {
   EuiSteps,
   EuiText,
   EuiTextColor,
+  EuiSpacer,
 } from '@elastic/eui';
 import { FC, useCallback, useEffect, useState } from 'react';
 import type { EuiStepsProps } from '@elastic/eui';
-import { GITHUB_TOKEN, TokenValidated, validateToken } from '../common';
+import { clearGitHubService, GITHUB_TOKEN, TokenValidated, validateToken } from '../common';
 import { Machine, assign, DoneInvokeEvent, State } from 'xstate';
 import { useMachine } from '@xstate/react';
+import { useLocation } from 'react-router-dom';
 
 interface Context {
   name?: string;
@@ -112,6 +115,7 @@ const stateMachine = Machine<Context, StateSchema, Events>(
     actions: {
       storeToken: (context) => {
         localStorage.setItem(GITHUB_TOKEN, context.token);
+        clearGitHubService();
       },
       clearToken: () => {
         localStorage.removeItem(GITHUB_TOKEN);
@@ -151,6 +155,7 @@ function mapStateToTitle(state: State<Context, Events>): string {
 export const GitHubSettings: FC = () => {
   const [token, setToken] = useState(localStorage.getItem(GITHUB_TOKEN) ?? '');
   const [current, send] = useMachine(stateMachine);
+  const location = useLocation();
 
   const onChangeToken = useCallback(
     (ev: React.ChangeEvent<HTMLInputElement>) => {
@@ -177,12 +182,12 @@ export const GitHubSettings: FC = () => {
             <EuiLink href="https://github.com/settings/tokens" target="_blank">
               GitHub
             </EuiLink>{' '}
-            and <em>Generate new token</em>. The token must have only the{' '}
+            and click <em>Generate new token</em>. The token must have <strong>only</strong> the{' '}
             <EuiCode>public_repo</EuiCode> permission.
           </p>
           <p>
-            Enable SSO for this token after creating it by clicking <em>Enable SSO</em> in the token
-            list for the generated token and then <em>Authorize</em>.
+            Enable SSO for this token after creating it by clicking <em>Configure SSO</em> in the
+            token list behind the generated token and then <em>Authorize</em>.
           </p>
         </EuiText>
       ),
@@ -218,6 +223,29 @@ export const GitHubSettings: FC = () => {
 
   return (
     <EuiPageTemplate pageHeader={{ pageTitle: 'GitHub Settings' }}>
+      {location.state && (
+        <>
+          <EuiCallOut color="danger">
+            {location.state.statusCode === 403 && (
+              <>
+                Your token is not authorized to access the Elastic organization. Please make sure
+                you follow the steps outlined under (1) below to authorize it for Single sign on.
+              </>
+            )}
+            {location.state.statusCode !== 403 && (
+              <>
+                Your token got rejected from GitHub. Most often this means it expired, in which case
+                you should regenerate it on{' '}
+                <a href="https://github.com/settings/tokens" target="_blank" rel="noreferrer">
+                  GitHub
+                </a>
+                .
+              </>
+            )}
+          </EuiCallOut>
+          <EuiSpacer />
+        </>
+      )}
       <EuiSteps steps={steps} />
     </EuiPageTemplate>
   );

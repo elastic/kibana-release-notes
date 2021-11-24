@@ -1,10 +1,12 @@
+import { useMemo } from 'react';
 import { Octokit } from '@octokit/rest';
-import { Endpoints } from '@octokit/types';
+import { Endpoints, RequestError } from '@octokit/types';
 import { GITHUB_OWNER, GITHUB_REPO, KIBANA_REPO_ID } from './constants';
 import { getOctokit } from './github';
 import semver, { SemVer } from 'semver';
 import parseLinkHeader from 'parse-link-header';
 import { Observable, Subject } from 'rxjs';
+import { useNavigate } from 'react-router-dom';
 
 type Progress<T> =
   | { type: 'progress'; items: T[]; percentage: number }
@@ -18,8 +20,8 @@ const SEMVER_REGEX = /^v(\d+)\.(\d+)\.(\d+)$/;
 function filterPrsForVersion(prs: PrItem[], version: string): PrItem[] {
   return prs.filter((pr) => {
     const prVersions = pr.labels
-      .filter((label) => label.name.match(SEMVER_REGEX))
-      .map((label) => semver.clean(label.name) ?? '');
+      .filter((label) => label.name?.match(SEMVER_REGEX))
+      .map((label) => semver.clean(label.name ?? '') ?? '');
     // Check if there is any version label below the one we are looking for
     // which would mean this PR has already been released (and blogged about)
     // in an earlier dev documentation blog post.
@@ -82,7 +84,7 @@ class GitHubService {
       });
 
       excludedVersions = (await this.octokit.paginate<Label>(labelsQuery)).map(
-        (label) => label.name
+        (label) => label.name ?? ''
       );
     }
 
@@ -120,11 +122,35 @@ class GitHubService {
   }
 }
 
-let service: GitHubService;
+let service: GitHubService | undefined;
 
-export function getGitHubService(): GitHubService {
-  if (!service) {
-    service = new GitHubService(getOctokit());
-  }
-  return service;
+type GitHubErrorHandler = (error: Error) => void;
+
+export function clearGitHubService(): void {
+  service = undefined;
+}
+
+export function useGitHubService(): [GitHubService, GitHubErrorHandler] {
+  const navigate = useNavigate();
+  return useMemo(() => {
+    if (!service) {
+      service = new GitHubService(getOctokit());
+    }
+
+    const errorHandler = (error: Error | RequestError): void => {
+      if (
+        'status' in error &&
+        (error.status === 401 || error.status === 403 || error.status === 422)
+      ) {
+        navigate('/github', { state: { statusCode: error.status } });
+        return;
+      }
+      throw error;
+    };
+    return [service, errorHandler];
+    // We're depending here on an "outside scope" variable service which will be reset
+    // via clearGitHubService. This is fine, since we're never calling clearGitHubService
+    // while there's still a page open using this hook, that would need to be rerendered.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigate, service]);
 }
