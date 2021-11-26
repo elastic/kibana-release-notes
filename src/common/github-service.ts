@@ -72,7 +72,8 @@ class GitHubService {
 
   public async getPrsForVersion(
     version: string,
-    excludedLabels: readonly string[] = []
+    excludedLabels: readonly string[] = [],
+    includedLabels?: readonly string[]
   ): Promise<Observable<Progress<PrItem>>> {
     const semVer = semver.parse(version);
 
@@ -99,8 +100,15 @@ class GitHubService {
     const labelExclusions = [...excludedLabels, ...excludedVersions]
       .map((label) => `-label:"${label}"`)
       .join(' ');
+    const labelInclusion =
+      includedLabels && includedLabels.length > 0
+        ? `label:${includedLabels.map((l) => `"${l}"`).join(',')}`
+        : '';
     const options = this.octokit.search.issuesAndPullRequests.endpoint.merge({
-      q: `repo:${GITHUB_OWNER}/${GITHUB_REPO} label:${version} is:pr is:merged base:master base:${semVer.major}.x base:${semVer.major}.${semVer.minor} ${labelExclusions}`,
+      q:
+        `repo:${GITHUB_OWNER}/${GITHUB_REPO} label:${version} is:pr is:merged ` +
+        `base:master base:${semVer.major}.x base:${semVer.major}.${semVer.minor} ` +
+        `${labelExclusions} ${labelInclusion}`,
       per_page: 100,
     });
 

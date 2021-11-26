@@ -13,7 +13,14 @@ interface AreaDefinition {
 }
 
 export interface Config {
+  /**
+   * A list of exclude labels. PRs having any of this label won't be rendered into the release note.
+   */
   excludedLabels: readonly string[];
+  /**
+   * If specified only PRs with that label will be loaded to generate the release notes.
+   */
+  includedLabels?: readonly string[];
   areas: readonly AreaDefinition[];
   templates: {
     pages: {

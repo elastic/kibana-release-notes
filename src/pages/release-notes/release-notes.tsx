@@ -39,7 +39,7 @@ export const ReleaseNotes: FC<Props> = ({ version, onVersionChange }) => {
     setProgress(undefined);
     try {
       subscriptionRef.current = (
-        await github.getPrsForVersion(version, config.excludedLabels)
+        await github.getPrsForVersion(version, config.excludedLabels, config.includedLabels)
       ).subscribe((status) => {
         if (status.type === 'complete') {
           setLoading(false);

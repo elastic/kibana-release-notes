@@ -1,10 +1,7 @@
 import {
-  EuiBadge,
   EuiButton,
   EuiButtonEmpty,
-  EuiButtonIcon,
   EuiCheckableCard,
-  EuiEmptyPrompt,
   EuiFieldText,
   EuiFlexGroup,
   EuiFlexItem,
@@ -16,9 +13,8 @@ import {
   EuiSteps,
   EuiStepsProps,
   EuiText,
-  EuiTitle,
 } from '@elastic/eui';
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { useGitHubService } from '../../common';
 import { getTemplateInfos, setActiveTemplate, TemplateId } from '../../config';
 import { ConfigFlyout } from './components';
@@ -65,7 +61,9 @@ export const ReleaseNotesWizard: FC<Props> = ({ onVersionSelected }) => {
                     <EuiFlexItem grow={false}>
                       <EuiIcon type={template.icon} />
                     </EuiFlexItem>
-                    <EuiFlexItem grow={true}>{template.name}</EuiFlexItem>
+                    <EuiFlexItem grow={true}>
+                      <EuiText size="m">{template.name}</EuiText>
+                    </EuiFlexItem>
                     <EuiFlexItem grow={false}>
                       <EuiButtonEmpty
                         iconType="gear"

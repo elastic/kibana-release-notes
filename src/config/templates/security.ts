@@ -20,26 +20,8 @@ export const securityLabels = [
 ];
 
 export const securityTemplate: Config = {
-  excludedLabels: [
-    'backport',
-    'release_note:skip',
-    'Team:KibanaApp',
-    'Team:AppServices',
-    'Team:Fleet',
-    'Team:apm',
-    'Team:logs-metrics-ui',
-    'Team:Geo',
-    'Team:uptime',
-    'Team:Elasticsearch UI',
-    'Team:Presentation',
-    ':ml',
-    'Team:Docs',
-    'Team:Alerting Services',
-    'Team:Core',
-    'Team:Security',
-    'Team:Operations',
-    'Team:Monitoring',
-  ],
+  includedLabels: securityLabels,
+  excludedLabels: ['backport', 'release_note:skip'],
   areas: [
     {
       title: 'Elastic Security',
