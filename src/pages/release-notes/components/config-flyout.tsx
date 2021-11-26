@@ -20,7 +20,7 @@ import {
   hasConfigChanges,
   resetConfigOverwrite,
   setConfig,
-} from '../../config';
+} from '../../../config';
 import { MarkerSeverity } from 'monaco-editor';
 
 interface Props {

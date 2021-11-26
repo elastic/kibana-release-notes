@@ -1,13 +1,13 @@
 import { EuiFlexGroup, EuiFlexItem, EuiCallOut, EuiCode } from '@elastic/eui';
 import { FC, useMemo } from 'react';
-import { groupByArea, groupPrs, PrItem } from '../common';
+import { groupByArea, groupPrs, PrItem } from '../../common';
 import semver from 'semver';
 import {
   renderGroupedByArea,
   renderPageAsAsciidoc,
   renderPrAsAsciidoc,
-} from '../common/output-utils';
-import { useConfig } from '../config';
+} from '../../common/output-utils';
+import { useConfig } from '../../config';
 import MonacoEditor from '@monaco-editor/react';
 
 interface Props {

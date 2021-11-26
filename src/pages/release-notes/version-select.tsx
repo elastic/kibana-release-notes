@@ -10,7 +10,7 @@ import {
   EuiText,
 } from '@elastic/eui';
 import { FC, useEffect, useState } from 'react';
-import { useGitHubService } from '../common';
+import { useGitHubService } from '../../common';
 import { ConfigFlyout } from './components';
 
 interface Props {

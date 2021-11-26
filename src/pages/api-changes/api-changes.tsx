@@ -22,7 +22,7 @@ import {
   cleanupIssueTitle,
   cleanupMarkdown,
 } from './utils';
-import { useGitHubService } from '../common';
+import { useGitHubService } from '../../common';
 import { AsiidocRenderer } from './asciidoc';
 
 const DEV_DOC_LABEL = 'release_note:plugin_api_changes';

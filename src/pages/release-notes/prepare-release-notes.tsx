@@ -1,8 +1,8 @@
 import { EuiText, EuiCode, EuiCallOut, EuiSpacer } from '@elastic/eui';
 import React, { FC, useMemo } from 'react';
-import { groupPrs, Pr, PrItem } from '../common';
-import { groupByArea } from '../common/pr-utils';
-import { useConfig } from '../config';
+import { groupPrs, Pr, PrItem } from '../../common';
+import { groupByArea } from '../../common/pr-utils';
+import { useConfig } from '../../config';
 import { GroupedPrList, UncategorizedPr } from './components';
 
 interface Props {

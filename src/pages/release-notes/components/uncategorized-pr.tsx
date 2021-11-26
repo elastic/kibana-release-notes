@@ -12,8 +12,8 @@ import {
   EuiIcon,
   EuiSelectableOption,
 } from '@elastic/eui';
-import { PrItem, Pr, Label } from '../../common';
-import { setConfig, useConfig } from '../../config';
+import { PrItem, Pr, Label } from '../../../common';
+import { setConfig, useConfig } from '../../../config';
 
 interface UncategorizedPrProps {
   pr: PrItem;

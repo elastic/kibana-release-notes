@@ -1,5 +1,4 @@
 import React from 'react';
-import { GitHubSettings } from './github';
 import {
   EuiHeader,
   EuiHeaderLink,
@@ -11,8 +10,7 @@ import {
   EuiIcon,
 } from '@elastic/eui';
 import { GITHUB_TOKEN } from './common';
-import { ReleaseNotesPage } from './release-notes';
-import { ApiChangesPage } from './api-changes';
+import { ApiChangesPage, GitHubSettings, ReleaseNotesPage } from './pages';
 import { Route, Routes, useNavigate, Navigate } from 'react-router-dom';
 
 export const App: React.FC = () => {

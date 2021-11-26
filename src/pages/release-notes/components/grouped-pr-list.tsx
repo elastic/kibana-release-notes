@@ -1,7 +1,7 @@
 import { EuiCallOut } from '@elastic/eui';
 import { FC, Fragment, memo, useMemo } from 'react';
-import { Pr, PrItem } from '../../common';
-import { Config } from '../../config';
+import { Pr, PrItem } from '../../../common';
+import { Config } from '../../../config';
 
 interface Props {
   groupedPrs: { [group: string]: PrItem[] };

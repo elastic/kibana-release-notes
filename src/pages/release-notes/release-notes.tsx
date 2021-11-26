@@ -11,8 +11,8 @@ import {
   EuiButtonEmpty,
 } from '@elastic/eui';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
-import { PrItem, useGitHubService } from '../common';
-import { useConfig } from '../config/config';
+import { PrItem, useGitHubService } from '../../common';
+import { useConfig } from '../../config/config';
 import { GenerateSidebar, PrepareSidebar } from './sidebars';
 import { Subscription } from 'rxjs';
 import { PrepareReleaseNotes } from './prepare-release-notes';
