@@ -8,6 +8,7 @@ import {
   EuiHeaderSection,
   EuiHeaderSectionItem,
   EuiHeaderSectionItemButton,
+  EuiIcon,
 } from '@elastic/eui';
 import { GITHUB_TOKEN } from './common';
 import { ReleaseNotesPage } from './release-notes';
@@ -35,13 +36,18 @@ export const App: React.FC = () => {
         <EuiHeaderSection grow={true}>
           <EuiHeaderLinks>
             <EuiHeaderLink onClick={() => navigate('/release-notes')}>Release Notes</EuiHeaderLink>
-            <EuiHeaderLink onClick={() => navigate('/devdocs')}>API changes</EuiHeaderLink>
+            <EuiHeaderLink onClick={() => navigate('/devdocs')}>Kibana API changes</EuiHeaderLink>
           </EuiHeaderLinks>
         </EuiHeaderSection>
         <EuiHeaderSection side="right">
-          <EuiHeaderSectionItemButton iconType="gear" onClick={() => navigate('/github')}>
-            GitHub Settings
-          </EuiHeaderSectionItemButton>
+          <EuiHeaderSectionItem border="left">
+            <EuiHeaderSectionItemButton
+              aria-label="GitHub Settings"
+              onClick={() => navigate('/github')}
+            >
+              <EuiIcon type="gear" />
+            </EuiHeaderSectionItemButton>
+          </EuiHeaderSectionItem>
         </EuiHeaderSection>
       </EuiHeader>
       <Routes>

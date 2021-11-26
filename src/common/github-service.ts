@@ -62,6 +62,14 @@ class GitHubService {
     ].map((v) => `v${v}`);
   }
 
+  public async getApiChanesPrsForVersion(version: string) {
+    const options = this.octokit.search.issuesAndPullRequests.endpoint.merge({
+      q: `repo:${GITHUB_OWNER}/${GITHUB_REPO} label:release_note:plugin_api_changes label:${version}`,
+    });
+    const items = await this.octokit.paginate<PrItem>(options);
+    return filterPrsForVersion(items, version);
+  }
+
   public async getPrsForVersion(
     version: string,
     excludedLabels: readonly string[] = []
