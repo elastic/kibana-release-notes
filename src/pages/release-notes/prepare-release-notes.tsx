@@ -2,7 +2,7 @@ import { EuiText, EuiCode, EuiCallOut, EuiSpacer } from '@elastic/eui';
 import React, { FC, useMemo } from 'react';
 import { groupPrs, Pr, PrItem } from '../../common';
 import { groupByArea } from '../../common/pr-utils';
-import { useConfig } from '../../config';
+import { useActiveConfig } from '../../config';
 import { GroupedPrList, UncategorizedPr } from './components';
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
 }
 
 export const PrepareReleaseNotes: FC<Props> = ({ prs }) => {
-  const config = useConfig();
+  const config = useActiveConfig();
   const groupedPrs = useMemo(() => groupPrs(prs), [prs]);
 
   const [featurePrs, unknownFeature] = useMemo(

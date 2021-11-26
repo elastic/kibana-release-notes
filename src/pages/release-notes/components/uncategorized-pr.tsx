@@ -13,14 +13,14 @@ import {
   EuiSelectableOption,
 } from '@elastic/eui';
 import { PrItem, Pr, Label } from '../../../common';
-import { setConfig, useConfig } from '../../../config';
+import { setConfig, useActiveConfig } from '../../../config';
 
 interface UncategorizedPrProps {
   pr: PrItem;
 }
 
 const LabelBadge: FC<{ label: Label }> = memo(({ label }) => {
-  const config = useConfig();
+  const config = useActiveConfig();
   const [isPopoverVisible, setPopoverVisible] = useState(false);
 
   const areaTitles = useMemo(

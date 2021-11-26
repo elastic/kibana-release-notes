@@ -1,8 +1,7 @@
-import type { Config } from '../config';
+import type { Config } from './types';
 import { securityLabels } from './security';
 
 export const kibanaTemplate: Config = {
-  template: 'kibana',
   excludedLabels: ['release_note:skip', 'Team:Docs', 'reverted', 'backport'],
   areas: [
     {

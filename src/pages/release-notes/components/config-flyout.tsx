@@ -7,54 +7,60 @@ import {
   EuiTitle,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiContextMenu,
-  EuiPopover,
+  EuiBadge,
 } from '@elastic/eui';
 import { useState } from 'react';
 import type { FC } from 'react';
 import MonacoEditor, { DiffEditor } from '@monaco-editor/react';
 import {
-  Config,
+  discardConfigChanges,
   getConfig,
-  getTemplate,
+  getDefaultConfig,
   hasConfigChanges,
-  resetConfigOverwrite,
   setConfig,
+  TemplateId,
 } from '../../../config';
 import { MarkerSeverity } from 'monaco-editor';
 
 interface Props {
-  onSaved: (config: Config) => void;
+  templateId: TemplateId;
+  onSaved: () => void;
   onClose: () => void;
 }
 
-export const ConfigFlyout: FC<Props> = ({ onSaved, onClose }) => {
+export const ConfigFlyout: FC<Props> = ({ templateId, onSaved, onClose }) => {
   const [configString, setConfigString] = useState<string>(() =>
-    JSON.stringify(getConfig(), null, 2)
+    JSON.stringify(getConfig(templateId), null, 2)
   );
   const [isValid, setValid] = useState(true);
   const [viewChanges, setViewChanged] = useState(false);
-  const [isTemplatePopoverOpen, setTemplatePopoverOpen] = useState(false);
 
   const onViewChanges = (): void => {
     setViewChanged(!viewChanges);
   };
 
   const onSave = (): void => {
-    onSaved(setConfig(JSON.parse(configString)));
+    setConfig(JSON.parse(configString), templateId);
+    onSaved();
   };
 
-  const onLoadTemplate = (template: 'kibana' | 'security'): void => {
-    resetConfigOverwrite(template);
-    setTemplatePopoverOpen(false);
-    setConfigString(JSON.stringify(getConfig(), null, 2));
+  const onDiscard = (): void => {
+    discardConfigChanges(templateId);
+    onSaved();
   };
 
   return (
     <EuiFlyout onClose={onClose}>
       <EuiFlyoutHeader style={{ marginBottom: '8px' }}>
         <EuiTitle size="m">
-          <h2>Config {hasConfigChanges() && <>(changed)</>}</h2>
+          <h2>
+            Customize config: {templateId}{' '}
+            {hasConfigChanges(templateId) && (
+              <EuiBadge color="accent" iconType="pencil">
+                modified
+              </EuiBadge>
+            )}
+          </h2>
         </EuiTitle>
       </EuiFlyoutHeader>
       {!viewChanges ? (
@@ -71,7 +77,7 @@ export const ConfigFlyout: FC<Props> = ({ onSaved, onClose }) => {
         />
       ) : (
         <DiffEditor
-          original={JSON.stringify(getTemplate(JSON.parse(configString).template), null, 2)}
+          original={JSON.stringify(getDefaultConfig(templateId), null, 2)}
           modified={configString}
           language="json"
           options={{ readOnly: true, renderSideBySide: false }}
@@ -86,49 +92,22 @@ export const ConfigFlyout: FC<Props> = ({ onSaved, onClose }) => {
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiFlexGroup>
-              <EuiFlexItem grow={false}>
-                <EuiPopover
-                  button={
+              {hasConfigChanges(templateId) && (
+                <>
+                  <EuiFlexItem grow={false}>
                     <EuiButtonEmpty
-                      onClick={() => setTemplatePopoverOpen(!isTemplatePopoverOpen)}
-                      iconType="folderOpen"
+                      iconType={viewChanges ? 'pencil' : 'eye'}
+                      onClick={onViewChanges}
                     >
-                      Load template
+                      {viewChanges ? 'Edit config' : 'View changes'}
                     </EuiButtonEmpty>
-                  }
-                  panelPaddingSize="none"
-                  isOpen={isTemplatePopoverOpen}
-                  closePopover={() => setTemplatePopoverOpen(false)}
-                  anchorPosition="upLeft"
-                >
-                  <EuiContextMenu
-                    initialPanelId={0}
-                    panels={[
-                      {
-                        id: 0,
-                        items: [
-                          {
-                            name: 'Kibana',
-                            icon: 'logoKibana',
-                            onClick: () => onLoadTemplate('kibana'),
-                          },
-                          {
-                            name: 'Security',
-                            icon: 'logoSecurity',
-                            onClick: () => onLoadTemplate('security'),
-                          },
-                        ],
-                      },
-                    ]}
-                  />
-                </EuiPopover>
-              </EuiFlexItem>
-              {hasConfigChanges() && (
-                <EuiFlexItem grow={false}>
-                  <EuiButtonEmpty iconType={viewChanges ? 'pencil' : 'eye'} onClick={onViewChanges}>
-                    {viewChanges ? 'Edit config' : 'View changes'}
-                  </EuiButtonEmpty>
-                </EuiFlexItem>
+                  </EuiFlexItem>
+                  <EuiFlexItem>
+                    <EuiButtonEmpty onClick={onDiscard} iconType="eraser">
+                      Discard config customizations
+                    </EuiButtonEmpty>
+                  </EuiFlexItem>
+                </>
               )}
             </EuiFlexGroup>
           </EuiFlexItem>

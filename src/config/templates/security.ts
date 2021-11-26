@@ -1,4 +1,4 @@
-import type { Config } from '../config';
+import type { Config } from './types';
 
 export const securityLabels = [
   'Team:SIEM',
@@ -20,7 +20,6 @@ export const securityLabels = [
 ];
 
 export const securityTemplate: Config = {
-  template: 'security',
   excludedLabels: [
     'backport',
     'release_note:skip',

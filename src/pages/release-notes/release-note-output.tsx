@@ -7,7 +7,7 @@ import {
   renderPageAsAsciidoc,
   renderPrAsAsciidoc,
 } from '../../common/output-utils';
-import { useConfig } from '../../config';
+import { useActiveConfig } from '../../config';
 import MonacoEditor from '@monaco-editor/react';
 
 interface Props {
@@ -16,7 +16,7 @@ interface Props {
 }
 
 export const ReleaseNoteOutput: FC<Props> = ({ prs, version: ver }) => {
-  const config = useConfig();
+  const config = useActiveConfig();
   const version = ver.replace(/^v(.*)$/, '$1');
   const isPatchVersion = semver.patch(version) !== 0;
 

@@ -1,6 +1,6 @@
 import { FC, useCallback, useState } from 'react';
 import { ReleaseNotes } from './release-notes';
-import { VersionSelection } from './version-select';
+import { ReleaseNotesWizard } from './wizard';
 
 export const ReleaseNotesPage: FC = () => {
   const [selectedVersion, setSelectedVersion] = useState<string>();
@@ -11,7 +11,7 @@ export const ReleaseNotesPage: FC = () => {
 
   return (
     <>
-      {!selectedVersion && <VersionSelection onVersionSelected={onVersionChange} />}
+      {!selectedVersion && <ReleaseNotesWizard onVersionSelected={onVersionChange} />}
       {selectedVersion && (
         <ReleaseNotes
           version={selectedVersion}

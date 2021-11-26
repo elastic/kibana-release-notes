@@ -1,93 +1,88 @@
 import { useEffect, useState } from 'react';
 import { BehaviorSubject } from 'rxjs';
-import { kibanaTemplate } from './templates/kibana';
-import { securityTemplate } from './templates/security';
+import { TemplateId, templates } from './templates';
+import { Config } from './templates/types';
 
-interface AreaDefinition {
-  title: string;
-  labels?: readonly string[];
-  /**
-   * If a PR can fall into multiple areas it will fall into the area with the highest priority.
-   * If all areas it would be under have the same priority the result is random.
-   */
-  priority?: number;
-  options?: {
-    bracketHandling?: 'strip' | 'keep' | 'visualizations';
-    textOverwriteTemplate?: string;
-  };
+const ACTIVE_TEMPLATE = 'template.active';
+const TEMPLATE_CONFIG_PREFIX = 'template.config';
+
+const localStorageConfigKey = (id: TemplateId) => `${TEMPLATE_CONFIG_PREFIX}.${id}`;
+
+const activeConfig$ = new BehaviorSubject<Config>(getConfig());
+
+export function getTemplateInfos() {
+  const activeTemplate = getActiveTemplateId();
+  return templates.map((template) => ({
+    ...template,
+    active: activeTemplate === template.id,
+    modified: hasConfigChanges(template.id),
+  }));
 }
 
-export interface Config {
-  template: string;
-  excludedLabels: readonly string[];
-  areas: readonly AreaDefinition[];
-  templates: {
-    pages: {
-      releaseNotes: string;
-      patchReleaseNotes?: string;
-    };
-    prs: {
-      breaking?: string;
-      deprecation?: string;
-      _other_: string;
-    };
-    prGroup: string;
-  };
+/**
+ * Returns the id of the currently used config template.
+ */
+export function getActiveTemplateId(): TemplateId {
+  return (localStorage.getItem(ACTIVE_TEMPLATE) as TemplateId | null) ?? 'kibana';
 }
 
-const TEMPLATE_KEY = 'releaseNotes.template';
-const CONFIG_KEY = 'releaseNotes.config';
+export function setActiveTemplate(templateId: TemplateId) {
+  localStorage.setItem(ACTIVE_TEMPLATE, templateId);
+  activeConfig$.next(getConfig(templateId));
+  return getTemplateInfos();
+}
 
-const configSubject$ = new BehaviorSubject<Config>(
-  localStorage.getItem(CONFIG_KEY)
-    ? JSON.parse(localStorage.getItem(CONFIG_KEY) ?? '')
-    : getTemplate(localStorage.getItem(TEMPLATE_KEY) ?? 'kibana')
-);
+export function hasConfigChanges(id: TemplateId): boolean {
+  return localStorage.getItem(localStorageConfigKey(id)) !== null;
+}
 
-configSubject$.subscribe((newConfig) => {
-  if (JSON.stringify(newConfig) === JSON.stringify(getTemplate(newConfig.template))) {
-    localStorage.removeItem(CONFIG_KEY);
+/**
+ * Returns the default (unmodified) config for a specific template.
+ */
+export function getDefaultConfig(id: TemplateId): Config {
+  // We know that there is one template for each id, so we can assume this is not null here.
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  return templates.find((template) => template.id === id)!.config;
+}
+
+/**
+ * Returns the specified config including potential customizations the user made.
+ * If no id will be specified the currently active config will be used.
+ */
+export function getConfig(id: TemplateId = getActiveTemplateId()): Config {
+  const customizedConfig = localStorage.getItem(localStorageConfigKey(id));
+  if (customizedConfig) {
+    return JSON.parse(customizedConfig);
   } else {
-    localStorage.setItem(CONFIG_KEY, JSON.stringify(newConfig));
-  }
-});
-
-export function getTemplate(key?: string): Config {
-  switch (key) {
-    case 'security':
-      return securityTemplate;
-    case 'kibana':
-    default:
-      return kibanaTemplate;
+    return getDefaultConfig(id);
   }
 }
 
-export function hasConfigChanges(): boolean {
-  return localStorage.getItem(CONFIG_KEY) !== null;
+export function setConfig(newConfig: Config, templateId: TemplateId = getActiveTemplateId()): void {
+  if (JSON.stringify(newConfig) === JSON.stringify(getDefaultConfig(templateId))) {
+    localStorage.removeItem(localStorageConfigKey(templateId));
+  } else {
+    localStorage.setItem(localStorageConfigKey(templateId), JSON.stringify(newConfig));
+  }
+  if (getActiveTemplateId() === templateId) {
+    activeConfig$.next(getConfig());
+  }
 }
 
-export function getConfig(): Config {
-  return configSubject$.getValue();
+export function discardConfigChanges(templateId: TemplateId): void {
+  localStorage.removeItem(localStorageConfigKey(templateId));
+  if (getActiveTemplateId() === templateId) {
+    activeConfig$.next(getConfig());
+  }
 }
 
-export function useConfig(): Config {
-  const [config, setConfig] = useState<Config>(configSubject$.getValue());
+export function useActiveConfig(): Config {
+  const [config, setConfig] = useState<Config>(activeConfig$.getValue());
   useEffect(() => {
-    const subscription = configSubject$.subscribe((newConfig) => {
+    const subscription = activeConfig$.subscribe((newConfig) => {
       setConfig(newConfig);
     });
     return () => subscription.unsubscribe();
   }, []);
   return config;
-}
-
-export function setConfig(newConfig: Config): Config {
-  configSubject$.next(newConfig);
-  return newConfig;
-}
-
-export function resetConfigOverwrite(template: 'kibana' | 'security'): void {
-  localStorage.removeItem(CONFIG_KEY);
-  localStorage.setItem(TEMPLATE_KEY, template);
-  configSubject$.next(getTemplate(template));
 }

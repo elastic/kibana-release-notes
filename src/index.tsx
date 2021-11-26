@@ -4,7 +4,7 @@ import './index.css';
 import { App } from './App';
 import { BrowserRouter } from 'react-router-dom';
 
-import '@elastic/eui/dist/eui_theme_light.css';
+import '@elastic/eui/dist/eui_theme_amsterdam_light.css';
 
 ReactDOM.render(
   <React.StrictMode>

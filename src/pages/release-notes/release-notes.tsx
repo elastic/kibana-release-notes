@@ -12,7 +12,7 @@ import {
 } from '@elastic/eui';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { PrItem, useGitHubService } from '../../common';
-import { useConfig } from '../../config/config';
+import { useActiveConfig, getActiveTemplateId } from '../../config/config';
 import { GenerateSidebar, PrepareSidebar } from './sidebars';
 import { Subscription } from 'rxjs';
 import { PrepareReleaseNotes } from './prepare-release-notes';
@@ -27,7 +27,7 @@ interface Props {
 export const ReleaseNotes: FC<Props> = ({ version, onVersionChange }) => {
   const subscriptionRef = useRef<Subscription>();
   const [github, errorHandler] = useGitHubService();
-  const config = useConfig();
+  const config = useActiveConfig();
   const [showConfigFlyout, setShowConfigFlyout] = useState(false);
   const [isLoading, setLoading] = useState(true);
   const [progress, setProgress] = useState<number>();
@@ -133,6 +133,7 @@ export const ReleaseNotes: FC<Props> = ({ version, onVersionChange }) => {
               <EuiHorizontalRule margin="m" />
               {showConfigFlyout && (
                 <ConfigFlyout
+                  templateId={getActiveTemplateId()}
                   onClose={() => setShowConfigFlyout(false)}
                   onSaved={() => setShowConfigFlyout(false)}
                 />
