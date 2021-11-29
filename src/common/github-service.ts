@@ -107,7 +107,7 @@ class GitHubService {
     const options = this.octokit.search.issuesAndPullRequests.endpoint.merge({
       q:
         `repo:${GITHUB_OWNER}/${GITHUB_REPO} label:${version} is:pr is:merged ` +
-        `base:master base:${semVer.major}.x base:${semVer.major}.${semVer.minor} ` +
+        `base:master base:main base:${semVer.major}.x base:${semVer.major}.${semVer.minor} ` +
         `${labelExclusions} ${labelInclusion}`,
       per_page: 100,
     });
