@@ -21,10 +21,11 @@ import { ConfigFlyout } from './components';
 
 interface Props {
   version: string;
+  ignoredPriorReleases: string[];
   onVersionChange: () => void;
 }
 
-export const ReleaseNotes: FC<Props> = ({ version, onVersionChange }) => {
+export const ReleaseNotes: FC<Props> = ({ version, onVersionChange, ignoredPriorReleases }) => {
   const subscriptionRef = useRef<Subscription>();
   const [github, errorHandler] = useGitHubService();
   const config = useActiveConfig();
@@ -39,7 +40,12 @@ export const ReleaseNotes: FC<Props> = ({ version, onVersionChange }) => {
     setProgress(undefined);
     try {
       subscriptionRef.current = (
-        await github.getPrsForVersion(version, config.excludedLabels, config.includedLabels)
+        await github.getPrsForVersion(
+          version,
+          config.excludedLabels,
+          config.includedLabels,
+          ignoredPriorReleases
+        )
       ).subscribe((status) => {
         if (status.type === 'complete') {
           setLoading(false);
@@ -51,7 +57,6 @@ export const ReleaseNotes: FC<Props> = ({ version, onVersionChange }) => {
       });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
-      console.log('run into error?');
       errorHandler(e);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
