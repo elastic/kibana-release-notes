@@ -6,7 +6,7 @@ export const securityLabels = [
   'Team: SecuritySolution',
   'Team:Endpoint Response',
   'Team:Threat Hunting',
-  'Team:Threat HuntingCases',
+  'Team:Threat Hunting:Explore',
   'Team:Threat Hunting:Investigations',
   'Team:Detections and Resp',
   'Team:Asset Management',
@@ -15,8 +15,11 @@ export const securityLabels = [
   'Feature:Timeline',
   'Feature:Detection Rules',
   'Feature:Detection Alerts',
+  'Team:Detection Rules',
+  'Team:Detection Alerts',
   'Team: CTI',
   'Team:CTI',
+  'Team:Threat Hunting:Cases',
 ];
 
 export const securityTemplate: Config = {
