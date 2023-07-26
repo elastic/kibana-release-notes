@@ -1,9 +1,0 @@
-[build]
-  command = "yarn test && yarn build"
-  publish = "build/"
-
-# SPA serve all URLs via index.html
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200

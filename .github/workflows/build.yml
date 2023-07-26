@@ -1,0 +1,19 @@
+name: Build & Test
+on: [push]
+permissions:
+  contents: write
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v3
+
+      - name: Install 🔧
+        run: yarn --ci
+
+      - name: Build 👷‍♂️
+        # Set BASENAME if the static page is hosted under a specific path segment (e.g. elastic.github.io/kibana-release-notes)
+        # env:
+        #   BASENAME: kibana-release-notes
+        run: yarn build
