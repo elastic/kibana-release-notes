@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { BehaviorSubject } from 'rxjs';
-import { TemplateId, templates } from './templates';
-import { Config } from './templates/types';
+import { TemplateId, templates, Config } from './templates';
 
 const ACTIVE_TEMPLATE = 'template.active';
 const TEMPLATE_CONFIG_PREFIX = 'template.config';
@@ -85,4 +84,9 @@ export function useActiveConfig(): Config {
     return () => subscription.unsubscribe();
   }, []);
   return config;
+}
+
+declare const _BASENAME_: string;
+export function getBasename() {
+  return typeof _BASENAME_ == 'undefined' ? undefined : _BASENAME_;
 }

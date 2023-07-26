@@ -13,6 +13,8 @@ jobs:
         run: yarn --ci
 
       - name: Build 👷‍♂️
+        env:
+          BASENAME: kibana-release-notes
         run: yarn build
 
       - name: Deploy 🚀
