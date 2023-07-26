@@ -5,5 +5,7 @@ module.exports = (webpackConfig, env) => {
         "querystring": require.resolve("querystring-es3")
     }
 
+    webpackConfig.output.publicPath = "/kibana-release-notes/"
+
     return webpackConfig;
 }

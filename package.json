@@ -39,6 +39,7 @@
   "scripts": {
     "start": "PORT=4000 react-app-rewired start",
     "build": "react-app-rewired build",
+    "postbuild": "./postbuild.sh",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject"
   },
