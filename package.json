@@ -1,6 +1,6 @@
 {
   "name": "kibana-release-notes",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "dependencies": {
     "@elastic/datemath": "^5.0.3",
@@ -12,7 +12,7 @@
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.0.3",
-    "@types/node": "^16.11.10",
+    "@types/node": "^18.17.1",
     "@types/parse-link-header": "^1.0.1",
     "@types/react": "^17.0.36",
     "@types/react-dom": "^17.0.11",
@@ -23,21 +23,23 @@
     "moment": "^2.29.1",
     "monaco-editor": "^0.30.1",
     "mustache": "^4.2.0",
-    "parse-link-header": "^1.0.1",
+    "parse-link-header": "^2.0.0",
+    "querystring-es3": "^0.2.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-router-dom": "6",
-    "react-scripts": "4.0.3",
+    "react-scripts": "^5.0.1",
     "rxjs": "^7.4.0",
     "semver": "^7.3.5",
     "typescript": "^4.5.2",
+    "url": "^0.11.1",
     "web-vitals": "^2.1.2",
     "xstate": "^4.26.1"
   },
   "scripts": {
-    "start": "PORT=4000 react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "PORT=4000 react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
     "eject": "react-scripts eject"
   },
   "browserslist": {
@@ -53,12 +55,14 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@types/lodash.clonedeep": "^4.5.6",
     "@types/lodash.uniq": "^4.5.6",
     "@types/mustache": "^4.1.2",
     "@types/semver": "^7.3.9",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "prettier": "^2.4.1"
+    "prettier": "^2.4.1",
+    "react-app-rewired": "^2.2.1"
   }
 }
