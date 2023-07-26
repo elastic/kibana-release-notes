@@ -1,5 +1,8 @@
 name: Build & Test
-on: [push]
+on:
+  push:
+    branches-ignore:
+      - main
 permissions:
   contents: write
 jobs:
@@ -13,7 +16,4 @@ jobs:
         run: yarn --ci
 
       - name: Build 👷‍♂️
-        # Set BASENAME if the static page is hosted under a specific path segment (e.g. elastic.github.io/kibana-release-notes)
-        # env:
-        #   BASENAME: kibana-release-notes
         run: yarn build
