@@ -1,13 +1,9 @@
-name: Build & Deploy
-on:
-  push:
-    branches:
-      - main
-
+name: Build & Test
+on: [push]
 permissions:
   contents: write
 jobs:
-  build-and-deploy:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️
@@ -21,8 +17,3 @@ jobs:
         # env:
         #   BASENAME: kibana-release-notes
         run: yarn build
-
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: build
