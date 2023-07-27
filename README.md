@@ -1,3 +1,3 @@
 # Kibana Release Notes
 
-Tool to generate the Kibana release notes. Deployed at [release-notes.kibana.team](https://release-notes.kibana.team)
+Tool to generate the Kibana release notes. Deployed at [release-notes.kibanateam.dev](https://release-notes.kibanateam.dev)
