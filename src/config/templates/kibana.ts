@@ -233,12 +233,7 @@ For information about the {kib} {{version}} release, review the following inform
 Breaking changes can prevent your application from optimal operation and performance.
 Before you upgrade to {{version}}, review the breaking changes, then mitigate the impact to your application.
 
-// tag::notable-breaking-changes[]
-
 {{{prs.breaking}}}
-
-// end::notable-breaking-changes[]
-
 {{/prs.breaking}}
 {{#prs.deprecations}}
 [float]
