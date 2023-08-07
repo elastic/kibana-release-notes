@@ -313,11 +313,11 @@ The {{version}} release includes the following bug fixes.
     prs: {
       breaking: `[discrete]
 [[breaking-{{number}}]]
-.{{{title}}}
+* {{{title}}}.
 [%collapsible]
 ====
 *Details* +
-!!TODO!! For more information, refer to {kibana-pull}{{number}}[#{{number}}]
+!!TODO!! For more information, refer to ({kibana-pull}{{number}}[#{{number}}]).
 
 *Impact* +
 !!TODO!!
@@ -325,18 +325,19 @@ The {{version}} release includes the following bug fixes.
       `,
       deprecation: `[discrete]
 [[deprecation-{{number}}]]
-.{{{title}}}
+* {{{title}}}.
 [%collapsible]
 ====
 *Details* +
-!!TODO!! For more information, refer to {kibana-pull}{{number}}[#{{number}}]
+!!TODO!! For more information, refer to ({kibana-pull}{{number}}[#{{number}}]).
 
 *Impact* +
 !!TODO!!
 ====
       `,
       _other_:
-        '* {{{title}}} {kibana-pull}{{number}}[#{{number}}]{{#details}}\n////\n!!TODO!! The above PR had a lengthy release note description:\n{{{details}}}\n////{{/details}}',
+        '* {{{title}}} ({kibana-pull}{{number}}[#{{number}}]).' +
+        '{{#details}}\n////\n!!TODO!! The above PR had a lengthy release note description:\n{{{details}}}\n////{{/details}}',
     },
     prGroup: `{{{groupTitle}}}::\n{{{prs}}}`,
   },
