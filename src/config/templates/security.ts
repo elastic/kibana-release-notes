@@ -12,14 +12,20 @@ export const securityLabels = [
   'Team:Asset Management',
   'Team:Onboarding and Lifecycle Mgt',
   'Team:Security Solution Platform',
-  'Feature:Timeline',
-  'Feature:Detection Rules',
-  'Feature:Detection Alerts',
-  'Team:Detection Rules',
   'Team:Detection Alerts',
   'Team: CTI',
   'Team:CTI',
   'Team:Threat Hunting:Cases',
+  'Team:ResponseOps',
+  'Team:Cloud Security',
+  'Team:Detection Engine',
+  'Team:Defend Workflows',
+  'Team:Detection Rules',
+  'Feature:Timeline',
+  'Feature:Detection Rules',
+  'Feature:Detection Alerts',
+  'Feature:Entity Analytics',
+  'Feature:Rule Exceptions',
 ];
 
 export const securityTemplate: Config = {
@@ -68,10 +74,11 @@ export const securityTemplate: Config = {
     },
     prGroup: '{{{prs}}}',
     prs: {
-      breaking: `*{{{title}}}*\n\n!!TODO!!\n\nSee ({pull}{{number}}[#{{number}}]) for details.\n`,
-      deprecation: `*{{{title}}}*\n\n!!TODO!!\n\nSee ({pull}{{number}}[#{{number}}]) for details.\n`,
+      breaking: `*{{{title}}}*\n\n!!TODO!!\n\nSee ({kibana-pull}{{number}}[#{{number}}]) for details.\n`,
+      deprecation: `*{{{title}}}*\n\n!!TODO!!\n\nSee ({kibana-pull}{{number}}[#{{number}}]) for details.\n`,
       _other_:
-        '* {{{title}}} {pull}{{number}}[#{{number}}]{{#details}}\n////\n!!TODO!! The above PR had a lengthy release note description:\n{{{details}}}\n////{{/details}}',
+        '* {{{title}}} ({kibana-pull}{{number}}[#{{number}}]).' +
+        '{{#details}}\n////\n!!TODO!! The above PR had a lengthy release note description:\n{{{details}}}\n////{{/details}}',
     },
   },
 };
