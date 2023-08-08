@@ -60,24 +60,32 @@ export const securityTemplate: Config = {
 
 [discrete]
 [[features-{{version}}]]
-==== Features
+==== New features
 {{{prs.features}}}
 {{/prs.features}}
-{{#prs.enhancementsAndFixes}}
+{{#prs.enhancements}}
+
+[discrete]
+[[enhancements-{{version}}]]
+==== Enhancements
+{{{prs.enhancements}}}
+{{/prs.enhancements}}
+{{#prs.fixes}}
 
 [discrete]
 [[bug-fixes-{{version}}]]
-==== Bug fixes and enhancements
-{{{prs.enhancementsAndFixes}}}
-{{/prs.enhancementsAndFixes}}
+==== Bug fixes
+{{{prs.fixes}}}
+{{/prs.fixes}}
+
 `,
     },
     prGroup: '{{{prs}}}',
     prs: {
-      breaking: `*{{{title}}}*\n\n!!TODO!!\n\nSee ({kibana-pull}{{number}}[#{{number}}]) for details.\n`,
-      deprecation: `*{{{title}}}*\n\n!!TODO!!\n\nSee ({kibana-pull}{{number}}[#{{number}}]) for details.\n`,
+      breaking: `*{{{title}}}*\n\n!!TODO!!\n\nSee ({pull}{{number}}[#{{number}}]) for details.\n`,
+      deprecation: `*{{{title}}}*\n\n!!TODO!!\n\nSee ({pull}{{number}}[#{{number}}]) for details.\n`,
       _other_:
-        '* {{{title}}} ({kibana-pull}{{number}}[#{{number}}]).' +
+        '* {{{title}}} ({pull}{{number}}[#{{number}}]).' +
         '{{#details}}\n////\n!!TODO!! The above PR had a lengthy release note description:\n{{{details}}}\n////{{/details}}',
     },
   },
