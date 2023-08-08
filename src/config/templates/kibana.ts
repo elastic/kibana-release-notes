@@ -157,6 +157,7 @@ export const kibanaTemplate: Config = {
         'Feature:Graph',
         'Feature:New Feature',
         'Feature:MetricVis',
+        'Team:Visualizations',
       ],
       options: {
         bracketHandling: 'visualizations',
@@ -196,7 +197,7 @@ export const kibanaTemplate: Config = {
     },
     {
       title: 'APM',
-      labels: ['Team:apm'],
+      labels: ['Team:apm', 'Team:APM', 'Team: Actionable Observability'],
       priority: 100,
     },
     {
@@ -214,6 +215,18 @@ export const kibanaTemplate: Config = {
     {
       title: 'Fleet',
       labels: ['Team:Fleet'],
+    },
+    {
+      title: 'Presentation',
+      labels: ['Team:Presentation'],
+    },
+    {
+      title: 'SharedUX',
+      labels: ['Team:SharedUX'],
+    },
+    {
+      title: 'Data Discovery',
+      labels: ['Team:DataDiscovery'],
     },
   ],
   templates: {
