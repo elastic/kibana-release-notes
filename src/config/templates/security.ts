@@ -12,14 +12,20 @@ export const securityLabels = [
   'Team:Asset Management',
   'Team:Onboarding and Lifecycle Mgt',
   'Team:Security Solution Platform',
-  'Feature:Timeline',
-  'Feature:Detection Rules',
-  'Feature:Detection Alerts',
-  'Team:Detection Rules',
   'Team:Detection Alerts',
   'Team: CTI',
   'Team:CTI',
   'Team:Threat Hunting:Cases',
+  'Team:ResponseOps',
+  'Team:Cloud Security',
+  'Team:Detection Engine',
+  'Team:Defend Workflows',
+  'Team:Detection Rules',
+  'Feature:Timeline',
+  'Feature:Detection Rules',
+  'Feature:Detection Alerts',
+  'Feature:Entity Analytics',
+  'Feature:Rule Exceptions',
 ];
 
 export const securityTemplate: Config = {
@@ -54,16 +60,24 @@ export const securityTemplate: Config = {
 
 [discrete]
 [[features-{{version}}]]
-==== Features
+==== New features
 {{{prs.features}}}
 {{/prs.features}}
-{{#prs.enhancementsAndFixes}}
+{{#prs.enhancements}}
+
+[discrete]
+[[enhancements-{{version}}]]
+==== Enhancements
+{{{prs.enhancements}}}
+{{/prs.enhancements}}
+{{#prs.fixes}}
 
 [discrete]
 [[bug-fixes-{{version}}]]
-==== Bug fixes and enhancements
-{{{prs.enhancementsAndFixes}}}
-{{/prs.enhancementsAndFixes}}
+==== Bug fixes
+{{{prs.fixes}}}
+{{/prs.fixes}}
+
 `,
     },
     prGroup: '{{{prs}}}',
@@ -71,7 +85,8 @@ export const securityTemplate: Config = {
       breaking: `*{{{title}}}*\n\n!!TODO!!\n\nSee ({pull}{{number}}[#{{number}}]) for details.\n`,
       deprecation: `*{{{title}}}*\n\n!!TODO!!\n\nSee ({pull}{{number}}[#{{number}}]) for details.\n`,
       _other_:
-        '* {{{title}}} {pull}{{number}}[#{{number}}]{{#details}}\n////\n!!TODO!! The above PR had a lengthy release note description:\n{{{details}}}\n////{{/details}}',
+        '* {{{title}}} ({pull}{{number}}[#{{number}}]).' +
+        '{{#details}}\n////\n!!TODO!! The above PR had a lengthy release note description:\n{{{details}}}\n////{{/details}}',
     },
   },
 };

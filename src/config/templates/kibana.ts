@@ -157,6 +157,7 @@ export const kibanaTemplate: Config = {
         'Feature:Graph',
         'Feature:New Feature',
         'Feature:MetricVis',
+        'Team:Visualizations',
       ],
       options: {
         bracketHandling: 'visualizations',
@@ -196,7 +197,7 @@ export const kibanaTemplate: Config = {
     },
     {
       title: 'APM',
-      labels: ['Team:apm'],
+      labels: ['Team:apm', 'Team:APM'],
       priority: 100,
     },
     {
@@ -214,6 +215,18 @@ export const kibanaTemplate: Config = {
     {
       title: 'Fleet',
       labels: ['Team:Fleet'],
+    },
+    {
+      title: 'Presentation',
+      labels: ['Team:Presentation'],
+    },
+    {
+      title: 'SharedUX',
+      labels: ['Team:SharedUX'],
+    },
+    {
+      title: 'Data Discovery',
+      labels: ['Team:DataDiscovery'],
     },
   ],
   templates: {
@@ -313,11 +326,11 @@ The {{version}} release includes the following bug fixes.
     prs: {
       breaking: `[discrete]
 [[breaking-{{number}}]]
-.{{{title}}}
+* {{{title}}}.
 [%collapsible]
 ====
 *Details* +
-!!TODO!! For more information, refer to {kibana-pull}{{number}}[#{{number}}]
+!!TODO!! For more information, refer to ({kibana-pull}{{number}}[#{{number}}]).
 
 *Impact* +
 !!TODO!!
@@ -325,18 +338,19 @@ The {{version}} release includes the following bug fixes.
       `,
       deprecation: `[discrete]
 [[deprecation-{{number}}]]
-.{{{title}}}
+* {{{title}}}.
 [%collapsible]
 ====
 *Details* +
-!!TODO!! For more information, refer to {kibana-pull}{{number}}[#{{number}}]
+!!TODO!! For more information, refer to ({kibana-pull}{{number}}[#{{number}}]).
 
 *Impact* +
 !!TODO!!
 ====
       `,
       _other_:
-        '* {{{title}}} {kibana-pull}{{number}}[#{{number}}]{{#details}}\n////\n!!TODO!! The above PR had a lengthy release note description:\n{{{details}}}\n////{{/details}}',
+        '* {{{title}}} ({kibana-pull}{{number}}[#{{number}}]).' +
+        '{{#details}}\n////\n!!TODO!! The above PR had a lengthy release note description:\n{{{details}}}\n////{{/details}}',
     },
     prGroup: `{{{groupTitle}}}::\n{{{prs}}}`,
   },
