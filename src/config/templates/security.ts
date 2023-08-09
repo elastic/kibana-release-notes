@@ -16,7 +16,6 @@ export const securityLabels = [
   'Team: CTI',
   'Team:CTI',
   'Team:Threat Hunting:Cases',
-  'Team:ResponseOps',
   'Team:Cloud Security',
   'Team:Detection Engine',
   'Team:Defend Workflows',
@@ -41,7 +40,7 @@ export const securityTemplate: Config = {
     pages: {
       releaseNotes: `[discrete]
 [[release-notes-{{version}}]]
-== {{version}}
+=== {{version}}
 {{#prs.breaking}}
 
 [discrete]
