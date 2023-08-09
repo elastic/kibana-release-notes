@@ -197,7 +197,7 @@ export const kibanaTemplate: Config = {
     },
     {
       title: 'APM',
-      labels: ['Team:apm', 'Team:APM', 'Team: Actionable Observability'],
+      labels: ['Team:apm', 'Team:APM'],
       priority: 100,
     },
     {
