@@ -176,8 +176,8 @@ export const kibanaTemplate: Config = {
       labels: ['Team:Code'],
     },
     {
-      title: 'Observability Home',
-      labels: ['Feature:Observability Home'],
+      title: 'Observability',
+      labels: ['Feature:Observability Home', 'Feature:SLO'],
     },
     {
       title: 'Infrastructure',
