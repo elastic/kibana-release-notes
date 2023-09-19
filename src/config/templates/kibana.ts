@@ -299,7 +299,7 @@ For detailed information about the {{version}} release, review the enhancements 
 {{#prs.fixes}}
 [float]
 [[fixes-v{{version}}]]
-=== Bug Fixes
+=== Bug fixes
 {{{prs.fixes}}}
 {{/prs.fixes}}
       `,
@@ -318,7 +318,7 @@ The {{version}} release includes the following bug fixes.
 {{#prs.fixes}}
 [float]
 [[fixes-v{{version}}]]
-=== Bug Fixes
+=== Bug fixes
 {{{prs.fixes}}}
 {{/prs.fixes}}
       `,
