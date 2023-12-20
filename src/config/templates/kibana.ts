@@ -166,10 +166,6 @@ export const kibanaTemplate: Config = {
     {
       title: 'Elastic Security',
       labels: securityLabels,
-      options: {
-        textOverwriteTemplate:
-          'For the Elastic Security {{version}} release information, refer to {security-guide}/release-notes.html[_Elastic Security Solution Release Notes_].',
-      },
     },
     {
       title: 'Code',
