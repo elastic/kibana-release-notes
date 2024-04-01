@@ -81,10 +81,10 @@ export const securityTemplate: Config = {
     },
     prGroup: '{{{prs}}}',
     prs: {
-      breaking: `*{{{title}}}*\n\n!!TODO!!\n\nSee ({pull}{{number}}[#{{number}}]) for details.\n`,
-      deprecation: `*{{{title}}}*\n\n!!TODO!!\n\nSee ({pull}{{number}}[#{{number}}]) for details.\n`,
+      breaking: `*{{{title}}}*\n\n!!TODO!!\n\nSee ({kibana-pull}{{number}}[#{{number}}]) for details.\n`,
+      deprecation: `*{{{title}}}*\n\n!!TODO!!\n\nSee ({kibana-pull}{{number}}[#{{number}}]) for details.\n`,
       _other_:
-        '* {{{title}}} ({pull}{{number}}[#{{number}}]).' +
+        '* {{{title}}} ({kibana-pull}{{number}}[#{{number}}]).' +
         '{{#details}}\n////\n!!TODO!! The above PR had a lengthy release note description:\n{{{details}}}\n////{{/details}}',
     },
   },
