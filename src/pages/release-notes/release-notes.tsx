@@ -146,7 +146,7 @@ export const ReleaseNotes: FC<Props> = ({ version, onVersionChange, ignoredPrior
             </>
           )}
           {step === 'prepare' ? (
-            <PrepareReleaseNotes prs={prs} />
+            <PrepareReleaseNotes prs={prs} repoIsPrivate={github.repoIsPrivate} />
           ) : (
             <ReleaseNoteOutput prs={prs} version={version} />
           )}

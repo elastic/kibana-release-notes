@@ -8,19 +8,22 @@ interface PrProps {
   showAuthor?: boolean;
   showTransformedTitle?: boolean;
   normalizeOptions?: NormalizeOptions;
+  repoIsPrivate?: boolean;
 }
 
 export const Pr: FC<PrProps> = memo(
-  ({ pr, showAuthor, showTransformedTitle, normalizeOptions }) => {
+  ({ pr, showAuthor, showTransformedTitle, normalizeOptions, repoIsPrivate }) => {
     const title: ReleaseNoteDetails = showTransformedTitle
       ? extractReleaseNotes(pr, normalizeOptions)
       : { type: 'title', title: pr.title };
     return (
       <>
         {title.title} (
-        <EuiLink target="_blank" href={pr.html_url}>
-          #{pr.number}
-        </EuiLink>{' '}
+        {!repoIsPrivate && (
+          <EuiLink target="_blank" href={pr.html_url}>
+            #{pr.number}
+          </EuiLink>
+        )}{' '}
         {showAuthor && (
           <>
             by <em>{pr.user?.login}</em>

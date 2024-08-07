@@ -44,6 +44,7 @@ function filterPrsForVersion(
 class GitHubService {
   private octokit: Octokit;
   private repoId: number | undefined;
+  public repoIsPrivate: boolean | undefined;
   public repoName: string;
 
   constructor(config: GitHubServiceConfig) {
@@ -59,6 +60,7 @@ class GitHubService {
         repo: this.repoName,
       });
       this.repoId = response.data.id;
+      this.repoIsPrivate = response.data.private;
     } catch (error) {
       console.error('Error fetching repository info:', error);
     }
