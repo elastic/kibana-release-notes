@@ -2,12 +2,13 @@ import { useMemo } from 'react';
 import { Octokit } from '@octokit/rest';
 import uniq from 'lodash.uniq';
 import { Endpoints, RequestError } from '@octokit/types';
-import { GITHUB_OWNER, GITHUB_REPO, KIBANA_REPO_ID } from './constants';
+import { GITHUB_OWNER } from './constants';
 import { getOctokit } from './github';
 import semver, { SemVer } from 'semver';
 import parseLinkHeader from 'parse-link-header';
 import { Observable, Subject } from 'rxjs';
 import { useNavigate } from 'react-router-dom';
+import { useActiveConfig } from '../config';
 
 type Progress<T> =
   | { type: 'progress'; items: T[]; percentage: number }
@@ -15,6 +16,11 @@ type Progress<T> =
 
 export type PrItem = Endpoints['GET /search/issues']['response']['data']['items'][number];
 export type Label = PrItem['labels'][number];
+
+interface GitHubServiceConfig {
+  octokit: Octokit;
+  repoName: string;
+}
 
 const SEMVER_REGEX = /^v(\d+)\.(\d+)\.(\d+)$/;
 
@@ -36,12 +42,32 @@ function filterPrsForVersion(
 }
 
 class GitHubService {
-  constructor(private octokit: Octokit) {}
+  private octokit: Octokit;
+  private repoId: number | undefined;
+  public repoName: string;
+
+  constructor(config: GitHubServiceConfig) {
+    this.octokit = config.octokit;
+    this.repoName = config.repoName;
+    this.initializeRepo();
+  }
+
+  private async initializeRepo(): Promise<void> {
+    try {
+      const response = await this.octokit.repos.get({
+        owner: GITHUB_OWNER,
+        repo: this.repoName,
+      });
+      this.repoId = response.data.id;
+    } catch (error) {
+      console.error('Error fetching repository info:', error);
+    }
+  }
 
   public async getUpcomingReleaseVersions(): Promise<string[]> {
     const response = await this.octokit.repos.listReleases({
       owner: GITHUB_OWNER,
-      repo: GITHUB_REPO,
+      repo: this.repoName,
       per_page: 10,
     });
 
@@ -75,7 +101,8 @@ class GitHubService {
    */
   private async getHighestVersionsForMajor(major: number, minorCount: number): Promise<string[]> {
     const allLabelsResponse = await this.octokit.search.labels({
-      repository_id: KIBANA_REPO_ID,
+      // TODO: better undefined checking for repoId instead of casting
+      repository_id: this.repoId as number,
       q: `v${major}.`,
       per_page: 100,
       sort: 'created',
@@ -104,7 +131,8 @@ class GitHubService {
 
   private async getVersionsForMinor(major: number, minors: number[]): Promise<string[]> {
     const labelsResponse = await this.octokit.search.labels({
-      repository_id: KIBANA_REPO_ID,
+      // TODO: better undefined checking for repoId instead of casting
+      repository_id: this.repoId as number,
       q: minors.map((minor) => `v${major}.${minor}.`).join(' '),
       per_page: 100,
       sort: 'created',
@@ -153,7 +181,7 @@ class GitHubService {
       priorVersionLabels.map((label) => {
         return this.octokit.repos.getReleaseByTag({
           owner: GITHUB_OWNER,
-          repo: GITHUB_REPO,
+          repo: this.repoName,
           tag: label,
         });
       })
@@ -173,7 +201,7 @@ class GitHubService {
 
   public async getApiChanesPrsForVersion(version: string) {
     const options = this.octokit.search.issuesAndPullRequests.endpoint.merge({
-      q: `repo:${GITHUB_OWNER}/${GITHUB_REPO} label:release_note:plugin_api_changes label:${version}`,
+      q: `repo:${GITHUB_OWNER}/${this.repoName} label:release_note:plugin_api_changes label:${version}`,
     });
     const items = await this.octokit.paginate<PrItem>(options);
     return filterPrsForVersion(items, version);
@@ -199,7 +227,7 @@ class GitHubService {
       // major label and exclude them in the search.
       const labelsQuery = this.octokit.search.labels.endpoint.merge({
         q: `v${semVer.major - 1}`,
-        repository_id: KIBANA_REPO_ID,
+        repository_id: this.repoId,
       });
 
       excludedVersions = (await this.octokit.paginate<Label>(labelsQuery)).map(
@@ -214,7 +242,7 @@ class GitHubService {
       includedLabels.length > 0 ? `label:${includedLabels.map((l) => `"${l}"`).join(',')}` : '';
     const options = this.octokit.search.issuesAndPullRequests.endpoint.merge({
       q:
-        `repo:${GITHUB_OWNER}/${GITHUB_REPO} label:${version} is:pr is:merged ` +
+        `repo:${GITHUB_OWNER}/${this.repoName} label:${version} is:pr is:merged ` +
         `base:master base:main base:${semVer.major}.x base:${semVer.major}.${semVer.minor} ` +
         `${labelExclusions} ${labelInclusion}`,
       per_page: 100,
@@ -256,9 +284,11 @@ export function clearGitHubService(): void {
 
 export function useGitHubService(): [GitHubService, GitHubErrorHandler] {
   const navigate = useNavigate();
+  const config = useActiveConfig();
+
   return useMemo(() => {
-    if (!service) {
-      service = new GitHubService(getOctokit());
+    if (!service || service.repoName !== config.repoName) {
+      service = new GitHubService({ octokit: getOctokit(), repoName: config.repoName });
     }
 
     const errorHandler = (error: Error | RequestError): void => {
@@ -276,5 +306,5 @@ export function useGitHubService(): [GitHubService, GitHubErrorHandler] {
     // via clearGitHubService. This is fine, since we're never calling clearGitHubService
     // while there's still a page open using this hook, that would need to be rerendered.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigate, service]);
+  }, [navigate, service, config.repoName]);
 }

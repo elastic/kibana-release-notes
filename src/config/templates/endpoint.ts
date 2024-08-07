@@ -26,6 +26,7 @@ export const endpointLabels = [
 ];
 
 export const endpointTemplate: Config = {
+  repoName: 'endpoint-dev',
   includedLabels: endpointLabels,
   excludedLabels: ['backport', 'release_note:skip'],
   areas: [

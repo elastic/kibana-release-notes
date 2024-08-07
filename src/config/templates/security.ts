@@ -28,6 +28,7 @@ export const securityLabels = [
 ];
 
 export const securityTemplate: Config = {
+  repoName: 'kibana',
   includedLabels: securityLabels,
   excludedLabels: ['backport', 'release_note:skip'],
   areas: [

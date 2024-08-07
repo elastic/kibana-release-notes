@@ -2,6 +2,7 @@ import type { Config } from './types';
 import { securityLabels } from './security';
 
 export const kibanaTemplate: Config = {
+  repoName: 'kibana',
   excludedLabels: ['release_note:skip', 'Team:Docs', 'reverted', 'backport'],
   areas: [
     {
