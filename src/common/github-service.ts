@@ -103,7 +103,6 @@ class GitHubService {
    */
   private async getHighestVersionsForMajor(major: number, minorCount: number): Promise<string[]> {
     const allLabelsResponse = await this.octokit.search.labels({
-      // TODO: better undefined checking for repoId instead of casting
       repository_id: this.repoId as number,
       q: `v${major}.`,
       per_page: 100,
@@ -133,7 +132,6 @@ class GitHubService {
 
   private async getVersionsForMinor(major: number, minors: number[]): Promise<string[]> {
     const labelsResponse = await this.octokit.search.labels({
-      // TODO: better undefined checking for repoId instead of casting
       repository_id: this.repoId as number,
       q: minors.map((minor) => `v${major}.${minor}.`).join(' '),
       per_page: 100,
