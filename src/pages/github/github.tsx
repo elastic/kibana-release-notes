@@ -65,7 +65,7 @@ const stateMachine = Machine<Context, StateSchema, Events>(
             {
               target: 'error.invalidScope',
               cond: (context, event: DoneInvokeEvent<TokenValidated>) =>
-                !event.data.scopes.includes('public_repo'),
+                !event.data.scopes.includes('repo'),
             },
             {
               target: 'success',
@@ -182,8 +182,9 @@ export const GitHubSettings: FC = () => {
             <EuiLink href="https://github.com/settings/tokens" target="_blank">
               GitHub
             </EuiLink>{' '}
-            and click <em>Generate new token</em>. The token must have <strong>only</strong> the{' '}
-            <EuiCode>public_repo</EuiCode> permission.
+            and click <em>Generate new token</em>. The token must have the{' '}
+            <EuiCode>public_repo</EuiCode> permission for public repos and the full{' '}
+            <EuiCode>repo</EuiCode> scope for private repos.
           </p>
           <p>
             Enable SSO for this token after creating it by clicking <em>Configure SSO</em> in the
@@ -213,7 +214,7 @@ export const GitHubSettings: FC = () => {
           )}
           {current.matches('error.invalidScope') && (
             <EuiTextColor color="danger">
-              Your token is missing the <EuiCode>public_repo</EuiCode> permission.
+              Your token is missing the <EuiCode>repo</EuiCode> permission.
             </EuiTextColor>
           )}
         </EuiText>

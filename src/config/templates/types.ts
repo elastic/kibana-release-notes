@@ -34,4 +34,5 @@ export interface Config {
     };
     prGroup: string;
   };
+  repoName: string;
 }

@@ -8,52 +8,70 @@ interface PrProps {
   showAuthor?: boolean;
   showTransformedTitle?: boolean;
   normalizeOptions?: NormalizeOptions;
+  repoIsPrivate?: boolean;
 }
 
-export const Pr: FC<PrProps> = memo(
-  ({ pr, showAuthor, showTransformedTitle, normalizeOptions }) => {
-    const title: ReleaseNoteDetails = showTransformedTitle
-      ? extractReleaseNotes(pr, normalizeOptions)
-      : { type: 'title', title: pr.title };
-    return (
-      <>
-        {title.title} (
-        <EuiLink target="_blank" href={pr.html_url}>
-          #{pr.number}
-        </EuiLink>{' '}
-        {showAuthor && (
-          <>
-            by <em>{pr.user?.login}</em>
-          </>
-        )}
-        ){' '}
-        {title.type === 'releaseNoteTitle' && (
-          <EuiIconTip
-            color="secondary"
-            type="iInCircle"
-            size="m"
-            content={
-              <>
-                This title was extracted from the PR description. Original PR title was:{' '}
-                <em>{title.originalTitle}</em>
-              </>
-            }
-          />
-        )}
-        {title.type === 'releaseNoteDetails' && (
-          <EuiIconTip
-            color="secondary"
-            type="visText"
-            size="m"
-            content={
-              <>
-                This PR had a lengthy release note description, that will be put into the release
-                notes and might need to be shortened.
-              </>
-            }
-          />
-        )}
-      </>
-    );
+const getLinkAndAuthor = (prProps: PrProps) => {
+  const { pr, showAuthor, repoIsPrivate } = prProps;
+
+  if (repoIsPrivate && !showAuthor) {
+    return '';
   }
-);
+
+  return (
+    <>
+      {' ('}
+      {!repoIsPrivate && (
+        <EuiLink target="_blank" href={pr.html_url}>
+          {`#${pr.number}`}
+        </EuiLink>
+      )}
+      {showAuthor && (
+        <>
+          {`${repoIsPrivate ? '' : ' '}by `}
+          <em>{pr.user?.login}</em>
+        </>
+      )}
+      {')'}
+    </>
+  );
+};
+
+export const Pr: FC<PrProps> = memo((props) => {
+  const { pr, showTransformedTitle, normalizeOptions } = props;
+  const title: ReleaseNoteDetails = showTransformedTitle
+    ? extractReleaseNotes(pr, normalizeOptions)
+    : { type: 'title', title: pr.title };
+  return (
+    <>
+      {title.title}
+      {getLinkAndAuthor(props)}
+      {title.type === 'releaseNoteTitle' && (
+        <EuiIconTip
+          color="secondary"
+          type="iInCircle"
+          size="m"
+          content={
+            <>
+              This title was extracted from the PR description. Original PR title was:{' '}
+              <em>{title.originalTitle}</em>
+            </>
+          }
+        />
+      )}
+      {title.type === 'releaseNoteDetails' && (
+        <EuiIconTip
+          color="secondary"
+          type="visText"
+          size="m"
+          content={
+            <>
+              This PR had a lengthy release note description, that will be put into the release
+              notes and might need to be shortened.
+            </>
+          }
+        />
+      )}
+    </>
+  );
+});
