@@ -5,6 +5,8 @@ export const securityLabels = [
   'Team:SecuritySolution',
   'Team: SecuritySolution',
   'Team:Endpoint Response',
+  'Team:Entity Analytics',
+  'Team:Security Generative AI',
   'Team:Threat Hunting',
   'Team:Threat Hunting:Explore',
   'Team:Threat Hunting:Investigations',
