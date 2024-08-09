@@ -80,10 +80,10 @@ export const endpointTemplate: Config = {
     },
     prGroup: '{{{prs}}}',
     prs: {
-      breaking: `*{{{title}}}*\n\n!!TODO!!\n\nSee ({kibana-pull}{{number}}[#{{number}}]) for details.\n`,
-      deprecation: `*{{{title}}}*\n\n!!TODO!!\n\nSee ({kibana-pull}{{number}}[#{{number}}]) for details.\n`,
+      breaking: `*{{{title}}}*\n\n!!TODO!!\n`,
+      deprecation: `*{{{title}}}*\n\n!!TODO!!\n`,
       _other_:
-        '* {{{title}}} ({kibana-pull}{{number}}[#{{number}}]).' +
+        '* {{{title}}}.' +
         '{{#details}}\n////\n!!TODO!! The above PR had a lengthy release note description:\n{{{details}}}\n////{{/details}}',
     },
   },
