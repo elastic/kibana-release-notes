@@ -17,7 +17,6 @@ import { setConfig, useActiveConfig } from '../../../config';
 
 interface UncategorizedPrProps {
   pr: PrItem;
-  repoIsPrivate: boolean | undefined;
 }
 
 const LabelBadge: FC<{ label: Label }> = memo(({ label }) => {
@@ -84,7 +83,7 @@ const LabelBadge: FC<{ label: Label }> = memo(({ label }) => {
   );
 });
 
-export const UncategorizedPr: FC<UncategorizedPrProps> = memo(({ pr, repoIsPrivate }) => {
+export const UncategorizedPr: FC<UncategorizedPrProps> = memo(({ pr }) => {
   // We only want to show non version non release_note labels in the UI
   const filteredLables = useMemo(
     () =>
@@ -96,7 +95,7 @@ export const UncategorizedPr: FC<UncategorizedPrProps> = memo(({ pr, repoIsPriva
   return (
     <EuiSplitPanel.Outer>
       <EuiSplitPanel.Inner paddingSize="s">
-        <Pr pr={pr} showAuthor={true} repoIsPrivate={repoIsPrivate} />
+        <Pr pr={pr} showAuthor={true} />
       </EuiSplitPanel.Inner>
       <EuiSplitPanel.Inner paddingSize="s" color="subdued">
         {filteredLables.length > 0 && (
