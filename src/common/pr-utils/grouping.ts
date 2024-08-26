@@ -73,20 +73,6 @@ export function groupPrs(prs: PrItem[], options: GroupPrOptions = {}): ReleaseNo
             break;
           case 'release_note:feature':
             groups.features.push(pr);
-            // We treat the feature label slightly different, so that it will be also grouped
-            // into the enhancement category (for the "all changes list", that doesn't list
-            // features), unless it also has another release_note label on it that will then define
-            // its group.
-            if (
-              options.includeFeaturesInEnhancements &&
-              // Check if there's any release_note: label other than release_note:feature
-              !pr.labels.some(
-                ({ name }) =>
-                  name && name.startsWith('release_note:') && name !== 'release_note:feature'
-              )
-            ) {
-              groups.enhancements.push(pr);
-            }
             break;
         }
       }

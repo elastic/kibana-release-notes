@@ -7,10 +7,9 @@ import { GroupedPrList, UncategorizedPr } from './components';
 
 interface Props {
   prs: PrItem[];
-  repoIsPrivate: boolean | undefined;
 }
 
-export const PrepareReleaseNotes: FC<Props> = ({ prs, repoIsPrivate }) => {
+export const PrepareReleaseNotes: FC<Props> = ({ prs }) => {
   const config = useActiveConfig();
   const groupedPrs = useMemo(() => groupPrs(prs), [prs]);
 
@@ -50,7 +49,7 @@ export const PrepareReleaseNotes: FC<Props> = ({ prs, repoIsPrivate }) => {
           <ul>
             {groupedPrs.missingLabel.map((pr) => (
               <li key={pr.id}>
-                <Pr pr={pr} showAuthor={true} repoIsPrivate={repoIsPrivate} />
+                <Pr pr={pr} showAuthor={true} />
               </li>
             ))}
           </ul>
@@ -74,7 +73,7 @@ export const PrepareReleaseNotes: FC<Props> = ({ prs, repoIsPrivate }) => {
           <EuiSpacer size="m" />
           {unknownPrs.map((pr) => (
             <React.Fragment key={pr.id}>
-              <UncategorizedPr pr={pr} repoIsPrivate={repoIsPrivate} />
+              <UncategorizedPr pr={pr} />
               <EuiSpacer size="s" />
             </React.Fragment>
           ))}
@@ -88,7 +87,7 @@ export const PrepareReleaseNotes: FC<Props> = ({ prs, repoIsPrivate }) => {
           <ul>
             {groupedPrs.breaking.map((pr) => (
               <li key={`breaking-${pr.id}`}>
-                <Pr pr={pr} showTransformedTitle={true} repoIsPrivate={repoIsPrivate} />
+                <Pr pr={pr} showTransformedTitle={true} />
               </li>
             ))}
           </ul>
@@ -102,7 +101,7 @@ export const PrepareReleaseNotes: FC<Props> = ({ prs, repoIsPrivate }) => {
           <ul>
             {groupedPrs.deprecation.map((pr) => (
               <li key={`deprecation-${pr.id}`}>
-                <Pr pr={pr} showTransformedTitle={true} repoIsPrivate={repoIsPrivate} />
+                <Pr pr={pr} showTransformedTitle={true} />
               </li>
             ))}
           </ul>
@@ -113,12 +112,7 @@ export const PrepareReleaseNotes: FC<Props> = ({ prs, repoIsPrivate }) => {
           <h2>
             Features (<EuiCode>release_note:feature</EuiCode>)
           </h2>
-          <GroupedPrList
-            groupedPrs={featurePrs}
-            groups={config.areas}
-            keyPrefix="features"
-            repoIsPrivate={repoIsPrivate}
-          />
+          <GroupedPrList groupedPrs={featurePrs} groups={config.areas} keyPrefix="features" />
         </>
       )}
       {Object.keys(enhancementPrs).length > 0 && (
@@ -130,7 +124,6 @@ export const PrepareReleaseNotes: FC<Props> = ({ prs, repoIsPrivate }) => {
             groupedPrs={enhancementPrs}
             groups={config.areas}
             keyPrefix="enhancements"
-            repoIsPrivate={repoIsPrivate}
           />
         </>
       )}
@@ -139,12 +132,7 @@ export const PrepareReleaseNotes: FC<Props> = ({ prs, repoIsPrivate }) => {
           <h2>
             Bug fixes (<EuiCode>release_note:fix</EuiCode>)
           </h2>
-          <GroupedPrList
-            groupedPrs={fixesPr}
-            groups={config.areas}
-            keyPrefix="fixes"
-            repoIsPrivate={repoIsPrivate}
-          />
+          <GroupedPrList groupedPrs={fixesPr} groups={config.areas} keyPrefix="fixes" />
         </>
       )}
     </EuiText>
