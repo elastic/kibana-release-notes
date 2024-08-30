@@ -178,7 +178,7 @@ export const kibanaTemplate: Config = {
     },
     {
       title: 'Observability',
-      labels: ['Feature:Observability Home', 'Feature:SLO'],
+      labels: ['Feature:Observability Home', 'Feature:SLO', 'Team:obs-ux-management', 'Team:Obs AI Assistant', 'Team:obs-ux-infra_services'],
     },
     {
       title: 'Infrastructure',
