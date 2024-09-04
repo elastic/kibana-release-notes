@@ -229,6 +229,10 @@ export const kibanaTemplate: Config = {
       title: 'Data Discovery',
       labels: ['Team:DataDiscovery'],
     },
+    {
+      title: 'Search',
+      labels: ['Team:Search'],
+    },
   ],
   templates: {
     pages: {
