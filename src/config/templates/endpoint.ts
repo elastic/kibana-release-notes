@@ -1,33 +1,7 @@
 import type { Config } from './types';
 
-export const endpointLabels = [
-  'feature:hostisolation',
-  'feature:memoryscan',
-  'feature:harden',
-  'feature:memoryprotection',
-  'feature:comms',
-  'feature:performance',
-  'feature:malware',
-  'feature:events',
-  'feature:install',
-  'feature:policy',
-  'feature:ransomware',
-  'feature:security',
-  'feature:testing',
-  'feature:rules',
-  'feature:ASR',
-  'feature:shipper',
-  'feature:code_quality',
-  'feature:false-positives',
-  'feature:filescore',
-  'feature:telemetry',
-  'feature:agentintegration',
-  'feature:user_experience',
-];
-
 export const endpointTemplate: Config = {
   repoName: 'endpoint-dev',
-  includedLabels: endpointLabels,
   excludedLabels: ['backport', 'release_note:skip'],
   areas: [
     {
