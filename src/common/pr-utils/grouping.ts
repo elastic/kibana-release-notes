@@ -1,6 +1,5 @@
 import { PrItem } from '../../common';
-import { Config } from '../../config';
-import { AreaDefinition } from '../../config/templates';
+import { Config, AreaDefinition } from '../../config';
 
 export interface ReleaseNoteGroups<T> {
   fixes: T;
