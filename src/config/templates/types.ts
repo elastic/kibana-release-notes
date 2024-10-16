@@ -1,4 +1,4 @@
-interface AreaDefinition {
+export interface AreaDefinition {
   title: string;
   labels?: readonly string[];
   /**
