@@ -1,5 +1,5 @@
 import { PrItem } from '../../common';
-import { Config, AreaDefinition } from '../../config';
+import { Config } from '../../config';
 
 export interface ReleaseNoteGroups<T> {
   fixes: T;
@@ -21,14 +21,9 @@ export function groupByArea(prs: PrItem[], { areas }: Config): GroupedByArea {
   // TODO: How to handle/track PRs in multiple areas.
   const grouped = prs.reduce<{ unknown: PrItem[]; areas: { [title: string]: PrItem[] } }>(
     (grouped, pr) => {
-      let matchingAreas: AreaDefinition[] = [];
-      if (!areas || areas.length === 0) {
-        matchingAreas = [{ title: '', labels: [] }];
-      } else {
-        matchingAreas = areas.filter(
-          ({ labels }) => labels && pr.labels.some(({ name }) => name && labels.includes(name))
-        );
-      }
+      const matchingAreas = areas.filter(
+        ({ labels }) => labels && pr.labels.some(({ name }) => name && labels.includes(name))
+      );
 
       if (matchingAreas.length === 0) {
         grouped.unknown.push(pr);
