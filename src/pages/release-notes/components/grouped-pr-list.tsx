@@ -11,7 +11,7 @@ interface Props {
 
 export const GroupedPrList: FC<Props> = memo(({ groupedPrs, groups, keyPrefix }) => {
   const sortedGroups = useMemo(
-    () => [...groups].sort((a, b) => a.title.localeCompare(b.title)),
+    () => (groups ? [...groups].sort((a, b) => a.title.localeCompare(b.title)) : [{ title: '' }]),
     [groups]
   );
   return (

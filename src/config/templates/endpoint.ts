@@ -3,11 +3,7 @@ import type { Config } from './types';
 export const endpointTemplate: Config = {
   repoName: 'endpoint-dev',
   excludedLabels: ['backport', 'release_note:skip'],
-  areas: [
-    {
-      title: 'Elastic Endpoint',
-    },
-  ],
+  areas: [],
   templates: {
     pages: {
       releaseNotes: `[discrete]
