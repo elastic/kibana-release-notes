@@ -212,6 +212,10 @@ export const kibanaTemplate: Config = {
       labels: ['Feature:Alerting', 'Team:Alerting Services', 'Feature:Actions'],
     },
     {
+      title: 'Cases',
+      labels: ['Feature:Cases'],
+    },
+    {
       title: 'Metrics',
       labels: ['Feature:Metrics UI', 'Team:logs-metrics-ui'],
     },
