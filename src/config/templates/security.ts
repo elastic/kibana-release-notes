@@ -22,11 +22,13 @@ export const securityLabels = [
   'Team:Detection Engine',
   'Team:Defend Workflows',
   'Team:Detection Rules',
+  'Team:Security-Scalability',
   'Feature:Timeline',
   'Feature:Detection Rules',
   'Feature:Detection Alerts',
   'Feature:Entity Analytics',
   'Feature:Rule Exceptions',
+  'Feature:AutomaticImport',
 ];
 
 export const securityTemplate: Config = {
