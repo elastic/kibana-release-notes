@@ -46,6 +46,10 @@ export const ReleaseNotesWizard: FC<Props> = ({ onVersionSelected }) => {
     );
   }, [errorHandler, github]);
 
+  useEffect(() => {
+    github.getServerlessReleaseSHAs();
+  }, [github]);
+
   const onValidateVersion = async (version: string): Promise<void> => {
     setValidateVersion(version);
     setIsValidatingVersion(true);

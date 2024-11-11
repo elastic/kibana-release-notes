@@ -270,6 +270,22 @@ class GitHubService {
 
     return progressSubject$.asObservable();
   }
+
+  public async getServerlessReleaseSHAs() {
+    /**
+     * Find the last two Kibana commits which were promoted to production-canary successfully. We
+     * cannot use the deploy@ tags from the Kibana repo, since they do not always reach prod. We
+     * need to be careful matching with this query because kibana-controller is managed in serverless-gitops as well.
+     */
+    const commits = await this.octokit.search.commits({
+      q: `repo:${GITHUB_OWNER}/serverless-gitops "gitops: production-canary-ds" "Artifact promotion for kibana to git-"`,
+      sort: 'committer-date',
+    });
+
+    const shas = commits.data.items
+      .slice(0, 2)
+      .map((item) => item.commit.message.split('See elastic/kibana@')[1]);
+  }
 }
 
 let service: GitHubService | undefined;
