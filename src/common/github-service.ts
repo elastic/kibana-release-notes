@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo } from 'react';
 import { Octokit } from '@octokit/rest';
 import uniq from 'lodash.uniq';
+import chunk from 'lodash.chunk';
 import { Endpoints, RequestError } from '@octokit/types';
 import { GITHUB_OWNER } from './constants';
 import { getOctokit } from './github';
@@ -281,10 +283,63 @@ class GitHubService {
       q: `repo:${GITHUB_OWNER}/serverless-gitops "gitops: production-canary-ds" "Artifact promotion for kibana to git-"`,
       sort: 'committer-date',
     });
-
     const shas = commits.data.items
       .slice(0, 2)
       .map((item) => item.commit.message.split('See elastic/kibana@')[1]);
+
+    const compareResult = await this.octokit.repos.compareCommits({
+      owner: GITHUB_OWNER,
+      repo: this.repoName,
+      base: shas[1],
+      head: shas[0],
+    });
+    const commitNodeIds = compareResult.data.commits.map((commit) => commit.node_id);
+
+    const query = `
+    query($commitNodeIds: [ID!]!) {
+      nodes(ids: $commitNodeIds) {
+        ... on Commit {
+          associatedPullRequests(first: 10) {
+            nodes {
+              url
+              title
+              number
+              labels(first: 50) {
+                nodes {
+                  name
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+
+    const pullRequests: PrItem[] = [];
+    const chunks = chunk(commitNodeIds, 20);
+    const promises = chunks.map((chunk) => {
+      const variables = {
+        commitNodeIds: chunk,
+      };
+
+      return this.octokit.graphql(query, variables);
+    });
+
+    const results = await Promise.all(promises);
+
+    results.forEach((result) => {
+      // @ts-expect-error type not defined yet
+      result.nodes.forEach((node: any) => {
+        if (node.associatedPullRequests) {
+          node.associatedPullRequests.nodes.forEach((pr: any) => {
+            pullRequests.push(pr);
+          });
+        }
+      });
+    });
+
+    console.log(pullRequests);
   }
 }
 
