@@ -287,11 +287,11 @@ class GitHubService {
       .slice(0, 2)
       .map((item) => item.commit.message.split('See elastic/kibana@')[1]);
 
-    const compareResult = await this.octokit.repos.compareCommits({
+    // TODO add error handling
+    const compareResult = await this.octokit.repos.compareCommitsWithBasehead({
       owner: GITHUB_OWNER,
       repo: this.repoName,
-      base: shas[1],
-      head: shas[0],
+      basehead: `${shas[1]}...${shas[0]}`,
     });
     const commitNodeIds = compareResult.data.commits.map((commit) => commit.node_id);
 
