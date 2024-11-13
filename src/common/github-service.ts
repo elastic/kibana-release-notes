@@ -4,6 +4,7 @@ import { Octokit } from '@octokit/rest';
 import uniq from 'lodash.uniq';
 import chunk from 'lodash.chunk';
 import { Endpoints, RequestError } from '@octokit/types';
+import { Commit, PullRequest } from '@octokit/graphql-schema';
 import { GITHUB_OWNER } from './constants';
 import { getOctokit } from './github';
 import semver, { SemVer } from 'semver';
@@ -18,6 +19,7 @@ type Progress<T> =
 
 export type PrItem = Endpoints['GET /search/issues']['response']['data']['items'][number];
 export type Label = PrItem['labels'][number];
+export type ServerlessPrItem = Pick<PullRequest, 'url' | 'title' | 'number' | 'body' | 'labels'>;
 
 interface GitHubServiceConfig {
   octokit: Octokit;
@@ -304,6 +306,7 @@ class GitHubService {
               url
               title
               number
+              body
               labels(first: 50) {
                 nodes {
                   name
@@ -316,24 +319,25 @@ class GitHubService {
     }
   `;
 
-    const pullRequests: PrItem[] = [];
+    const pullRequests: ServerlessPrItem[] = [];
     const chunks = chunk(commitNodeIds, 20);
     const promises = chunks.map((chunk) => {
       const variables = {
         commitNodeIds: chunk,
       };
 
-      return this.octokit.graphql(query, variables);
+      return this.octokit.graphql<{ nodes: Commit[] }>(query, variables);
     });
 
     const results = await Promise.all(promises);
 
     results.forEach((result) => {
-      // @ts-expect-error type not defined yet
-      result.nodes.forEach((node: any) => {
+      result.nodes.forEach((node) => {
         if (node.associatedPullRequests) {
-          node.associatedPullRequests.nodes.forEach((pr: any) => {
-            pullRequests.push(pr);
+          node.associatedPullRequests.nodes?.forEach((pr) => {
+            if (pr) {
+              pullRequests.push(pr);
+            }
           });
         }
       });
