@@ -19,7 +19,10 @@ type Progress<T> =
 
 export type PrItem = Endpoints['GET /search/issues']['response']['data']['items'][number];
 export type Label = PrItem['labels'][number];
-export type ServerlessPrItem = Pick<PullRequest, 'url' | 'title' | 'number' | 'body' | 'labels'>;
+export type ServerlessPrItem = Pick<
+  PullRequest,
+  'id' | 'url' | 'title' | 'number' | 'body' | 'labels' | 'author'
+>;
 
 interface GitHubServiceConfig {
   octokit: Octokit;
@@ -305,10 +308,14 @@ class GitHubService {
         ... on Commit {
           associatedPullRequests(first: 10) {
             nodes {
+              id
               url
               title
               number
               body
+              author {
+                login
+              }
               labels(first: 50) {
                 nodes {
                   name
@@ -353,6 +360,16 @@ class GitHubService {
           });
         }
       });
+    });
+
+    return pullRequests.map((pr) => {
+      return {
+        ...pr,
+        // @ts-expect-error sadasd
+        labels: pr.labels.nodes,
+        user: pr.author,
+        html_url: pr.url,
+      };
     });
   }
 }
