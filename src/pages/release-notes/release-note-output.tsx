@@ -1,6 +1,6 @@
 import { EuiFlexGroup, EuiFlexItem, EuiCallOut, EuiCode } from '@elastic/eui';
 import { FC, useMemo } from 'react';
-import { groupByArea, groupPrs, PrItem } from '../../common';
+import { groupByArea, groupPrs, PrItem, useGitHubService } from '../../common';
 import semver from 'semver';
 import {
   renderGroupedByArea,
@@ -16,6 +16,7 @@ interface Props {
 }
 
 export const ReleaseNoteOutput: FC<Props> = ({ prs, version: ver }) => {
+  const [github] = useGitHubService();
   const config = useActiveConfig();
   const version = ver.replace(/^v(.*)$/, '$1');
   const isServerless = ver === 'serverless';
@@ -57,11 +58,13 @@ export const ReleaseNoteOutput: FC<Props> = ({ prs, version: ver }) => {
           prs: renderedGroups,
           nextMajorVersion: isServerless ? '' : `${semver.major(version) + 1}.0.0`,
           isPatchRelease: isPatchVersion,
+          serverlessReleaseDate: github.serverlessReleaseDate,
         }
       ).trim(),
     [
       config.templates.pages.patchReleaseNotes,
       config.templates.pages.releaseNotes,
+      github.serverlessReleaseDate,
       isPatchVersion,
       isServerless,
       renderedGroups,

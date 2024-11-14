@@ -21,7 +21,7 @@ export const serverlessTemplate: Config = {
     pages: {
       releaseNotes: `[discrete]
 [[release-notes-{{version}}]]
-=== {{version}}
+=== {{serverlessReleaseDate}}
 {{#prs.breaking}}
 
 [discrete]

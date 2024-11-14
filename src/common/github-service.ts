@@ -51,6 +51,7 @@ class GitHubService {
   private octokit: Octokit;
   private repoId: number | undefined;
   public repoName: string;
+  public serverlessReleaseDate: string | undefined;
 
   constructor(config: GitHubServiceConfig) {
     this.octokit = config.octokit;
@@ -293,6 +294,16 @@ class GitHubService {
       .catch((error) => {
         throw error;
       });
+
+    const commitDate = commits.data.items[0]?.commit?.committer?.date;
+
+    if (commitDate) {
+      this.serverlessReleaseDate = new Date(commitDate).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    }
 
     const shas = commits.data.items
       .slice(0, 2)
