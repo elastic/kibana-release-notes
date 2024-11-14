@@ -275,7 +275,7 @@ class GitHubService {
     return progressSubject$.asObservable();
   }
 
-  public async getServerlessReleaseSHAs() {
+  public async getPrsForServerless() {
     /**
      * Find the last two Kibana commits which were promoted to production-canary successfully. We
      * cannot use the deploy@ tags from the Kibana repo, since they do not always reach prod. We
@@ -342,8 +342,6 @@ class GitHubService {
         }
       });
     });
-
-    console.log(pullRequests);
   }
 }
 
