@@ -365,12 +365,11 @@ class GitHubService {
     return pullRequests.map((pr) => {
       return {
         ...pr,
-        // @ts-expect-error sadasd
-        labels: pr.labels.nodes,
+        labels: pr.labels?.nodes ?? [],
         user: pr.author,
         html_url: pr.url,
       };
-    });
+    }) as any as PrItem[];
   }
 }
 
