@@ -18,7 +18,8 @@ interface Props {
 export const ReleaseNoteOutput: FC<Props> = ({ prs, version: ver }) => {
   const config = useActiveConfig();
   const version = ver.replace(/^v(.*)$/, '$1');
-  const isPatchVersion = semver.patch(version) !== 0;
+  const isServerless = ver === 'serverless';
+  const isPatchVersion = isServerless ? false : semver.patch(version) !== 0;
 
   const renderedGroups = useMemo(() => {
     const grouped = groupPrs(prs, { includeFeaturesInEnhancements: true });
@@ -54,7 +55,7 @@ export const ReleaseNoteOutput: FC<Props> = ({ prs, version: ver }) => {
           version,
           minorVersion: version.replace(/\.\d+$/, ''),
           prs: renderedGroups,
-          nextMajorVersion: `${semver.major(version) + 1}.0.0`,
+          nextMajorVersion: isServerless ? '' : `${semver.major(version) + 1}.0.0`,
           isPatchRelease: isPatchVersion,
         }
       ).trim(),
@@ -62,6 +63,7 @@ export const ReleaseNoteOutput: FC<Props> = ({ prs, version: ver }) => {
       config.templates.pages.patchReleaseNotes,
       config.templates.pages.releaseNotes,
       isPatchVersion,
+      isServerless,
       renderedGroups,
       version,
     ]
