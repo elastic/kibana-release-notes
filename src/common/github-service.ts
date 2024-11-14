@@ -286,20 +286,29 @@ class GitHubService {
      * cannot use the deploy@ tags from the Kibana repo, since they do not always reach prod. We
      * need to be careful matching with this query because kibana-controller is managed in serverless-gitops as well.
      */
-    const commits = await this.octokit.search.commits({
-      q: `repo:${GITHUB_OWNER}/serverless-gitops "gitops: production-canary-ds" "Artifact promotion for kibana to git-"`,
-      sort: 'committer-date',
-    });
+    const commits = await this.octokit.search
+      .commits({
+        q: `repo:${GITHUB_OWNER}/serverless-gitops "gitops: production-canary-ds" "Artifact promotion for kibana to git-"`,
+        sort: 'committer-date',
+      })
+      .catch((error) => {
+        throw error;
+      });
+
     const shas = commits.data.items
       .slice(0, 2)
       .map((item) => item.commit.message.split('See elastic/kibana@')[1]);
 
-    // TODO add error handling
-    const compareResult = await this.octokit.repos.compareCommitsWithBasehead({
-      owner: GITHUB_OWNER,
-      repo: 'kibana',
-      basehead: `${shas[1]}...${shas[0]}`,
-    });
+    const compareResult = await this.octokit.repos
+      .compareCommitsWithBasehead({
+        owner: GITHUB_OWNER,
+        repo: 'kibana',
+        basehead: `${shas[1]}...${shas[0]}`,
+      })
+      .catch((error) => {
+        throw error;
+      });
+
     const commitNodeIds = compareResult.data.commits.map((commit) => commit.node_id);
 
     const query = `
@@ -339,7 +348,9 @@ class GitHubService {
       return this.octokit.graphql<{ nodes: Commit[] }>(query, variables);
     });
 
-    const results = await Promise.all(promises);
+    const results = await Promise.all(promises).catch((error) => {
+      throw error;
+    });
 
     results.forEach((result) => {
       result.nodes.forEach((node) => {
