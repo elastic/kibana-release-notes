@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo } from 'react';
 import { Octokit } from '@octokit/rest';
 import uniq from 'lodash.uniq';
@@ -299,6 +298,7 @@ class GitHubService {
       .slice(0, 2)
       .map((item) => item.commit.message.split('See elastic/kibana@')[1]);
 
+    // Get all the merge commit between the two releases
     const compareResult = await this.octokit.repos
       .compareCommitsWithBasehead({
         owner: GITHUB_OWNER,
@@ -309,13 +309,13 @@ class GitHubService {
         throw error;
       });
 
+    // Find all the PRs which were associated with the merge commits
     const commitNodeIds = compareResult.data.commits.map((commit) => commit.node_id);
-
     const query = `
     query($commitNodeIds: [ID!]!) {
       nodes(ids: $commitNodeIds) {
         ... on Commit {
-          associatedPullRequests(first: 10) {
+          associatedPullRequests(first: 1) {
             nodes {
               id
               url
@@ -340,6 +340,7 @@ class GitHubService {
     const pullRequests: ServerlessPrItem[] = [];
     // Can use chunks up to 100, but they slow down the requests significantly
     const chunks = chunk(commitNodeIds, 20);
+
     const promises = chunks.map((chunk) => {
       const variables = {
         commitNodeIds: chunk,
@@ -380,6 +381,8 @@ class GitHubService {
         user: pr.author,
         html_url: pr.url,
       };
+      // Coerce to any because there is not full overlap between ServerlessPrItem and PrItem
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }) as any as PrItem[];
   }
 }

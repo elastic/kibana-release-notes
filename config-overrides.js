@@ -23,7 +23,7 @@ module.exports = {
   },
   devServer: (configFunction) => {
     return function (proxy, allowedHost) {
-      // Create the default config by calling configFunction with the proxy/allowedHost parameters
+      // Create the default config
       const config = configFunction(proxy, allowedHost);
 
       config.client = {
