@@ -4,14 +4,14 @@ import { Octokit } from '@octokit/rest';
 import uniq from 'lodash.uniq';
 import chunk from 'lodash.chunk';
 import { Endpoints, RequestError } from '@octokit/types';
-import { Commit, PullRequest } from '@octokit/graphql-schema';
+import { Commit, PullRequest, Label as GQLLabel } from '@octokit/graphql-schema';
 import { GITHUB_OWNER } from './constants';
 import { getOctokit } from './github';
 import semver, { SemVer } from 'semver';
 import parseLinkHeader from 'parse-link-header';
 import { Observable, Subject } from 'rxjs';
 import { useNavigate } from 'react-router-dom';
-import { useActiveConfig } from '../config';
+import { Config, useActiveConfig } from '../config';
 
 type Progress<T> =
   | { type: 'progress'; items: T[]; percentage: number }
@@ -275,7 +275,9 @@ class GitHubService {
     return progressSubject$.asObservable();
   }
 
-  public async getPrsForServerless() {
+  public async getPrsForServerless(config: Config) {
+    const { excludedLabels = [], includedLabels = [] } = config;
+
     /**
      * Find the last two Kibana commits which were promoted to production-canary successfully. We
      * cannot use the deploy@ tags from the Kibana repo, since they do not always reach prod. We
@@ -292,7 +294,7 @@ class GitHubService {
     // TODO add error handling
     const compareResult = await this.octokit.repos.compareCommitsWithBasehead({
       owner: GITHUB_OWNER,
-      repo: this.repoName,
+      repo: 'kibana',
       basehead: `${shas[1]}...${shas[0]}`,
     });
     const commitNodeIds = compareResult.data.commits.map((commit) => commit.node_id);
@@ -320,6 +322,7 @@ class GitHubService {
   `;
 
     const pullRequests: ServerlessPrItem[] = [];
+    // Can use chunks up to 100, but they slow down the requests significantly
     const chunks = chunk(commitNodeIds, 20);
     const promises = chunks.map((chunk) => {
       const variables = {
@@ -335,8 +338,17 @@ class GitHubService {
       result.nodes.forEach((node) => {
         if (node.associatedPullRequests) {
           node.associatedPullRequests.nodes?.forEach((pr) => {
-            if (pr) {
-              pullRequests.push(pr);
+            if (pr?.labels?.nodes) {
+              // Cannot filter by label in the GraphQL query, so we need to do it here
+              const prLabels = pr.labels.nodes.map((label) => (label as GQLLabel).name);
+              const hasExcludedLabel = prLabels.some((label) => excludedLabels.includes(label));
+              const hasIncludedLabel =
+                includedLabels.length === 0 ||
+                prLabels.some((label) => includedLabels.includes(label));
+
+              if (!hasExcludedLabel && hasIncludedLabel) {
+                pullRequests.push(pr);
+              }
             }
           });
         }
