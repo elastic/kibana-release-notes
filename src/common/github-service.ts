@@ -52,6 +52,7 @@ class GitHubService {
   private repoId: number | undefined;
   public repoName: string;
   public serverlessReleaseDate: string | undefined;
+  public serverlessReleaseTag: string | undefined;
 
   constructor(config: GitHubServiceConfig) {
     this.octokit = config.octokit;
@@ -295,19 +296,34 @@ class GitHubService {
         throw error;
       });
 
-    const commitDate = commits.data.items[0]?.commit?.committer?.date;
+    const shas = commits.data.items
+      .slice(0, 2)
+      .map((item) => item.commit.message.split('See elastic/kibana@')[1]);
 
-    if (commitDate) {
-      this.serverlessReleaseDate = new Date(commitDate).toLocaleDateString('en-US', {
+    const tags = await this.octokit
+      .paginate(this.octokit.repos.listTags, {
+        owner: GITHUB_OWNER,
+        repo: this.repoName,
+        per_page: 100,
+      })
+      .catch((error) => {
+        throw error;
+      });
+
+    const tagForReleaseCommit = tags.filter((tag) => tag.commit.sha.startsWith(shas[0])).pop();
+
+    if (tagForReleaseCommit) {
+      this.serverlessReleaseTag = tagForReleaseCommit.name;
+      this.serverlessReleaseDate = new Date(
+        Number(tagForReleaseCommit.name.split('@')[1]) * 1000
+      ).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
       });
+    } else {
+      throw new Error('No tag found for the release commit');
     }
-
-    const shas = commits.data.items
-      .slice(0, 2)
-      .map((item) => item.commit.message.split('See elastic/kibana@')[1]);
 
     // Get all the merge commit between the two releases
     const compareResult = await this.octokit.repos
