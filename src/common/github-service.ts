@@ -52,7 +52,7 @@ class GitHubService {
   private repoId: number | undefined;
   public repoName: string;
   public serverlessReleaseDate: string | undefined;
-  public serverlessReleaseTag: string | undefined;
+  public serverlessReleaseTag: string = '';
 
   constructor(config: GitHubServiceConfig) {
     this.octokit = config.octokit;

@@ -18,8 +18,8 @@ interface Props {
 export const ReleaseNoteOutput: FC<Props> = ({ prs, version: ver }) => {
   const [github] = useGitHubService();
   const config = useActiveConfig();
-  const version = ver.replace(/^v(.*)$/, '$1');
   const isServerless = ver === 'serverless';
+  const version = isServerless ? github.serverlessReleaseTag : ver.replace(/^v(.*)$/, '$1');
   const isPatchVersion = isServerless ? false : semver.patch(version) !== 0;
 
   const renderedGroups = useMemo(() => {
