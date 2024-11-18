@@ -38,6 +38,14 @@ export const ReleaseNotes: FC<Props> = ({ version, onVersionChange, ignoredPrior
   const loadPrs = useCallback(async () => {
     setLoading(true);
     setProgress(undefined);
+
+    if (version === 'serverless') {
+      setPrs(await github.getPrsForServerless(config));
+      setLoading(false);
+      setProgress(100);
+      return;
+    }
+
     try {
       subscriptionRef.current = (
         await github.getPrsForVersion(

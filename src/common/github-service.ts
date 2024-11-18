@@ -1,14 +1,16 @@
 import { useMemo } from 'react';
 import { Octokit } from '@octokit/rest';
 import uniq from 'lodash.uniq';
+import chunk from 'lodash.chunk';
 import { Endpoints, RequestError } from '@octokit/types';
+import { Commit, PullRequest, Label as GQLLabel } from '@octokit/graphql-schema';
 import { GITHUB_OWNER } from './constants';
 import { getOctokit } from './github';
 import semver, { SemVer } from 'semver';
 import parseLinkHeader from 'parse-link-header';
 import { Observable, Subject } from 'rxjs';
 import { useNavigate } from 'react-router-dom';
-import { useActiveConfig } from '../config';
+import { Config, useActiveConfig } from '../config';
 
 type Progress<T> =
   | { type: 'progress'; items: T[]; percentage: number }
@@ -16,6 +18,10 @@ type Progress<T> =
 
 export type PrItem = Endpoints['GET /search/issues']['response']['data']['items'][number];
 export type Label = PrItem['labels'][number];
+export type ServerlessPrItem = Pick<
+  PullRequest,
+  'id' | 'url' | 'title' | 'number' | 'body' | 'labels' | 'author'
+>;
 
 interface GitHubServiceConfig {
   octokit: Octokit;
@@ -45,6 +51,8 @@ class GitHubService {
   private octokit: Octokit;
   private repoId: number | undefined;
   public repoName: string;
+  public serverlessReleaseDate: string | undefined;
+  public serverlessReleaseTag: string = '';
 
   constructor(config: GitHubServiceConfig) {
     this.octokit = config.octokit;
@@ -269,6 +277,141 @@ class GitHubService {
     })();
 
     return progressSubject$.asObservable();
+  }
+
+  public async getPrsForServerless(config: Config) {
+    const { excludedLabels = [], includedLabels = [] } = config;
+
+    /**
+     * Find the last two Kibana commits which were promoted to production-canary successfully. We
+     * cannot use the deploy@ tags from the Kibana repo, since they do not always reach prod. We
+     * need to be careful matching with this query because kibana-controller is managed in serverless-gitops as well.
+     */
+    const commits = await this.octokit.search
+      .commits({
+        q: `repo:${GITHUB_OWNER}/serverless-gitops "gitops: production-canary-ds" "Artifact promotion for kibana to git-"`,
+        sort: 'committer-date',
+      })
+      .catch((error) => {
+        throw error;
+      });
+
+    const shas = commits.data.items
+      .slice(0, 2)
+      .map((item) => item.commit.message.split('See elastic/kibana@')[1]);
+
+    // Need to retrieve all the tags because ref tags are always last
+    const tags = await this.octokit
+      .paginate(this.octokit.repos.listTags, {
+        owner: GITHUB_OWNER,
+        repo: 'kibana',
+        per_page: 100,
+      })
+      .catch((error) => {
+        throw error;
+      });
+
+    const tagForReleaseCommit = tags.filter((tag) => tag.commit.sha.startsWith(shas[0])).pop();
+
+    if (tagForReleaseCommit) {
+      this.serverlessReleaseTag = tagForReleaseCommit.name;
+      this.serverlessReleaseDate = new Date(
+        Number(tagForReleaseCommit.name.split('@')[1]) * 1000
+      ).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    } else {
+      throw new Error('No tag found for the release commit');
+    }
+
+    // Get all the merge commit between the two releases
+    const compareResult = await this.octokit.repos
+      .compareCommitsWithBasehead({
+        owner: GITHUB_OWNER,
+        repo: 'kibana',
+        basehead: `${shas[1]}...${shas[0]}`,
+      })
+      .catch((error) => {
+        throw error;
+      });
+
+    // Find all the PRs which were associated with the merge commits
+    const commitNodeIds = compareResult.data.commits.map((commit) => commit.node_id);
+    const query = `
+    query($commitNodeIds: [ID!]!) {
+      nodes(ids: $commitNodeIds) {
+        ... on Commit {
+          associatedPullRequests(first: 1) {
+            nodes {
+              id
+              url
+              title
+              number
+              body
+              author {
+                login
+              }
+              labels(first: 50) {
+                nodes {
+                  name
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+
+    const pullRequests: ServerlessPrItem[] = [];
+    // Can use chunks up to 100, but they slow down the requests significantly
+    const chunks = chunk(commitNodeIds, 20);
+
+    const promises = chunks.map((chunk) => {
+      const variables = {
+        commitNodeIds: chunk,
+      };
+
+      return this.octokit.graphql<{ nodes: Commit[] }>(query, variables);
+    });
+
+    const results = await Promise.all(promises).catch((error) => {
+      throw error;
+    });
+
+    results.forEach((result) => {
+      result.nodes.forEach((node) => {
+        if (node.associatedPullRequests) {
+          node.associatedPullRequests.nodes?.forEach((pr) => {
+            if (pr?.labels?.nodes) {
+              // Cannot filter by label in the GraphQL query, so we need to do it here
+              const prLabels = pr.labels.nodes.map((label) => (label as GQLLabel).name);
+              const hasExcludedLabel = prLabels.some((label) => excludedLabels.includes(label));
+              const hasIncludedLabel =
+                includedLabels.length === 0 ||
+                prLabels.some((label) => includedLabels.includes(label));
+
+              if (!hasExcludedLabel && hasIncludedLabel) {
+                pullRequests.push(pr);
+              }
+            }
+          });
+        }
+      });
+    });
+
+    return pullRequests.map((pr) => {
+      return {
+        ...pr,
+        labels: pr.labels?.nodes ?? [],
+        user: pr.author,
+        html_url: pr.url,
+      };
+      // Coerce to any because there is not full overlap between ServerlessPrItem and PrItem
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }) as any as PrItem[];
   }
 }
 
