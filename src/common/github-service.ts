@@ -300,6 +300,7 @@ class GitHubService {
       .slice(0, 2)
       .map((item) => item.commit.message.split('See elastic/kibana@')[1]);
 
+    // Need to retrieve all the tags because ref tags are always last
     const tags = await this.octokit
       .paginate(this.octokit.repos.listTags, {
         owner: GITHUB_OWNER,
