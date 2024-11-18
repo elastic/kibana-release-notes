@@ -321,6 +321,7 @@ class GitHubService {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
+        timeZone: 'UTC',
       });
     } else {
       throw new Error('No tag found for the release commit');
