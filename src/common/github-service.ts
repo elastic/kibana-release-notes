@@ -303,7 +303,7 @@ class GitHubService {
     const tags = await this.octokit
       .paginate(this.octokit.repos.listTags, {
         owner: GITHUB_OWNER,
-        repo: this.repoName,
+        repo: 'kibana',
         per_page: 100,
       })
       .catch((error) => {
