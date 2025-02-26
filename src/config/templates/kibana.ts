@@ -6,10 +6,6 @@ export const kibanaTemplate: Config = {
   excludedLabels: ['release_note:skip', 'Team:Docs', 'reverted', 'backport'],
   areas: [
     {
-      title: 'Design',
-      labels: ['Team:Design', 'Project:Accessibility'],
-    },
-    {
       title: 'Logstash',
       labels: ['Feature:Logstash Pipelines'],
     },
@@ -85,7 +81,7 @@ export const kibanaTemplate: Config = {
       labels: ['Team:QA'],
     },
     {
-      title: 'Security',
+      title: 'Kibana security',
       labels: [
         'Team:Security',
         'Feature:Security/Spaces',
@@ -93,6 +89,7 @@ export const kibanaTemplate: Config = {
         'Feature:Security/Authentication',
         'Feature:Security/Authorization',
         'Feature:Security/Feature Controls',
+        'Team:Security-Scalability',
       ],
     },
     {
@@ -100,42 +97,12 @@ export const kibanaTemplate: Config = {
       labels: ['Feature:Canvas'],
     },
     {
-      title: 'Dashboard',
-      labels: ['Feature:Dashboard', 'Feature:Drilldowns', 'Project:TimeToVisualize'],
-    },
-    {
-      title: 'Discover',
-      labels: ['Feature:Discover'],
-    },
-    {
-      title: 'Kibana Home & Add Data',
-      labels: ['Feature:Add Data', 'Feature:Home'],
-    },
-    {
-      title: 'Querying & Filtering',
+      title: 'Dashboards and Visualizations',
       labels: [
-        'Feature:Query Bar',
-        'Feature:Courier',
-        'Feature:Filters',
-        'Feature:Timepicker',
-        'Feature:Highlight',
-        'Feature:KQL',
-        'Feature:Rollups',
-        'Feature:Search',
-        'Project:AsyncSearch',
-      ],
-    },
-    {
-      title: 'Reporting',
-      labels: ['Feature:Reporting', 'Team:Reporting Services'],
-    },
-    {
-      title: 'Sharing',
-      labels: ['Feature:Embedding', 'Feature:SharingURLs'],
-    },
-    {
-      title: 'Lens & Visualizations',
-      labels: [
+        'Feature:Dashboard', 
+        'Feature:Drilldowns', 
+        'Project:TimeToVisualize',
+        'Team:Presentation',
         'Feature:Lens',
         'Feature:Timelion',
         'Feature:TSVB',
@@ -165,8 +132,65 @@ export const kibanaTemplate: Config = {
       },
     },
     {
-      title: 'Elastic Security',
-      labels: securityLabels,
+      title: 'Discover',
+      labels: [
+        'Feature:Discover',
+        'Team:DataDiscovery',
+        'Team:ESQL',
+      ],
+    },
+    {
+      title: 'Querying & Filtering',
+      labels: [
+        'Feature:Query Bar',
+        'Feature:Courier',
+        'Feature:Filters',
+        'Feature:Timepicker',
+        'Feature:Highlight',
+        'Feature:KQL',
+        'Feature:Rollups',
+        'Feature:Search',
+        'Project:AsyncSearch',
+      ],
+    },
+    {
+      title: 'Reporting',
+      labels: ['Feature:Reporting', 'Team:Reporting Services'],
+    },
+    {
+      title: 'Sharing',
+      labels: ['Feature:Embedding', 'Feature:SharingURLs'],
+    },
+    {
+      title: 'Elastic Security solution',
+      labels: [
+        'Team:SIEM',
+        'Team:SecuritySolution',
+        'Team: SecuritySolution',
+        'Team:Endpoint Response',
+        'Team:Entity Analytics',
+        'Team:Security Generative AI',
+        'Team:Threat Hunting',
+        'Team:Threat Hunting:Explore',
+        'Team:Threat Hunting:Investigations',
+        'Team:Detections and Resp',
+        'Team:Asset Management',
+        'Team:Onboarding and Lifecycle Mgt',
+        'Team:Security Solution Platform',
+        'Team:Detection Alerts',
+        'Team: CTI',
+        'Team:CTI',
+        'Team:Threat Hunting:Cases',
+        'Team:Cloud Security',
+        'Team:Detection Engine',
+        'Team:Defend Workflows',
+        'Team:Detection Rules',
+        'Feature:Timeline',
+        'Feature:Detection Rules',
+        'Feature:Detection Alerts',
+        'Feature:Entity Analytics',
+        'Feature:Rule Exceptions',
+      ],
       options: {
         textOverwriteTemplate:
           'For the Elastic Security {{version}} release information, refer to {security-guide}/release-notes.html[_Elastic Security Solution Release Notes_].',
@@ -177,13 +201,17 @@ export const kibanaTemplate: Config = {
       labels: ['Team:Code'],
     },
     {
-      title: 'Observability',
+      title: 'Elastic Observability Solution',
       labels: [
         'Feature:Observability Home',
         'Feature:SLO',
         'Team:obs-ux-management',
         'Team:Obs AI Assistant',
         'Team:obs-ux-infra_services',
+        'Team:obs-ux-logs',
+        'Team:obs-knowledge',
+        'Team:obs-entities',
+        'ci:project-deploy-observability'
       ],
     },
     {
@@ -209,40 +237,31 @@ export const kibanaTemplate: Config = {
     },
     {
       title: 'Alerting',
-      labels: ['Feature:Alerting', 'Team:Alerting Services', 'Feature:Actions'],
-    },
-    {
-      title: 'Cases',
-      labels: ['Feature:Cases'],
+      labels: ['Feature:Alerting', 'Team:Alerting Services', 'Feature:Actions', 'Team:ResponseOps'],
     },
     {
       title: 'Metrics',
       labels: ['Feature:Metrics UI', 'Team:logs-metrics-ui'],
     },
     {
-      title: 'Data ingest',
-      labels: ['Ingest', 'Feature:Ingest Node Pipelines'],
+      title: 'Data ingestion and Fleet',
+      labels: ['Team:Fleet', 'Ingest', 'Feature:Ingest Node Pipelines'],
     },
     {
-      title: 'Fleet',
-      labels: ['Team:Fleet'],
+      title: 'Kibana platform',
+      labels: [
+        'Team:SharedUX',
+        'Team:Design',
+        'Project:Accessibility',
+        'Feature:Add Data',
+        'Feature:Home',
+        'Team:Cloud'
+      ],
     },
     {
-      title: 'Presentation',
-      labels: ['Team:Presentation'],
-    },
-    {
-      title: 'SharedUX',
-      labels: ['Team:SharedUX'],
-    },
-    {
-      title: 'Data Discovery',
-      labels: ['Team:DataDiscovery'],
-    },
-    {
-      title: 'Search',
-      labels: ['Team:Search'],
-    },
+      title: 'Elastic Search solution',
+      labels: ['Team:Search']
+    }
   ],
   templates: {
     pages: {
@@ -251,7 +270,7 @@ export const kibanaTemplate: Config = {
 
 coming::[{{version}}]
 
-For information about the {kib} {{version}} release, review the following information.
+Review the following information about the {kib} {{version}} release.
 
 {{#prs.breaking}}
 [float]
