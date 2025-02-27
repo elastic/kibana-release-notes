@@ -99,8 +99,8 @@ export const kibanaTemplate: Config = {
     {
       title: 'Dashboards and Visualizations',
       labels: [
-        'Feature:Dashboard', 
-        'Feature:Drilldowns', 
+        'Feature:Dashboard',
+        'Feature:Drilldowns',
         'Project:TimeToVisualize',
         'Team:Presentation',
         'Feature:Lens',
@@ -133,11 +133,7 @@ export const kibanaTemplate: Config = {
     },
     {
       title: 'Discover',
-      labels: [
-        'Feature:Discover',
-        'Team:DataDiscovery',
-        'Team:ESQL',
-      ],
+      labels: ['Feature:Discover', 'Team:DataDiscovery', 'Team:ESQL'],
     },
     {
       title: 'Querying & Filtering',
@@ -211,7 +207,7 @@ export const kibanaTemplate: Config = {
         'Team:obs-ux-logs',
         'Team:obs-knowledge',
         'Team:obs-entities',
-        'ci:project-deploy-observability'
+        'ci:project-deploy-observability',
       ],
     },
     {
@@ -255,13 +251,13 @@ export const kibanaTemplate: Config = {
         'Project:Accessibility',
         'Feature:Add Data',
         'Feature:Home',
-        'Team:Cloud'
+        'Team:Cloud',
       ],
     },
     {
       title: 'Elastic Search solution',
-      labels: ['Team:Search']
-    }
+      labels: ['Team:Search'],
+    },
   ],
   templates: {
     pages: {
