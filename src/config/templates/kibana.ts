@@ -133,7 +133,7 @@ export const kibanaTemplate: Config = {
     },
     {
       title: 'Discover',
-      labels: ['Feature:Discover', 'Team:DataDiscovery', 'Team:ESQL',],
+      labels: ['Feature:Discover', 'Team:DataDiscovery', 'Team:ESQL'],
     },
     {
       title: 'Querying & Filtering',
