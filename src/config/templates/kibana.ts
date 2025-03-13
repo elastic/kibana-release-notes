@@ -333,10 +333,12 @@ The {{version}} release includes the following bug fixes.
 [%collapsible]
 ====
 *Details* +
-!!TODO!! For more information, refer to ({kibana-pull}{{number}}[#{{number}}]).
+!!TODO!!
 
 *Impact* +
 !!TODO!!
+
+View ({kibana-pull}{{number}}[#{{number}}])
 ====
       `,
       deprecation: `[discrete]
@@ -345,10 +347,12 @@ The {{version}} release includes the following bug fixes.
 [%collapsible]
 ====
 *Details* +
-!!TODO!! For more information, refer to ({kibana-pull}{{number}}[#{{number}}]).
+!!TODO!!
 
 *Impact* +
 !!TODO!!
+
+View ({kibana-pull}{{number}}[#{{number}}])
 ====
       `,
       _other_:
