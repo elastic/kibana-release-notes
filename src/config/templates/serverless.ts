@@ -54,7 +54,7 @@ export const serverlessTemplate: Config = {
 
 [discrete]
 [[bug-fixes-{{version}}]]
-==== Bug fixes
+==== Fixes
 {{{prs.fixes}}}
 {{/prs.fixes}}
 
