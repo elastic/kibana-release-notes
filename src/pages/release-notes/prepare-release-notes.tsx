@@ -130,7 +130,7 @@ export const PrepareReleaseNotes: FC<Props> = ({ prs }) => {
       {Object.keys(fixesPr).length > 0 && (
         <>
           <h2>
-            Bug fixes (<EuiCode>release_note:fix</EuiCode>)
+            Fixes (<EuiCode>release_note:fix</EuiCode>)
           </h2>
           <GroupedPrList groupedPrs={fixesPr} groups={config.areas} keyPrefix="fixes" />
         </>

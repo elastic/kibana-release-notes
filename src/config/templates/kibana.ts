@@ -274,9 +274,9 @@ you make the necessary updates after you upgrade to {{version}}.
 For more information about the features introduced in {{version}}, refer to <<whats-new,What's new in {{minorVersion}}>>.
 
 [[enhancements-and-bug-fixes-v{{version}}]]
-{{^isPatchRelease}}=== Enhancements and bug fixes{{/isPatchRelease}}{{#isPatchRelease}}=== {kib} {{version}}{{/isPatchRelease}}
+{{^isPatchRelease}}=== Enhancements and fixes{{/isPatchRelease}}{{#isPatchRelease}}=== {kib} {{version}}{{/isPatchRelease}}
 
-For detailed information about the {{version}} release, review the enhancements and bug fixes.
+For detailed information about the {{version}} release, review the enhancements and fixes.
 
 {{#prs.breaking}}
 [float]
@@ -302,14 +302,14 @@ For detailed information about the {{version}} release, review the enhancements 
 {{#prs.fixes}}
 [float]
 [[fixes-v{{version}}]]
-=== Bug fixes
+=== Fixes
 {{{prs.fixes}}}
 {{/prs.fixes}}
       `,
       patchReleaseNotes: `[[release-notes-{{version}}]]
 == {kib} {{version}}
 
-The {{version}} release includes the following bug fixes.
+The {{version}} release includes the following fixes.
 
 {{#prs.enhancements}}
 [float]
@@ -321,7 +321,7 @@ The {{version}} release includes the following bug fixes.
 {{#prs.fixes}}
 [float]
 [[fixes-v{{version}}]]
-=== Bug fixes
+=== Fixes
 {{{prs.fixes}}}
 {{/prs.fixes}}
       `,
