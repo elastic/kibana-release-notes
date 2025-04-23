@@ -6,6 +6,10 @@ export const kibanaTemplate: Config = {
   excludedLabels: ['release_note:skip', 'Team:Docs', 'reverted', 'backport'],
   areas: [
     {
+      title: 'Theme',
+      labels: ['EUI'],
+    },
+    {
       title: 'Logstash',
       labels: ['Feature:Logstash Pipelines'],
     },
@@ -22,6 +26,7 @@ export const kibanaTemplate: Config = {
         'Feature:Dev Tools',
         'Feature:Inspector',
         'Feature:Index Management',
+        'Feature:Streams',
         'Feature:Snapshot and Restore',
         'Team:Elasticsearch UI',
         'Team:Stack Management',
@@ -70,6 +75,7 @@ export const kibanaTemplate: Config = {
         'Feature:File Data Viz',
         'Feature:ml-results',
         'Feature:Data Frame Analytics',
+        'Feature:Inference UI',
       ],
     },
     {
@@ -136,6 +142,10 @@ export const kibanaTemplate: Config = {
       labels: ['Feature:Discover', 'Team:DataDiscovery', 'Team:ESQL'],
     },
     {
+      title: 'ES|QL',
+      labels: ['Team:ESQL'],
+    },
+    {
       title: 'Querying & Filtering',
       labels: [
         'Feature:Query Bar',
@@ -162,7 +172,7 @@ export const kibanaTemplate: Config = {
       labels: securityLabels,
       options: {
         textOverwriteTemplate:
-          'For the Elastic Security {{version}} release information, refer to {security-guide}/release-notes.html[_Elastic Security Solution Release Notes_].',
+          'For the Elastic Security {{version}} release information, refer to [Elastic Security Solution Release Notes](docs-content://release-notes/elastic-security/index.md).',
       },
     },
     {
@@ -170,7 +180,7 @@ export const kibanaTemplate: Config = {
       labels: ['Team:Code'],
     },
     {
-      title: 'Elastic Observability Solution',
+      title: 'Elastic Observability solution',
       labels: [
         'Feature:Observability Home',
         'Feature:SLO',
@@ -181,36 +191,28 @@ export const kibanaTemplate: Config = {
         'Team:obs-knowledge',
         'Team:obs-entities',
         'ci:project-deploy-observability',
+        'Feature:Uptime',
+        'Team:uptime',
+        'Team:apm',
+        'Team:APM',
+        'Feature:Metrics UI',
+        'Team:logs-metrics-ui',
+        'Feature:Logs UI',
+        'Feature:Infra UI',
+        'Feature:Service Maps',
       ],
-    },
-    {
-      title: 'Infrastructure',
-      labels: ['Feature:Infra UI', 'Feature:Service Maps'],
-    },
-    {
-      title: 'Logs',
-      labels: ['Feature:Logs UI'],
-    },
-    {
-      title: 'Uptime',
-      labels: ['Feature:Uptime', 'Team:uptime'],
+      options: {
+        textOverwriteTemplate:
+          'For the Elastic Observability {{version}} release information, refer to [Elastic Observability Solution Release Notes](docs-content://release-notes/elastic-observability/index.md).',
+      },
     },
     {
       title: 'Beats Management',
       labels: ['Feature:beats-cm', 'Team:Beats'],
     },
     {
-      title: 'APM',
-      labels: ['Team:apm', 'Team:APM'],
-      priority: 100,
-    },
-    {
       title: 'Alerting',
       labels: ['Feature:Alerting', 'Team:Alerting Services', 'Feature:Actions', 'Team:ResponseOps'],
-    },
-    {
-      title: 'Metrics',
-      labels: ['Feature:Metrics UI', 'Team:logs-metrics-ui'],
     },
     {
       title: 'Data ingestion and Fleet',
@@ -228,137 +230,100 @@ export const kibanaTemplate: Config = {
       ],
     },
     {
-      title: 'Elastic Search solution',
+      title: 'Search',
       labels: ['Team:Search'],
     },
   ],
   templates: {
     pages: {
-      releaseNotes: `[[release-notes-{{version}}]]
-== {kib} {{version}}
+      releaseNotes: `% FEATURES, ENHANCEMENTS, FIXES
+% Paste in index.md
 
-coming::[{{version}}]
+## {{version}} [kibana-{{version}}-release-notes]
 
-Review the following information about the {kib} {{version}} release.
-
-{{#prs.breaking}}
-[float]
-[[breaking-changes-{{version}}]]
-=== Breaking changes
-
-Breaking changes can prevent your application from optimal operation and performance.
-Before you upgrade to {{version}}, review the breaking changes, then mitigate the impact to your application.
-
-{{{prs.breaking}}}
-{{/prs.breaking}}
-{{#prs.deprecations}}
-[float]
-[[deprecations-{{version}}]]
-=== Deprecations
-
-The following functionality is deprecated in {{version}}, and will be removed in {{nextMajorVersion}}.
-Deprecated functionality does not have an immediate impact on your application, but we strongly recommend
-you make the necessary updates after you upgrade to {{version}}.
-
-{{{prs.deprecations}}}
-{{/prs.deprecations}}
 {{#prs.features}}
-[float]
-[[features-{{version}}]]
-=== Features
-{kib} {{version}} adds the following new and notable features.
+
+### Features and enhancements [kibana-{{version}}-features-enhancements]
 
 {{{prs.features}}}
 {{/prs.features}}
 
-For more information about the features introduced in {{version}}, refer to <<whats-new,What's new in {{minorVersion}}>>.
-
-[[enhancements-and-bug-fixes-v{{version}}]]
-{{^isPatchRelease}}=== Enhancements and fixes{{/isPatchRelease}}{{#isPatchRelease}}=== {kib} {{version}}{{/isPatchRelease}}
-
-For detailed information about the {{version}} release, review the enhancements and fixes.
-
-{{#prs.breaking}}
-[float]
-[[breaking-v{{version}}]]
-=== Breaking
-{{{prs.breaking}}}
-
-{{/prs.breaking}}
-{{#prs.deprecations}}
-[float]
-[[deprecation-v{{version}}]]
-=== Deprecations
-{{{prs.deprecations}}}
-
-{{/prs.deprecations}}
 {{#prs.enhancements}}
-[float]
-[[enhancement-v{{version}}]]
-=== Enhancements
-{{{prs.enhancements}}}
 
+{{{prs.enhancements}}}
 {{/prs.enhancements}}
+
+
+### Fixes [kibana-{{version}}-fixes]
+
 {{#prs.fixes}}
-[float]
-[[fixes-v{{version}}]]
-=== Fixes
+
 {{{prs.fixes}}}
 {{/prs.fixes}}
-      `,
-      patchReleaseNotes: `[[release-notes-{{version}}]]
-== {kib} {{version}}
 
-The {{version}} release includes the following fixes.
+{{#prs.breaking}}
+% BREAKING CHANGES
+% Paste in breaking-changes.md
+
+## {{version}} [kibana-{{version}}-breaking-changes]
+
+{{{prs.breaking}}}
+{{/prs.breaking}}
+
+
+{{#prs.deprecations}}
+% DEPRECATIONS
+% Paste in deprecations.md
+
+## {{version}} [kibana-{{version}}-deprecations]
+
+{{{prs.deprecations}}}
+{{/prs.deprecations}}
+
+      `,
+      patchReleaseNotes: `% ENHANCEMENTS, FIXES
+% Paste in index.md
+
+## {{version}} [kibana-{{version}}-release-notes]
 
 {{#prs.enhancements}}
-[float]
-[[enhancement-v{{version}}]]
-=== Enhancements
+### Enhancements [kibana-{{version}}-features-enhancements]
 {{{prs.enhancements}}}
 
 {{/prs.enhancements}}
 {{#prs.fixes}}
-[float]
-[[fixes-v{{version}}]]
-=== Fixes
+### Fixes [kibana-{{version}}-fixes]
 {{{prs.fixes}}}
 {{/prs.fixes}}
       `,
     },
     prs: {
-      breaking: `[discrete]
-[[breaking-{{number}}]]
-* {{{title}}}.
-[%collapsible]
-====
-*Details* +
-!!TODO!!
+      breaking: `$$$kibana-{{number}}$$$
+::::{dropdown} {{{title}}}
+% **Details**<br> Description
 
-*Impact* +
-!!TODO!!
+% **Impact**<br> Impact of the breaking change.
 
-View ({kibana-pull}{{number}}[#{{number}}])
-====
+% **Action**<br> Steps for mitigating impact.
+
+View [#{{number}}](https://github.com/elastic/kibana/pull/{{number}}).
+::::
       `,
-      deprecation: `[discrete]
-[[deprecation-{{number}}]]
-* {{{title}}}.
-[%collapsible]
-====
-*Details* +
-!!TODO!!
+      deprecation: `$$$kibana-{{number}}$$$
+::::{dropdown} {{{title}}}
+% **Details**<br> Description
 
-*Impact* +
-!!TODO!!
+% **Impact**<br> Impact of the deprecation.
 
-View ({kibana-pull}{{number}}[#{{number}}])
-====
+% **Action**<br> Steps for mitigating impact.
+
+View [#{{number}}](https://github.com/elastic/kibana/pull/{{number}}).
+::::
       `,
       _other_:
-        '* {{{title}}} ({kibana-pull}{{number}}[#{{number}}]).' +
-        '{{#details}}\n////\n!!TODO!! The above PR had a lengthy release note description:\n{{{details}}}\n////{{/details}}',
+        '* {{{title}}} [#{{number}}](https://github.com/elastic/kibana/pull/{{number}}).' +
+        '{{#details}}\n% !!TODO!! This PR has a lengthy release note description:\n% {{{details}}}\n{{/details}}',
     },
-    prGroup: `{{{groupTitle}}}::\n{{{prs}}}`,
+    prGroup: `**{{{groupTitle}}}**:\n{{{prs}}}\n`,
   },
 } as const;
