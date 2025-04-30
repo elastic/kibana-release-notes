@@ -95,7 +95,7 @@ class GitHubService {
     );
 
     return [
-      ...[previousPatch ? [previousPatch.inc('patch')] : []],
+      ...(previousPatch ? [previousPatch.inc('patch')] : []),
       latestVersion.inc('patch').format(),
       latestVersion.inc('minor').format(),
       latestVersion.inc('major').format(),
