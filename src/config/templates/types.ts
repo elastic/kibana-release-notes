@@ -12,6 +12,21 @@ interface AreaDefinition {
   };
 }
 
+interface Template {
+  pages: {
+    releaseNotes: string;
+    patchReleaseNotes?: string;
+  };
+  prs: {
+    breaking?: string;
+    deprecation?: string;
+    _other_: string;
+  };
+  prGroup: string;
+}
+
+type TemplateType = 'markdown' | 'asciidoc';
+
 export interface Config {
   /**
    * A list of exclude labels. PRs having any of this label won't be rendered into the release note.
@@ -22,17 +37,6 @@ export interface Config {
    */
   includedLabels?: readonly string[];
   areas: readonly AreaDefinition[];
-  templates: {
-    pages: {
-      releaseNotes: string;
-      patchReleaseNotes?: string;
-    };
-    prs: {
-      breaking?: string;
-      deprecation?: string;
-      _other_: string;
-    };
-    prGroup: string;
-  };
+  templates: Record<TemplateType, Template>;
   repoName: string;
 }
