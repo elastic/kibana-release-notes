@@ -1,1 +1,1 @@
-export * from './asciidoc';
+export * from './render';

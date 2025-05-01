@@ -1,2 +1,2 @@
 export * from './config';
-export type { TemplateId, Config } from './templates';
+export type { TemplateId, Config, TemplateType } from './templates';

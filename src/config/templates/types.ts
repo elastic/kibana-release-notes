@@ -25,7 +25,7 @@ interface Template {
   prGroup: string;
 }
 
-type TemplateType = 'markdown' | 'asciidoc';
+export type TemplateType = 'markdown' | 'asciidoc';
 
 export interface Config {
   /**
