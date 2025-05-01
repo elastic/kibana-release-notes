@@ -12,7 +12,7 @@ interface AreaDefinition {
   };
 }
 
-interface Template {
+interface OutputTemplate {
   pages: {
     releaseNotes: string;
     patchReleaseNotes?: string;
@@ -25,7 +25,7 @@ interface Template {
   prGroup: string;
 }
 
-export type TemplateType = 'markdown' | 'asciidoc';
+export type OutputTemplateType = 'markdown' | 'asciidoc';
 
 export interface Config {
   /**
@@ -37,6 +37,6 @@ export interface Config {
    */
   includedLabels?: readonly string[];
   areas: readonly AreaDefinition[];
-  templates: Record<TemplateType, Template>;
+  templates: Record<OutputTemplateType, OutputTemplate>;
   repoName: string;
 }

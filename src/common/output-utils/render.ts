@@ -1,5 +1,5 @@
 import Mustache from 'mustache';
-import { Config, TemplateType } from '../../config';
+import { Config, OutputTemplateType } from '../../config';
 import { PrItem } from '../github-service';
 import { extractReleaseNotes, GroupedByArea, NormalizeOptions } from '../pr-utils';
 import { groupByArea, groupPrs } from '../../common';
@@ -15,7 +15,7 @@ interface RenderPageContext {
 
 type PrType = 'feature' | 'enhancement' | 'fix' | 'breaking' | 'deprecation';
 
-const getTemplateTypeKey = (isMarkdown: boolean): TemplateType => {
+const getTemplateTypeKey = (isMarkdown: boolean): OutputTemplateType => {
   return isMarkdown ? 'markdown' : 'asciidoc';
 };
 
