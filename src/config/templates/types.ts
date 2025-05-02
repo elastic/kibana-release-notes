@@ -51,5 +51,5 @@ export interface OutputTemplateOptions {
   /**
    * Defaults to name property if not provided. eg: security
    */
-  url_path?: string;
+  urlPath?: string;
 }

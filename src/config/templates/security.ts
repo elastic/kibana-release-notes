@@ -99,7 +99,7 @@ export const securityTemplate: Config = {
       navigationTitle: 'Elastic Security',
       name: 'elastic-security',
       templateNameTag: 'elastic-sec',
-      url_path: 'security',
+      urlPath: 'security',
     }),
   },
 };

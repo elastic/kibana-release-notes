@@ -6,7 +6,7 @@ export const generateMarkdownTemplate = ({
   name,
   navigationTitle,
   templateNameTag = name,
-  url_path = name,
+  urlPath = name,
 }: OutputTemplateOptions): OutputTemplate => {
   // We want this to render as {{kib}} etc in the MD file, so we change the tag delimiters temporarily
   const escapedTemplateNameTag = createEscapedTag(templateNameTag);
@@ -17,10 +17,10 @@ export const generateMarkdownTemplate = ({
       releaseNotes: `---
 navigation_title: "${navigationTitle}"
 mapped_pages:
-  - https://www.elastic.co/guide/en/${url_path}/current/release-notes.html
-  - https://www.elastic.co/guide/en/${url_path}/current/whats-new.html
-  - https://www.elastic.co/guide/en/${url_path}/master/release-notes-{{version}}.html
-  - https://www.elastic.co/guide/en/${url_path}/master/enhancements-and-bug-fixes-v{{version}}.html
+  - https://www.elastic.co/guide/en/${urlPath}/current/release-notes.html
+  - https://www.elastic.co/guide/en/${urlPath}/current/whats-new.html
+  - https://www.elastic.co/guide/en/${urlPath}/master/release-notes-{{version}}.html
+  - https://www.elastic.co/guide/en/${urlPath}/master/enhancements-and-bug-fixes-v{{version}}.html
 ---
 
 # ${escapedTemplateNameTag} release notes [${name}-release-notes]
