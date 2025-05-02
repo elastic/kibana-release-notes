@@ -36,6 +36,7 @@ export const ReleaseNoteOutput: FC<Props> = ({ prs, version: ver }) => {
           nextMajorVersion: isServerless ? '' : `${semver.major(version) + 1}.0.0`,
           isPatchRelease: isPatchVersion,
           serverlessReleaseDate: github.serverlessReleaseDate,
+          versionWithoutPeriods: version.replace(/\./g, ''),
         },
         isMarkdown
       ),

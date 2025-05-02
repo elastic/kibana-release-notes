@@ -12,7 +12,7 @@ interface AreaDefinition {
   };
 }
 
-interface OutputTemplate {
+export interface OutputTemplate {
   pages: {
     releaseNotes: string;
     patchReleaseNotes?: string;
@@ -39,4 +39,17 @@ export interface Config {
   areas: readonly AreaDefinition[];
   templates: Record<OutputTemplateType, OutputTemplate>;
   repoName: string;
+}
+
+export interface OutputTemplateOptions {
+  name: string;
+  navigationTitle: string;
+  /**
+   * Defaults to name property if not provided. eg: kib
+   */
+  templateNameTag?: string;
+  /**
+   * Defaults to name property if not provided. eg: security
+   */
+  url_path?: string;
 }

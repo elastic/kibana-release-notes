@@ -1,6 +1,6 @@
 import type { Config } from './types';
 
-export const serverlessLabels = [
+const serverlessLabels = [
   'Team:SecuritySolution',
   'Team: SecuritySolution',
   'serverless-bugfix',
