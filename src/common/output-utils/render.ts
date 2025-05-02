@@ -78,6 +78,7 @@ function renderGroupedByArea(
     if (areas[area.title]) {
       output.push(
         Mustache.render(config.templates[templateTypeKey].prGroup, {
+          hasPRGroups: config.areas.length > 1,
           groupTitle: area.title,
           // If the area has a textOverwriteTemplate render that instead of the list of PRs
           prs: area.options?.textOverwriteTemplate

@@ -47,7 +47,6 @@ To check for security updates, go to [Security announcements for the Elastic sta
 
 
 ### Features and enhancements [${name}-{{versionWithoutPeriods}}-features-enhancements]
-
 {{#prs.features}}
 {{{prs.features}}}
 {{/prs.features}}
@@ -57,7 +56,6 @@ To check for security updates, go to [Security announcements for the Elastic sta
 
 
 ### Fixes [${name}-{{versionWithoutPeriods}}-fixes]
-
 {{#prs.fixes}}
 {{{prs.fixes}}}
 {{/prs.fixes}}
@@ -71,6 +69,6 @@ To check for security updates, go to [Security announcements for the Elastic sta
         `* {{{title}}} [#{{number}}](${kibPullTag}{{number}}).` +
         '{{#details}}\n////\n!!TODO!! The above PR had a lengthy release note description:\n{{{details}}}\n////{{/details}}',
     },
-    prGroup: `**{{{groupTitle}}}**:\n{{{prs}}}\n`,
+    prGroup: `{{#hasPRGroups}}\n\n**{{{groupTitle}}}**:\n{{{prs}}}{{/hasPRGroups}}{{^hasPRGroups}}{{{prs}}}{{/hasPRGroups}}`,
   };
 };
