@@ -1,5 +1,5 @@
 import type { Config } from './types';
-import { markdownCommonTemplate } from './common';
+import { generateMarkdownTemplate } from './common';
 
 export const securityLabels = [
   'Team:SIEM',
@@ -95,7 +95,7 @@ export const securityTemplate: Config = {
           '{{#details}}\n////\n!!TODO!! The above PR had a lengthy release note description:\n{{{details}}}\n////{{/details}}',
       },
     },
-    markdown: markdownCommonTemplate({
+    markdown: generateMarkdownTemplate({
       navigationTitle: 'Elastic Security',
       name: 'elastic-security',
       templateNameTag: 'elastic-sec',

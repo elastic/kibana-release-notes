@@ -2,7 +2,7 @@ import type { OutputTemplate, OutputTemplateOptions } from './types';
 
 const createEscapedTag = (str: string) => `{{=<% %>=}}{{${str}}}<%={{ }}=%>`;
 
-export const markdownCommonTemplate = ({
+export const generateMarkdownTemplate = ({
   name,
   navigationTitle,
   templateNameTag = name,

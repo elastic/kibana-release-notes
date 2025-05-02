@@ -1,6 +1,6 @@
 import type { Config } from './types';
 import { securityLabels } from './security';
-import { markdownCommonTemplate } from './common';
+import { generateMarkdownTemplate } from './common';
 
 export const kibanaTemplate: Config = {
   repoName: 'kibana',
@@ -363,7 +363,7 @@ View ({kibana-pull}{{number}}[#{{number}}])
       },
       prGroup: `{{{groupTitle}}}::\n{{{prs}}}`,
     },
-    markdown: markdownCommonTemplate({
+    markdown: generateMarkdownTemplate({
       navigationTitle: 'Kibana',
       name: 'kibana',
       templateNameTag: 'kib',
