@@ -59,12 +59,34 @@ To check for security updates, go to [Security announcements for the Elastic sta
 {{#prs.fixes}}
 {{{prs.fixes}}}
 {{/prs.fixes}}
+
+
+---
+navigation_title: "Deprecations"
+---
+
+# ${escapedTemplateNameTag} deprecations [${name}-deprecations]
+Over time, certain Elastic functionality becomes outdated and is replaced or removed. To help with the transition, Elastic deprecates functionality for a period before removal, giving you time to update your applications.
+
+Review the deprecated functionality for ${escapedTemplateNameTag}. While deprecations have no immediate impact, we strongly encourage you update your implementation after you upgrade. To learn how to upgrade, check out [Upgrade](docs-content://deploy-manage/upgrade.md).
+
+% ## Next version [${name}-next-deprecations]
+
+## {{version}} [${name}-{{versionWithoutPeriods}}-deprecations]
+{{#prs.deprecations}}
+{{{prs.deprecations}}}
+{{/prs.deprecations}}
 `,
       patchReleaseNotes: ``,
     },
     prs: {
       breaking: ``,
-      deprecation: ``,
+      deprecation: `\n\n::::{dropdown} {{{title}}}
+!!TODO!! Description of the deprecation.
+For more information, refer to [#{{number}}](${kibPullTag}{{number}}).
+**Impact**<br> Impact of deprecation.
+**Action**<br> Steps for mitigating deprecation impact.
+::::`,
       _other_:
         `* {{{title}}} [#{{number}}](${kibPullTag}{{number}}).` +
         '{{#details}}\n////\n!!TODO!! The above PR had a lengthy release note description:\n{{{details}}}\n////{{/details}}',
