@@ -113,7 +113,7 @@ For more information, refer to [#{{number}}](${kibPullTag}{{number}}).
 ::::`,
       _other_:
         `* {{{title}}} [#{{number}}](${kibPullTag}{{number}}).` +
-        '{{#details}}\n% !!TODO!! The above PR had a lengthy release note description:\n% {{{details}}}\n{{/details}}',
+        '{{#details}}\n% !!TODO!! The above PR had a lengthy release note description:\n% {{{details}}}{{/details}}',
     },
     prGroup: `{{#hasPRGroups}}\n\n**{{{groupTitle}}}**:\n{{{prs}}}{{/hasPRGroups}}{{^hasPRGroups}}{{{prs}}}{{/hasPRGroups}}`,
   };
