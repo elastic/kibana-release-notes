@@ -86,14 +86,14 @@ Review the deprecated functionality for ${escapedTemplateNameTag}. While depreca
     prs: {
       breaking: ``,
       deprecation: `\n\n::::{dropdown} {{{title}}}
-!!TODO!! Description of the deprecation.
+% !!TODO!! Description of the deprecation.
 For more information, refer to [#{{number}}](${kibPullTag}{{number}}).
 **Impact**<br> Impact of deprecation.
 **Action**<br> Steps for mitigating deprecation impact.
 ::::`,
       _other_:
         `* {{{title}}} [#{{number}}](${kibPullTag}{{number}}).` +
-        '{{#details}}\n////\n!!TODO!! The above PR had a lengthy release note description:\n{{{details}}}\n////{{/details}}',
+        '{{#details}}\n% !!TODO!! The above PR had a lengthy release note description:\n% {{{details}}}\n{{/details}}',
     },
     prGroup: `{{#hasPRGroups}}\n\n**{{{groupTitle}}}**:\n{{{prs}}}{{/hasPRGroups}}{{^hasPRGroups}}{{{prs}}}{{/hasPRGroups}}`,
   };
