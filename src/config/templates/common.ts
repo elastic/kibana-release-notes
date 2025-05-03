@@ -64,6 +64,22 @@ To check for security updates, go to [Security announcements for the Elastic sta
         patchTemplate +
         `
 
+{{#prs.breaking}}
+---
+navigation_title: "Breaking changes"
+mapped_pages:
+  - https://www.elastic.co/guide/en/${urlPath}/current/breaking-changes-summary.html
+---
+# ${escapedTemplateNameTag} breaking changes [${name}-breaking-changes]
+Breaking changes can impact your Elastic applications, potentially disrupting normal operations. Before you upgrade, carefully review the ${escapedTemplateNameTag} breaking changes and take the necessary steps to mitigate any issues. To learn how to upgrade, check [Upgrade](/deploy-manage/upgrade.md).
+
+% ## Next version [${name}-next-breaking-changes]
+
+## {{version}} [${name}-{{versionWithoutPeriods}}-breaking-changes]
+{{{prs.breaking}}}
+{{/prs.breaking}}
+
+
 {{#prs.deprecations}}
 ---
 navigation_title: "Deprecations"
@@ -77,19 +93,23 @@ Review the deprecated functionality for ${escapedTemplateNameTag}. While depreca
 % ## Next version [${name}-next-deprecations]
 
 ## {{version}} [${name}-{{versionWithoutPeriods}}-deprecations]
-
 {{{prs.deprecations}}}
 {{/prs.deprecations}}
 `,
       patchReleaseNotes: patchTemplate,
     },
     prs: {
-      breaking: ``,
+      breaking: `\n\n::::{dropdown} {{{title}}} 
+% !!TODO!! Description of the breaking change.
+For more information, check [#{{number}}](${kibPullTag}{{number}}).
+% !!TODO!! **Impact**<br> Impact of the breaking change.
+% !!TODO!! **Action**<br> Steps for mitigating deprecation impact.
+::::`,
       deprecation: `\n\n::::{dropdown} {{{title}}}
 % !!TODO!! Description of the deprecation.
 For more information, refer to [#{{number}}](${kibPullTag}{{number}}).
-**Impact**<br> Impact of deprecation.
-**Action**<br> Steps for mitigating deprecation impact.
+% !!TODO!! **Impact**<br> Impact of deprecation.
+% !!TODO!! **Action**<br> Steps for mitigating deprecation impact.
 ::::`,
       _other_:
         `* {{{title}}} [#{{number}}](${kibPullTag}{{number}}).` +
