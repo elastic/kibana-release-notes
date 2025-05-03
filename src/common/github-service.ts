@@ -51,7 +51,7 @@ class GitHubService {
   private octokit: Octokit;
   private repoId: number | undefined;
   public repoName: string;
-  public serverlessReleaseDate: string | undefined;
+  public serverlessReleaseDate: Date | undefined;
   public serverlessReleaseTag: string = '';
 
   constructor(config: GitHubServiceConfig) {
@@ -315,14 +315,7 @@ class GitHubService {
 
     if (tagForReleaseCommit) {
       this.serverlessReleaseTag = tagForReleaseCommit.name;
-      this.serverlessReleaseDate = new Date(
-        Number(tagForReleaseCommit.name.split('@')[1]) * 1000
-      ).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        timeZone: 'UTC',
-      });
+      this.serverlessReleaseDate = new Date(Number(tagForReleaseCommit.name.split('@')[1]) * 1000);
     } else {
       throw new Error('No tag found for the release commit');
     }

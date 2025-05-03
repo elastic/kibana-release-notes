@@ -15,7 +15,16 @@ export const ReleaseNoteOutput: FC<Props> = ({ prs, version: ver }) => {
   const [github] = useGitHubService();
   const config = useActiveConfig();
   const isServerless = ver === 'serverless';
-  const version = isServerless ? github.serverlessReleaseTag : ver.replace(/^v(.*)$/, '$1');
+  const version = isServerless
+    ? github.serverlessReleaseDate
+        ?.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          timeZone: 'UTC',
+        })
+        .replace(/\//g, '') ?? ''
+    : ver.replace(/^v(.*)$/, '$1');
   const isPatchVersion = isServerless ? false : semver.patch(version) !== 0;
   // Docs output changed from ascii to markdown in 9.0.0
   const isMarkdown = isServerless || semver.gte(ver, '9.0.0');
@@ -35,7 +44,12 @@ export const ReleaseNoteOutput: FC<Props> = ({ prs, version: ver }) => {
           prs: renderedGroups,
           nextMajorVersion: isServerless ? '' : `${semver.major(version) + 1}.0.0`,
           isPatchRelease: isPatchVersion,
-          serverlessReleaseDate: github.serverlessReleaseDate,
+          serverlessReleaseDate: github.serverlessReleaseDate?.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            timeZone: 'UTC',
+          }),
           versionWithoutPeriods: version.replace(/\./g, ''),
         },
         isMarkdown

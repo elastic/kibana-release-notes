@@ -1,36 +1,5 @@
 import type { Config } from './types';
-import { generateMarkdownTemplate } from './common';
-
-export const securityLabels = [
-  'Team:SIEM',
-  'Team:SecuritySolution',
-  'Team: SecuritySolution',
-  'Team:Endpoint Response',
-  'Team:Entity Analytics',
-  'Team:Security Generative AI',
-  'Team:Threat Hunting',
-  'Team:Threat Hunting:Explore',
-  'Team:Threat Hunting:Investigations',
-  'Team:Detections and Resp',
-  'Team:Asset Management',
-  'Team:Onboarding and Lifecycle Mgt',
-  'Team:Security Solution Platform',
-  'Team:Detection Alerts',
-  'Team: CTI',
-  'Team:CTI',
-  'Team:Threat Hunting:Cases',
-  'Team:Cloud Security',
-  'Team:Detection Engine',
-  'Team:Defend Workflows',
-  'Team:Detection Rules',
-  'Team:Security-Scalability',
-  'Feature:Timeline',
-  'Feature:Detection Rules',
-  'Feature:Detection Alerts',
-  'Feature:Entity Analytics',
-  'Feature:Rule Exceptions',
-  'Feature:AutomaticImport',
-];
+import { generateMarkdownTemplate, securityLabels } from './common';
 
 export const securityTemplate: Config = {
   repoName: 'kibana',

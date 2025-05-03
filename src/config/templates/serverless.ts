@@ -1,22 +1,10 @@
 import type { Config } from './types';
-
-const serverlessLabels = [
-  'Team:SecuritySolution',
-  'Team: SecuritySolution',
-  'serverless-bugfix',
-  'serverless-enhancement',
-];
+import { kibanaAreas, kibPullTag } from './common';
 
 export const serverlessTemplate: Config = {
   repoName: 'kibana',
-  includedLabels: serverlessLabels,
   excludedLabels: ['backport', 'release_note:skip', 'reverted'],
-  areas: [
-    {
-      title: 'Elastic Security',
-      labels: serverlessLabels,
-    },
-  ],
+  areas: kibanaAreas,
   templates: {
     asciidoc: {
       pages: {
@@ -72,54 +60,44 @@ export const serverlessTemplate: Config = {
     },
     markdown: {
       pages: {
-        releaseNotes: `[discrete]
-[[release-notes-{{version}}]]
-=== {{serverlessReleaseDate}}
-{{#prs.breaking}}
+        releaseNotes: `## {{serverlessReleaseDate}} [serverless-changelog-{{version}}]
 
-[discrete]
-[[breaking-changes-{{version}}]]
-==== Breaking changes
-{{{prs.breaking}}}
-{{/prs.breaking}}
-{{#prs.deprecations}}
-
-[discrete]
-[[deprecations-{{version}}]]
-==== Deprecations
-{{{prs.deprecations}}}
-{{/prs.deprecations}}
 {{#prs.features}}
+### Features and enhancements [serverless-changelog-{{version}}-features-enhancements]
 
-[discrete]
-[[features-{{version}}]]
-==== New features
 {{{prs.features}}}
 {{/prs.features}}
 {{#prs.enhancements}}
-
-[discrete]
-[[enhancements-{{version}}]]
-==== Enhancements
 {{{prs.enhancements}}}
 {{/prs.enhancements}}
-{{#prs.fixes}}
 
-[discrete]
-[[bug-fixes-{{version}}]]
-==== Fixes
+
+{{#prs.fixes}}
+### Fixes [serverless-changelog-{{version}}-fixes]
+
 {{{prs.fixes}}}
 {{/prs.fixes}}
 
+
+{{#prs.breaking}}
+# {{serverlessReleaseDate}} [elastic-cloud-serverless-{{version}}-breaking]
+{{{prs.breaking}}}
+{{/prs.breaking}}
+
+
+{{#prs.deprecations}}
+# {{serverlessReleaseDate}} [elastic-cloud-serverless-{{version}}-deprecations]
+{{{prs.deprecations}}}
+{{/prs.deprecations}}
 `,
       },
       prGroup: '{{{prs}}}',
       prs: {
-        breaking: `*{{{title}}}*\n\n!!TODO!!\n\nSee ({kibana-pull}{{number}}[#{{number}}]) for details.\n`,
-        deprecation: `*{{{title}}}*\n\n!!TODO!!\n\nSee ({kibana-pull}{{number}}[#{{number}}]) for details.\n`,
+        breaking: `* {{{title}}} For more information, refer to [#{{number}}](${kibPullTag}{{number}}).\n`,
+        deprecation: `* {{{title}}} For more information, refer to [#{{number}}](${kibPullTag}{{number}}).\n`,
         _other_:
-          '* {{{title}}} ({kibana-pull}{{number}}[#{{number}}]).' +
-          '{{#details}}\n////\n!!TODO!! The above PR had a lengthy release note description:\n{{{details}}}\n////{{/details}}',
+          `* {{{title}}} [#{{number}}](${kibPullTag}{{number}}).` +
+          '{{#details}}\n% !!TODO!! The above PR had a lengthy release note description:\n% {{{details}}}{{/details}}',
       },
     },
   },
