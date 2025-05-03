@@ -12,9 +12,7 @@ export const generateMarkdownTemplate = ({
   const escapedTemplateNameTag = createEscapedTag(templateNameTag);
   const kibPullTag = createEscapedTag('kib-pull');
 
-  return {
-    pages: {
-      releaseNotes: `---
+  const patchTemplate = `---
 navigation_title: "${navigationTitle}"
 mapped_pages:
   - https://www.elastic.co/guide/en/${urlPath}/current/release-notes.html
@@ -46,21 +44,27 @@ To check for security updates, go to [Security announcements for the Elastic sta
 ::::
 
 
-### Features and enhancements [${name}-{{versionWithoutPeriods}}-features-enhancements]
+{{#prs.enhancements}}
 {{#prs.features}}
+### Features and enhancements [${name}-{{versionWithoutPeriods}}-features-enhancements]
 {{{prs.features}}}
 {{/prs.features}}
-{{#prs.enhancements}}
 {{{prs.enhancements}}}
 {{/prs.enhancements}}
 
 
-### Fixes [${name}-{{versionWithoutPeriods}}-fixes]
 {{#prs.fixes}}
+### Fixes [${name}-{{versionWithoutPeriods}}-fixes]
 {{{prs.fixes}}}
-{{/prs.fixes}}
+{{/prs.fixes}}`;
 
+  return {
+    pages: {
+      releaseNotes:
+        patchTemplate +
+        `
 
+{{#prs.deprecations}}
 ---
 navigation_title: "Deprecations"
 ---
@@ -73,11 +77,11 @@ Review the deprecated functionality for ${escapedTemplateNameTag}. While depreca
 % ## Next version [${name}-next-deprecations]
 
 ## {{version}} [${name}-{{versionWithoutPeriods}}-deprecations]
-{{#prs.deprecations}}
+
 {{{prs.deprecations}}}
 {{/prs.deprecations}}
 `,
-      patchReleaseNotes: ``,
+      patchReleaseNotes: patchTemplate,
     },
     prs: {
       breaking: ``,
