@@ -6,11 +6,11 @@ import type { OutputTemplate, OutputTemplateOptions } from './types';
  * So we change the tag delimiters temporarily
  **/
 const createEscapedTag = (str: string) => `{{=<% %>=}}{{${str}}}<%={{ }}=%>`;
-export const kibPullTag = createEscapedTag('kib-pull');
+const kibPullTag = createEscapedTag('kib-pull');
 export const kibanaPRMarkdownLink = `[#{{number}}](${kibPullTag}{{number}})`;
 
-export const generateMarkdownTemplate = ({ name }: OutputTemplateOptions): OutputTemplate => {
-  const patchTemplate = `% FEATURES, ENHANCEMENTS, FIXES
+const getPatchMarkdownTemplate = (name: string) => {
+  return `% FEATURES, ENHANCEMENTS, FIXES
 % Paste in index.md
 
 ## {{version}} [${name}-{{version}}-release-notes]
@@ -32,12 +32,12 @@ export const generateMarkdownTemplate = ({ name }: OutputTemplateOptions): Outpu
 ### Fixes [${name}-{{version}}-fixes]
 {{{prs.fixes}}}
 {{/prs.fixes}}`;
+};
 
-  return {
-    pages: {
-      releaseNotes:
-        patchTemplate +
-        `
+const getFullMarkdownTemplate = (name: string, patchTemplate: string) => {
+  return (
+    patchTemplate +
+    `
 
 {{#prs.breaking}}
 % BREAKING CHANGES
@@ -55,29 +55,40 @@ export const generateMarkdownTemplate = ({ name }: OutputTemplateOptions): Outpu
 ## {{version}} [${name}-{{version}}-deprecations]
 {{{prs.deprecations}}}
 {{/prs.deprecations}}
-`,
+`
+  );
+};
+
+const getBreakingOrDeprecationPRTemplate = (name: string, isBreaking?: boolean) => {
+  return `$$$${name}-{{number}}$$$
+::::{dropdown} {{{title}}} 
+% **Details**<br> Description
+% **Impact**<br> Impact of the ${isBreaking ? 'breaking change' : 'deprecation'}.
+% **Action**<br> Steps for mitigating impact.
+View ${kibanaPRMarkdownLink}.
+::::`;
+};
+
+export const otherPRMarkdownTemplate =
+  `* {{{title}}} ${kibanaPRMarkdownLink}.` +
+  '{{#details}}\n% !!TODO!! The above PR had a lengthy release note description:\n% {{{details}}}{{/details}}';
+
+const dynamicPRGroupTemplate = `{{#hasPRGroups}}\n\n**{{{groupTitle}}}**:\n{{{prs}}}{{/hasPRGroups}}{{^hasPRGroups}}{{{prs}}}{{/hasPRGroups}}`;
+
+export const generateMarkdownTemplate = ({ name }: OutputTemplateOptions): OutputTemplate => {
+  const patchTemplate = getPatchMarkdownTemplate(name);
+
+  return {
+    pages: {
+      releaseNotes: getFullMarkdownTemplate(name, patchTemplate),
       patchReleaseNotes: patchTemplate,
     },
     prs: {
-      breaking: `$$$${name}-{{number}}$$$
-::::{dropdown} {{{title}}} 
-% **Details**<br> Description
-% **Impact**<br> Impact of the breaking change.
-% **Action**<br> Steps for mitigating impact.
-View ${kibanaPRMarkdownLink}.
-::::`,
-      deprecation: `$$$${name}-{{number}}$$$
-::::{dropdown} {{{title}}} 
-% **Details**<br> Description
-% **Impact**<br> Impact of the deprecation.
-% **Action**<br> Steps for mitigating impact.
-View ${kibanaPRMarkdownLink}.
-::::`,
-      _other_:
-        `* {{{title}}} ${kibanaPRMarkdownLink}.` +
-        '{{#details}}\n% !!TODO!! The above PR had a lengthy release note description:\n% {{{details}}}{{/details}}',
+      breaking: getBreakingOrDeprecationPRTemplate(name, true),
+      deprecation: getBreakingOrDeprecationPRTemplate(name),
+      _other_: otherPRMarkdownTemplate,
     },
-    prGroup: `{{#hasPRGroups}}\n\n**{{{groupTitle}}}**:\n{{{prs}}}{{/hasPRGroups}}{{^hasPRGroups}}{{{prs}}}{{/hasPRGroups}}`,
+    prGroup: dynamicPRGroupTemplate,
   };
 };
 

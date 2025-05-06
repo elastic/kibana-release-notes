@@ -1,5 +1,37 @@
 import type { Config } from './types';
-import { kibanaAreas, kibanaPRMarkdownLink } from './common';
+import { kibanaAreas, kibanaPRMarkdownLink, otherPRMarkdownTemplate } from './common';
+
+const serverlessBreakingOrDeprecationTemplate = `* {{{title}}} For more information, refer to ${kibanaPRMarkdownLink}.\n`;
+const serverlessReleaseNotesTemplate = `## {{serverlessReleaseDate}} [serverless-changelog-{{version}}]
+
+{{#prs.features}}
+### Features and enhancements [serverless-changelog-{{version}}-features-enhancements]
+
+{{{prs.features}}}
+{{/prs.features}}
+{{#prs.enhancements}}
+{{{prs.enhancements}}}
+{{/prs.enhancements}}
+
+
+{{#prs.fixes}}
+### Fixes [serverless-changelog-{{version}}-fixes]
+
+{{{prs.fixes}}}
+{{/prs.fixes}}
+
+
+{{#prs.breaking}}
+# {{serverlessReleaseDate}} [elastic-cloud-serverless-{{version}}-breaking]
+{{{prs.breaking}}}
+{{/prs.breaking}}
+
+
+{{#prs.deprecations}}
+# {{serverlessReleaseDate}} [elastic-cloud-serverless-{{version}}-deprecations]
+{{{prs.deprecations}}}
+{{/prs.deprecations}}
+`;
 
 export const serverlessTemplate: Config = {
   repoName: 'kibana',
@@ -60,44 +92,13 @@ export const serverlessTemplate: Config = {
     },
     markdown: {
       pages: {
-        releaseNotes: `## {{serverlessReleaseDate}} [serverless-changelog-{{version}}]
-
-{{#prs.features}}
-### Features and enhancements [serverless-changelog-{{version}}-features-enhancements]
-
-{{{prs.features}}}
-{{/prs.features}}
-{{#prs.enhancements}}
-{{{prs.enhancements}}}
-{{/prs.enhancements}}
-
-
-{{#prs.fixes}}
-### Fixes [serverless-changelog-{{version}}-fixes]
-
-{{{prs.fixes}}}
-{{/prs.fixes}}
-
-
-{{#prs.breaking}}
-# {{serverlessReleaseDate}} [elastic-cloud-serverless-{{version}}-breaking]
-{{{prs.breaking}}}
-{{/prs.breaking}}
-
-
-{{#prs.deprecations}}
-# {{serverlessReleaseDate}} [elastic-cloud-serverless-{{version}}-deprecations]
-{{{prs.deprecations}}}
-{{/prs.deprecations}}
-`,
+        releaseNotes: serverlessReleaseNotesTemplate,
       },
       prGroup: '{{{prs}}}',
       prs: {
-        breaking: `* {{{title}}} For more information, refer to ${kibanaPRMarkdownLink}.\n`,
-        deprecation: `* {{{title}}} For more information, refer to ${kibanaPRMarkdownLink}.\n`,
-        _other_:
-          `* {{{title}}} ${kibanaPRMarkdownLink}.` +
-          '{{#details}}\n% !!TODO!! The above PR had a lengthy release note description:\n% {{{details}}}{{/details}}',
+        breaking: serverlessBreakingOrDeprecationTemplate,
+        deprecation: serverlessBreakingOrDeprecationTemplate,
+        _other_: otherPRMarkdownTemplate,
       },
     },
   },
