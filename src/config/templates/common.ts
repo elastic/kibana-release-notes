@@ -66,15 +66,8 @@ To check for security updates, go to [Security announcements for the Elastic sta
         `
 
 {{#prs.breaking}}
----
-navigation_title: "Breaking changes"
-mapped_pages:
-  - https://www.elastic.co/guide/en/${urlPath}/current/breaking-changes-summary.html
----
-# ${escapedTemplateNameTag} breaking changes [${name}-breaking-changes]
-Breaking changes can impact your Elastic applications, potentially disrupting normal operations. Before you upgrade, carefully review the ${escapedTemplateNameTag} breaking changes and take the necessary steps to mitigate any issues. To learn how to upgrade, check [Upgrade](/deploy-manage/upgrade.md).
-
-% ## Next version [${name}-next-breaking-changes]
+% BREAKING CHANGES
+% Paste in breaking-changes.md
 
 ## {{version}} [${name}-{{version}}-breaking-changes]
 {{{prs.breaking}}}
@@ -82,16 +75,8 @@ Breaking changes can impact your Elastic applications, potentially disrupting no
 
 
 {{#prs.deprecations}}
----
-navigation_title: "Deprecations"
----
-
-# ${escapedTemplateNameTag} deprecations [${name}-deprecations]
-Over time, certain Elastic functionality becomes outdated and is replaced or removed. To help with the transition, Elastic deprecates functionality for a period before removal, giving you time to update your applications.
-
-Review the deprecated functionality for ${escapedTemplateNameTag}. While deprecations have no immediate impact, we strongly encourage you update your implementation after you upgrade. To learn how to upgrade, check out [Upgrade](docs-content://deploy-manage/upgrade.md).
-
-% ## Next version [${name}-next-deprecations]
+% DEPRECATIONS
+% Paste in deprecations.md
 
 ## {{version}} [${name}-{{version}}-deprecations]
 {{{prs.deprecations}}}
@@ -100,17 +85,19 @@ Review the deprecated functionality for ${escapedTemplateNameTag}. While depreca
       patchReleaseNotes: patchTemplate,
     },
     prs: {
-      breaking: `\n\n::::{dropdown} {{{title}}} 
-% !!TODO!! Description of the breaking change.
-For more information, check [#{{number}}](${kibPullTag}{{number}}).
-% !!TODO!! **Impact**<br> Impact of the breaking change.
-% !!TODO!! **Action**<br> Steps for mitigating deprecation impact.
+      breaking: `$$$${name}-{{number}}$$$
+::::{dropdown} {{{title}}} 
+% **Details**<br> Description
+% **Impact**<br> Impact of the breaking change.
+% **Action**<br> Steps for mitigating impact.
+View [#{{number}}](${kibPullTag}{{number}}).
 ::::`,
-      deprecation: `\n\n::::{dropdown} {{{title}}}
-% !!TODO!! Description of the deprecation.
-For more information, refer to [#{{number}}](${kibPullTag}{{number}}).
-% !!TODO!! **Impact**<br> Impact of deprecation.
-% !!TODO!! **Action**<br> Steps for mitigating deprecation impact.
+      deprecation: `$$$${name}-{{number}}$$$
+::::{dropdown} {{{title}}} 
+% **Details**<br> Description
+% **Impact**<br> Impact of the deprecation.
+% **Action**<br> Steps for mitigating impact.
+View [#{{number}}](${kibPullTag}{{number}}).
 ::::`,
       _other_:
         `* {{{title}}} [#{{number}}](${kibPullTag}{{number}}).` +
