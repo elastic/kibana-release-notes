@@ -153,6 +153,10 @@ export const securityLabels = [
 
 export const kibanaAreas: AreaDefinition[] = [
   {
+    title: 'Theme',
+    labels: ['EUI'],
+  },
+  {
     title: 'Logstash',
     labels: ['Feature:Logstash Pipelines'],
   },
@@ -169,6 +173,7 @@ export const kibanaAreas: AreaDefinition[] = [
       'Feature:Dev Tools',
       'Feature:Inspector',
       'Feature:Index Management',
+      'Feature:Streams',
       'Feature:Snapshot and Restore',
       'Team:Elasticsearch UI',
       'Team:Stack Management',
@@ -217,6 +222,7 @@ export const kibanaAreas: AreaDefinition[] = [
       'Feature:File Data Viz',
       'Feature:ml-results',
       'Feature:Data Frame Analytics',
+      'Feature:Inference UI',
     ],
   },
   {
@@ -283,6 +289,10 @@ export const kibanaAreas: AreaDefinition[] = [
     labels: ['Feature:Discover', 'Team:DataDiscovery', 'Team:ESQL'],
   },
   {
+    title: 'ES|QL',
+    labels: ['Team:ESQL'],
+  },
+  {
     title: 'Querying & Filtering',
     labels: [
       'Feature:Query Bar',
@@ -309,7 +319,7 @@ export const kibanaAreas: AreaDefinition[] = [
     labels: securityLabels,
     options: {
       textOverwriteTemplate:
-        'For the Elastic Security {{version}} release information, refer to {security-guide}/release-notes.html[_Elastic Security Solution Release Notes_].',
+        'For the Elastic Security {{version}} release information, refer to [Elastic Security Solution Release Notes](docs-content://release-notes/elastic-security/index.md).',
     },
   },
   {
@@ -317,7 +327,7 @@ export const kibanaAreas: AreaDefinition[] = [
     labels: ['Team:Code'],
   },
   {
-    title: 'Elastic Observability Solution',
+    title: 'Elastic Observability solution',
     labels: [
       'Feature:Observability Home',
       'Feature:SLO',
@@ -328,36 +338,28 @@ export const kibanaAreas: AreaDefinition[] = [
       'Team:obs-knowledge',
       'Team:obs-entities',
       'ci:project-deploy-observability',
+      'Feature:Uptime',
+      'Team:uptime',
+      'Team:apm',
+      'Team:APM',
+      'Feature:Metrics UI',
+      'Team:logs-metrics-ui',
+      'Feature:Logs UI',
+      'Feature:Infra UI',
+      'Feature:Service Maps',
     ],
-  },
-  {
-    title: 'Infrastructure',
-    labels: ['Feature:Infra UI', 'Feature:Service Maps'],
-  },
-  {
-    title: 'Logs',
-    labels: ['Feature:Logs UI'],
-  },
-  {
-    title: 'Uptime',
-    labels: ['Feature:Uptime', 'Team:uptime'],
+    options: {
+      textOverwriteTemplate:
+        'For the Elastic Observability {{version}} release information, refer to [Elastic Observability Solution Release Notes](docs-content://release-notes/elastic-observability/index.md).',
+    },
   },
   {
     title: 'Beats Management',
     labels: ['Feature:beats-cm', 'Team:Beats'],
   },
   {
-    title: 'APM',
-    labels: ['Team:apm', 'Team:APM'],
-    priority: 100,
-  },
-  {
     title: 'Alerting',
     labels: ['Feature:Alerting', 'Team:Alerting Services', 'Feature:Actions', 'Team:ResponseOps'],
-  },
-  {
-    title: 'Metrics',
-    labels: ['Feature:Metrics UI', 'Team:logs-metrics-ui'],
   },
   {
     title: 'Data ingestion and Fleet',
@@ -375,7 +377,7 @@ export const kibanaAreas: AreaDefinition[] = [
     ],
   },
   {
-    title: 'Elastic Search solution',
+    title: 'Search',
     labels: ['Team:Search'],
   },
 ];
