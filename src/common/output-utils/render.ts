@@ -11,7 +11,6 @@ interface RenderPageContext {
   nextMajorVersion: string;
   isPatchRelease: boolean;
   serverlessReleaseDate: string | undefined;
-  versionWithoutPeriods: string;
 }
 
 type PrType = 'feature' | 'enhancement' | 'fix' | 'breaking' | 'deprecation';

@@ -38,7 +38,7 @@ To check for security updates, go to [Security announcements for the Elastic sta
 % ### Fixes [${name}-next-fixes]
 % *
 
-## {{version}} [${name}-{{versionWithoutPeriods}}-release-notes]
+## {{version}} [${name}-{{version}}-release-notes]
 
 ::::{NOTE}
 
@@ -47,7 +47,7 @@ To check for security updates, go to [Security announcements for the Elastic sta
 
 {{#prs.enhancements}}
 {{#prs.features}}
-### Features and enhancements [${name}-{{versionWithoutPeriods}}-features-enhancements]
+### Features and enhancements [${name}-{{version}}-features-enhancements]
 {{{prs.features}}}
 {{/prs.features}}
 {{{prs.enhancements}}}
@@ -55,7 +55,7 @@ To check for security updates, go to [Security announcements for the Elastic sta
 
 
 {{#prs.fixes}}
-### Fixes [${name}-{{versionWithoutPeriods}}-fixes]
+### Fixes [${name}-{{version}}-fixes]
 {{{prs.fixes}}}
 {{/prs.fixes}}`;
 
@@ -76,7 +76,7 @@ Breaking changes can impact your Elastic applications, potentially disrupting no
 
 % ## Next version [${name}-next-breaking-changes]
 
-## {{version}} [${name}-{{versionWithoutPeriods}}-breaking-changes]
+## {{version}} [${name}-{{version}}-breaking-changes]
 {{{prs.breaking}}}
 {{/prs.breaking}}
 
@@ -93,7 +93,7 @@ Review the deprecated functionality for ${escapedTemplateNameTag}. While depreca
 
 % ## Next version [${name}-next-deprecations]
 
-## {{version}} [${name}-{{versionWithoutPeriods}}-deprecations]
+## {{version}} [${name}-{{version}}-deprecations]
 {{{prs.deprecations}}}
 {{/prs.deprecations}}
 `,

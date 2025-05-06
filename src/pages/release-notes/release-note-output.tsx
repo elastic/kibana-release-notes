@@ -50,7 +50,6 @@ export const ReleaseNoteOutput: FC<Props> = ({ prs, version: ver }) => {
             day: 'numeric',
             timeZone: 'UTC',
           }),
-          versionWithoutPeriods: version.replace(/\./g, ''),
         },
         isMarkdown
       ),
