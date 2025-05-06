@@ -3,6 +3,7 @@ import type { OutputTemplate, OutputTemplateOptions } from './types';
 
 const createEscapedTag = (str: string) => `{{=<% %>=}}{{${str}}}<%={{ }}=%>`;
 export const kibPullTag = createEscapedTag('kib-pull');
+export const kibanaPRMarkdownLink = `[#{{number}}](${kibPullTag}{{number}})`;
 
 export const generateMarkdownTemplate = ({
   name,
@@ -90,17 +91,17 @@ To check for security updates, go to [Security announcements for the Elastic sta
 % **Details**<br> Description
 % **Impact**<br> Impact of the breaking change.
 % **Action**<br> Steps for mitigating impact.
-View [#{{number}}](${kibPullTag}{{number}}).
+View ${kibanaPRMarkdownLink}.
 ::::`,
       deprecation: `$$$${name}-{{number}}$$$
 ::::{dropdown} {{{title}}} 
 % **Details**<br> Description
 % **Impact**<br> Impact of the deprecation.
 % **Action**<br> Steps for mitigating impact.
-View [#{{number}}](${kibPullTag}{{number}}).
+View ${kibanaPRMarkdownLink}.
 ::::`,
       _other_:
-        `* {{{title}}} [#{{number}}](${kibPullTag}{{number}}).` +
+        `* {{{title}}} ${kibanaPRMarkdownLink}.` +
         '{{#details}}\n% !!TODO!! The above PR had a lengthy release note description:\n% {{{details}}}{{/details}}',
     },
     prGroup: `{{#hasPRGroups}}\n\n**{{{groupTitle}}}**:\n{{{prs}}}{{/hasPRGroups}}{{^hasPRGroups}}{{{prs}}}{{/hasPRGroups}}`,

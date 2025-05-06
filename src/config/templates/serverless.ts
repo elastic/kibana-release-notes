@@ -1,5 +1,5 @@
 import type { Config } from './types';
-import { kibanaAreas, kibPullTag } from './common';
+import { kibanaAreas, kibanaPRMarkdownLink } from './common';
 
 export const serverlessTemplate: Config = {
   repoName: 'kibana',
@@ -93,10 +93,10 @@ export const serverlessTemplate: Config = {
       },
       prGroup: '{{{prs}}}',
       prs: {
-        breaking: `* {{{title}}} For more information, refer to [#{{number}}](${kibPullTag}{{number}}).\n`,
-        deprecation: `* {{{title}}} For more information, refer to [#{{number}}](${kibPullTag}{{number}}).\n`,
+        breaking: `* {{{title}}} For more information, refer to ${kibanaPRMarkdownLink}.\n`,
+        deprecation: `* {{{title}}} For more information, refer to ${kibanaPRMarkdownLink}.\n`,
         _other_:
-          `* {{{title}}} [#{{number}}](${kibPullTag}{{number}}).` +
+          `* {{{title}}} ${kibanaPRMarkdownLink}.` +
           '{{#details}}\n% !!TODO!! The above PR had a lengthy release note description:\n% {{{details}}}{{/details}}',
       },
     },
