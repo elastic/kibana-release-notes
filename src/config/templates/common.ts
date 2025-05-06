@@ -1,6 +1,10 @@
 import { AreaDefinition } from '.';
 import type { OutputTemplate, OutputTemplateOptions } from './types';
 
+/*
+ * We want this to render as {{str}} in the MD file to allow rendering again later in the docs pipeline.
+ * So we change the tag delimiters temporarily
+ **/
 const createEscapedTag = (str: string) => `{{=<% %>=}}{{${str}}}<%={{ }}=%>`;
 export const kibPullTag = createEscapedTag('kib-pull');
 export const kibanaPRMarkdownLink = `[#{{number}}](${kibPullTag}{{number}})`;
@@ -11,7 +15,6 @@ export const generateMarkdownTemplate = ({
   templateNameTag = name,
   urlPath = name,
 }: OutputTemplateOptions): OutputTemplate => {
-  // We want this to render as {{kib}} etc in the MD file, so we change the tag delimiters temporarily
   const escapedTemplateNameTag = createEscapedTag(templateNameTag);
 
   const patchTemplate = `---
@@ -41,9 +44,8 @@ To check for security updates, go to [Security announcements for the Elastic sta
 
 ## {{version}} [${name}-{{version}}-release-notes]
 
-::::{NOTE}
-
-::::
+% ::::{NOTE}
+% ::::
 
 
 {{#prs.enhancements}}
