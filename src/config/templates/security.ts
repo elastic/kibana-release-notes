@@ -64,11 +64,6 @@ export const securityTemplate: Config = {
           '{{#details}}\n////\n!!TODO!! The above PR had a lengthy release note description:\n{{{details}}}\n////{{/details}}',
       },
     },
-    markdown: generateMarkdownTemplate({
-      navigationTitle: 'Elastic Security',
-      name: 'elastic-security',
-      templateNameTag: 'elastic-sec',
-      urlPath: 'security',
-    }),
+    markdown: generateMarkdownTemplate({ name: 'elastic-security' }),
   },
 };

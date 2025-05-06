@@ -135,10 +135,6 @@ View ({kibana-pull}{{number}}[#{{number}}])
       },
       prGroup: `{{{groupTitle}}}::\n{{{prs}}}`,
     },
-    markdown: generateMarkdownTemplate({
-      navigationTitle: 'Kibana',
-      name: 'kibana',
-      templateNameTag: 'kib',
-    }),
+    markdown: generateMarkdownTemplate({ name: 'kibana' }),
   },
 } as const;

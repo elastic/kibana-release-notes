@@ -43,13 +43,4 @@ export interface Config {
 
 export interface OutputTemplateOptions {
   name: string;
-  navigationTitle: string;
-  /**
-   * Defaults to name property if not provided. eg: kib
-   */
-  templateNameTag?: string;
-  /**
-   * Defaults to name property if not provided. eg: security
-   */
-  urlPath?: string;
 }
