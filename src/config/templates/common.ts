@@ -19,13 +19,10 @@ const getPatchMarkdownTemplate = (name: string) => {
 % ::::
 
 
-{{#prs.enhancements}}
-{{#prs.features}}
+{{#prs.featuresAndEnhancements}}
 ### Features and enhancements [${name}-{{version}}-features-enhancements]
-{{{prs.features}}}
-{{/prs.features}}
-{{{prs.enhancements}}}
-{{/prs.enhancements}}
+{{{prs.featuresAndEnhancements}}}
+{{/prs.featuresAndEnhancements}}
 
 
 {{#prs.fixes}}

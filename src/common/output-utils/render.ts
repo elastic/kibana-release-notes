@@ -110,6 +110,33 @@ export const getRenderedPRGroups = (
 ) => {
   const grouped = groupPrs(prs, { includeFeaturesInEnhancements: true });
 
+  const featuresAndEnhancements = isMarkdown
+    ? {
+        featuresAndEnhancements: renderGroupedByArea(
+          groupByArea(grouped.features.concat(grouped.enhancements), config),
+          'feature',
+          config,
+          version,
+          isMarkdown
+        ),
+      }
+    : {
+        features: renderGroupedByArea(
+          groupByArea(grouped.features, config),
+          'feature',
+          config,
+          version,
+          isMarkdown
+        ),
+        enhancements: renderGroupedByArea(
+          groupByArea(grouped.enhancements, config),
+          'enhancement',
+          config,
+          version,
+          isMarkdown
+        ),
+      };
+
   return {
     breaking: grouped.breaking.map((pr) => renderPr(pr, 'breaking', config, isMarkdown)).join('\n'),
     deprecations: grouped.deprecation
@@ -122,20 +149,7 @@ export const getRenderedPRGroups = (
       version,
       isMarkdown
     ),
-    features: renderGroupedByArea(
-      groupByArea(grouped.features, config),
-      'feature',
-      config,
-      version,
-      isMarkdown
-    ),
-    enhancements: renderGroupedByArea(
-      groupByArea(grouped.enhancements, config),
-      'enhancement',
-      config,
-      version,
-      isMarkdown
-    ),
     missingReleaseNoteLabel: grouped.missingLabel,
+    ...featuresAndEnhancements,
   };
 };

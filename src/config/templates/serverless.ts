@@ -4,14 +4,11 @@ import { kibanaAreas, kibanaPRMarkdownLink, otherPRMarkdownTemplate } from './co
 const serverlessBreakingOrDeprecationTemplate = `* {{{title}}} For more information, refer to ${kibanaPRMarkdownLink}.\n`;
 const serverlessReleaseNotesTemplate = `## {{serverlessReleaseDate}} [serverless-changelog-{{version}}]
 
-{{#prs.features}}
+{{#prs.featuresAndEnhancements}}
 ### Features and enhancements [serverless-changelog-{{version}}-features-enhancements]
 
-{{{prs.features}}}
-{{/prs.features}}
-{{#prs.enhancements}}
-{{{prs.enhancements}}}
-{{/prs.enhancements}}
+{{{prs.featuresAndEnhancements}}}
+{{/prs.featuresAndEnhancements}}
 
 
 {{#prs.fixes}}
