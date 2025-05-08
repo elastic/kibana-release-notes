@@ -36,7 +36,14 @@ const serverlessReleaseNotesTemplate = `## {{serverlessReleaseDate}} [serverless
 export const serverlessTemplate: Config = {
   repoName: 'kibana',
   excludedLabels: ['backport', 'release_note:skip', 'reverted'],
-  areas: kibanaAreas,
+  areas: kibanaAreas.map((area) => {
+    // Remove the textOverwriteTemplate option from Security and Observability solutions
+    if (area.options && 'textOverwriteTemplate' in area.options) {
+      const { textOverwriteTemplate, ...restOptions } = area.options;
+      return { ...area, options: restOptions };
+    }
+    return area;
+  }),
   templates: {
     asciidoc: {
       pages: {
