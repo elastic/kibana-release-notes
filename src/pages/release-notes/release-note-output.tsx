@@ -1,12 +1,8 @@
 import { EuiFlexGroup, EuiFlexItem, EuiCallOut, EuiCode } from '@elastic/eui';
 import { FC, useMemo } from 'react';
-import { groupByArea, groupPrs, PrItem, useGitHubService } from '../../common';
+import { PrItem, useGitHubService } from '../../common';
 import semver from 'semver';
-import {
-  renderGroupedByArea,
-  renderPageAsAsciidoc,
-  renderPrAsAsciidoc,
-} from '../../common/output-utils';
+import { renderOutput, getRenderedPRGroups } from '../../common/output-utils';
 import { useActiveConfig } from '../../config';
 import MonacoEditor from '@monaco-editor/react';
 
@@ -19,52 +15,48 @@ export const ReleaseNoteOutput: FC<Props> = ({ prs, version: ver }) => {
   const [github] = useGitHubService();
   const config = useActiveConfig();
   const isServerless = ver === 'serverless';
-  const version = isServerless ? github.serverlessReleaseTag : ver.replace(/^v(.*)$/, '$1');
+  const version = isServerless
+    ? github.serverlessReleaseDate
+        ?.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          timeZone: 'UTC',
+        })
+        .replace(/\//g, '') ?? ''
+    : ver.replace(/^v(.*)$/, '$1');
   const isPatchVersion = isServerless ? false : semver.patch(version) !== 0;
+  // Docs output changed from ascii to markdown in 9.0.0
+  const isMarkdown = isServerless || semver.gte(ver, '9.0.0');
 
-  const renderedGroups = useMemo(() => {
-    const grouped = groupPrs(prs, { includeFeaturesInEnhancements: true });
-    return {
-      breaking: grouped.breaking.map((pr) => renderPrAsAsciidoc(pr, 'breaking', config)).join('\n'),
-      deprecations: grouped.deprecation
-        .map((pr) => renderPrAsAsciidoc(pr, 'deprecation', config))
-        .join('\n'),
-      fixes: renderGroupedByArea(groupByArea(grouped.fixes, config), 'fix', config, version),
-      features: renderGroupedByArea(
-        groupByArea(grouped.features, config),
-        'feature',
-        config,
-        version
-      ),
-      enhancements: renderGroupedByArea(
-        groupByArea(grouped.enhancements, config),
-        'enhancement',
-        config,
-        version
-      ),
-      missingReleaseNoteLabel: grouped.missingLabel,
-    };
-  }, [config, prs, version]);
+  const renderedGroups = useMemo(
+    () => getRenderedPRGroups(prs, config, version, isMarkdown),
+    [config, prs, version, isMarkdown]
+  );
 
-  const asciidoc = useMemo(
+  const renderedOutput = useMemo(
     () =>
-      renderPageAsAsciidoc(
-        isPatchVersion
-          ? config.templates.pages.patchReleaseNotes ?? config.templates.pages.releaseNotes
-          : config.templates.pages.releaseNotes,
+      renderOutput(
+        config,
         {
           version,
           minorVersion: version.replace(/\.\d+$/, ''),
           prs: renderedGroups,
           nextMajorVersion: isServerless ? '' : `${semver.major(version) + 1}.0.0`,
           isPatchRelease: isPatchVersion,
-          serverlessReleaseDate: github.serverlessReleaseDate,
-        }
-      ).trim(),
+          serverlessReleaseDate: github.serverlessReleaseDate?.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            timeZone: 'UTC',
+          }),
+        },
+        isMarkdown
+      ),
     [
-      config.templates.pages.patchReleaseNotes,
-      config.templates.pages.releaseNotes,
+      config,
       github.serverlessReleaseDate,
+      isMarkdown,
       isPatchVersion,
       isServerless,
       renderedGroups,
@@ -89,7 +81,12 @@ export const ReleaseNoteOutput: FC<Props> = ({ prs, version: ver }) => {
         </EuiFlexItem>
       )}
       <EuiFlexItem>
-        <MonacoEditor height="100%" options={{ readOnly: true }} value={asciidoc} />
+        <MonacoEditor
+          height="100%"
+          options={{ readOnly: true }}
+          value={renderedOutput}
+          language={isMarkdown ? 'markdown' : undefined}
+        />
       </EuiFlexItem>
     </EuiFlexGroup>
   );

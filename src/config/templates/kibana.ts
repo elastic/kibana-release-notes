@@ -1,240 +1,14 @@
 import type { Config } from './types';
-import { securityLabels } from './security';
+import { generateMarkdownTemplate, kibanaAreas } from './common';
 
 export const kibanaTemplate: Config = {
   repoName: 'kibana',
   excludedLabels: ['release_note:skip', 'Team:Docs', 'reverted', 'backport'],
-  areas: [
-    {
-      title: 'Logstash',
-      labels: ['Feature:Logstash Pipelines'],
-    },
-    {
-      title: 'Management',
-      labels: [
-        'Feature:license',
-        'Feature:Console',
-        'Feature:Search Profiler',
-        'Feature:watcher',
-        'Feature:Index Patterns',
-        'Feature:Data Views',
-        'Feature:Kibana Management',
-        'Feature:Dev Tools',
-        'Feature:Inspector',
-        'Feature:Index Management',
-        'Feature:Snapshot and Restore',
-        'Team:Elasticsearch UI',
-        'Team:Stack Management',
-        'Feature:FieldFormatters',
-        'Feature:CCR',
-        'Feature:ILM',
-        'Feature:Transforms',
-        'Feature:Search',
-        'Project:AsyncSearch',
-        'Feature:Upgrade Assistant',
-      ],
-    },
-    {
-      title: 'Monitoring',
-      labels: ['Team:Monitoring', 'Feature:Telemetry', 'Feature:Stack Monitoring'],
-    },
-    {
-      title: 'Operations',
-      labels: ['Team:Operations', 'Feature:License'],
-    },
-    {
-      title: 'Kibana UI',
-      labels: ['Kibana UI', 'Team:Core UI', 'Feature:Header'],
-    },
-    {
-      title: 'Platform',
-      labels: [
-        'Team:Core',
-        'Feature:Plugins',
-        'Feature:New Platform',
-        'Project:i18n',
-        'Feature:ExpressionLanguage',
-        'Feature:Saved Objects',
-        'Team:Stack Services',
-        'Feature:NP Migration',
-        'Feature:Task Manager',
-        'Team:Pulse',
-      ],
-    },
-    {
-      title: 'Machine Learning',
-      labels: [
-        ':ml',
-        'Feature:Anomaly Detection',
-        'Feature:Data Frames',
-        'Feature:File Data Viz',
-        'Feature:ml-results',
-        'Feature:Data Frame Analytics',
-      ],
-    },
-    {
-      title: 'Maps',
-      labels: ['Team:Geo'],
-    },
-    {
-      title: 'QA',
-      labels: ['Team:QA'],
-    },
-    {
-      title: 'Kibana security',
-      labels: [
-        'Team:Security',
-        'Feature:Security/Spaces',
-        'Feature:users and roles',
-        'Feature:Security/Authentication',
-        'Feature:Security/Authorization',
-        'Feature:Security/Feature Controls',
-        'Team:Security-Scalability',
-      ],
-    },
-    {
-      title: 'Canvas',
-      labels: ['Feature:Canvas'],
-    },
-    {
-      title: 'Dashboards and Visualizations',
-      labels: [
-        'Feature:Dashboard',
-        'Feature:Drilldowns',
-        'Project:TimeToVisualize',
-        'Team:Presentation',
-        'Feature:Lens',
-        'Feature:Timelion',
-        'Feature:TSVB',
-        'Feature:Coordinate Map',
-        'Feature:Region Map',
-        'Feature:Vega',
-        'Feature:Gauge Vis',
-        'Feature:Tagcloud',
-        'Feature:Vis Loader',
-        'Feature:Vislib',
-        'Feature:Vis Editor',
-        'Feature:Aggregations',
-        'Feature:Input Control',
-        'Feature:Visualizations',
-        'Feature:Markdown',
-        'Feature:Data Table',
-        'Feature:Heatmap',
-        'Feature:Pie Chart',
-        'Feature:XYAxis',
-        'Feature:Graph',
-        'Feature:New Feature',
-        'Feature:MetricVis',
-        'Team:Visualizations',
-      ],
-      options: {
-        bracketHandling: 'visualizations',
-      },
-    },
-    {
-      title: 'Discover',
-      labels: ['Feature:Discover', 'Team:DataDiscovery', 'Team:ESQL'],
-    },
-    {
-      title: 'Querying & Filtering',
-      labels: [
-        'Feature:Query Bar',
-        'Feature:Courier',
-        'Feature:Filters',
-        'Feature:Timepicker',
-        'Feature:Highlight',
-        'Feature:KQL',
-        'Feature:Rollups',
-        'Feature:Search',
-        'Project:AsyncSearch',
-      ],
-    },
-    {
-      title: 'Reporting',
-      labels: ['Feature:Reporting', 'Team:Reporting Services'],
-    },
-    {
-      title: 'Sharing',
-      labels: ['Feature:Embedding', 'Feature:SharingURLs'],
-    },
-    {
-      title: 'Elastic Security solution',
-      labels: securityLabels,
-      options: {
-        textOverwriteTemplate:
-          'For the Elastic Security {{version}} release information, refer to {security-guide}/release-notes.html[_Elastic Security Solution Release Notes_].',
-      },
-    },
-    {
-      title: 'Code',
-      labels: ['Team:Code'],
-    },
-    {
-      title: 'Elastic Observability Solution',
-      labels: [
-        'Feature:Observability Home',
-        'Feature:SLO',
-        'Team:obs-ux-management',
-        'Team:Obs AI Assistant',
-        'Team:obs-ux-infra_services',
-        'Team:obs-ux-logs',
-        'Team:obs-knowledge',
-        'Team:obs-entities',
-        'ci:project-deploy-observability',
-      ],
-    },
-    {
-      title: 'Infrastructure',
-      labels: ['Feature:Infra UI', 'Feature:Service Maps'],
-    },
-    {
-      title: 'Logs',
-      labels: ['Feature:Logs UI'],
-    },
-    {
-      title: 'Uptime',
-      labels: ['Feature:Uptime', 'Team:uptime'],
-    },
-    {
-      title: 'Beats Management',
-      labels: ['Feature:beats-cm', 'Team:Beats'],
-    },
-    {
-      title: 'APM',
-      labels: ['Team:apm', 'Team:APM'],
-      priority: 100,
-    },
-    {
-      title: 'Alerting',
-      labels: ['Feature:Alerting', 'Team:Alerting Services', 'Feature:Actions', 'Team:ResponseOps'],
-    },
-    {
-      title: 'Metrics',
-      labels: ['Feature:Metrics UI', 'Team:logs-metrics-ui'],
-    },
-    {
-      title: 'Data ingestion and Fleet',
-      labels: ['Team:Fleet', 'Ingest', 'Feature:Ingest Node Pipelines'],
-    },
-    {
-      title: 'Kibana platform',
-      labels: [
-        'Team:SharedUX',
-        'Team:Design',
-        'Project:Accessibility',
-        'Feature:Add Data',
-        'Feature:Home',
-        'Team:Cloud',
-      ],
-    },
-    {
-      title: 'Elastic Search solution',
-      labels: ['Team:Search'],
-    },
-  ],
+  areas: kibanaAreas,
   templates: {
-    pages: {
-      releaseNotes: `[[release-notes-{{version}}]]
+    asciidoc: {
+      pages: {
+        releaseNotes: `[[release-notes-{{version}}]]
 == {kib} {{version}}
 
 coming::[{{version}}]
@@ -306,7 +80,7 @@ For detailed information about the {{version}} release, review the enhancements 
 {{{prs.fixes}}}
 {{/prs.fixes}}
       `,
-      patchReleaseNotes: `[[release-notes-{{version}}]]
+        patchReleaseNotes: `[[release-notes-{{version}}]]
 == {kib} {{version}}
 
 The {{version}} release includes the following fixes.
@@ -325,9 +99,9 @@ The {{version}} release includes the following fixes.
 {{{prs.fixes}}}
 {{/prs.fixes}}
       `,
-    },
-    prs: {
-      breaking: `[discrete]
+      },
+      prs: {
+        breaking: `[discrete]
 [[breaking-{{number}}]]
 * {{{title}}}.
 [%collapsible]
@@ -341,7 +115,7 @@ The {{version}} release includes the following fixes.
 View ({kibana-pull}{{number}}[#{{number}}])
 ====
       `,
-      deprecation: `[discrete]
+        deprecation: `[discrete]
 [[deprecation-{{number}}]]
 * {{{title}}}.
 [%collapsible]
@@ -355,10 +129,12 @@ View ({kibana-pull}{{number}}[#{{number}}])
 View ({kibana-pull}{{number}}[#{{number}}])
 ====
       `,
-      _other_:
-        '* {{{title}}} ({kibana-pull}{{number}}[#{{number}}]).' +
-        '{{#details}}\n////\n!!TODO!! The above PR had a lengthy release note description:\n{{{details}}}\n////{{/details}}',
+        _other_:
+          '* {{{title}}} ({kibana-pull}{{number}}[#{{number}}]).' +
+          '{{#details}}\n////\n!!TODO!! The above PR had a lengthy release note description:\n{{{details}}}\n////{{/details}}',
+      },
+      prGroup: `{{{groupTitle}}}::\n{{{prs}}}`,
     },
-    prGroup: `{{{groupTitle}}}::\n{{{prs}}}`,
+    markdown: generateMarkdownTemplate({ name: 'kibana' }),
   },
 } as const;

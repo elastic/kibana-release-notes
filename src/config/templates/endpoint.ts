@@ -1,4 +1,5 @@
 import type { Config } from './types';
+import { generateMarkdownTemplate } from './common';
 
 export const endpointTemplate: Config = {
   repoName: 'endpoint-dev',
@@ -9,8 +10,9 @@ export const endpointTemplate: Config = {
     },
   ],
   templates: {
-    pages: {
-      releaseNotes: `[discrete]
+    asciidoc: {
+      pages: {
+        releaseNotes: `[discrete]
 [[release-notes-{{version}}]]
 === {{version}}
 {{#prs.breaking}}
@@ -50,14 +52,16 @@ export const endpointTemplate: Config = {
 {{/prs.fixes}}
 
 `,
+      },
+      prGroup: '{{{prs}}}',
+      prs: {
+        breaking: `*{{{title}}}*\n\n!!TODO!!\n`,
+        deprecation: `*{{{title}}}*\n\n!!TODO!!\n`,
+        _other_:
+          '* {{{title}}}.' +
+          '{{#details}}\n////\n!!TODO!! The above PR had a lengthy release note description:\n{{{details}}}\n////{{/details}}',
+      },
     },
-    prGroup: '{{{prs}}}',
-    prs: {
-      breaking: `*{{{title}}}*\n\n!!TODO!!\n`,
-      deprecation: `*{{{title}}}*\n\n!!TODO!!\n`,
-      _other_:
-        '* {{{title}}}.' +
-        '{{#details}}\n////\n!!TODO!! The above PR had a lengthy release note description:\n{{{details}}}\n////{{/details}}',
-    },
+    markdown: generateMarkdownTemplate({ name: 'elastic-security' }),
   },
 };

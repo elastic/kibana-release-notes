@@ -1,25 +1,50 @@
 import type { Config } from './types';
+import { kibanaAreas, kibanaPRMarkdownLink, otherPRMarkdownTemplate } from './common';
 
-export const serverlessLabels = [
-  'Team:SecuritySolution',
-  'Team: SecuritySolution',
-  'serverless-bugfix',
-  'serverless-enhancement',
-];
+const serverlessBreakingOrDeprecationTemplate = `* {{{title}}} For more information, refer to ${kibanaPRMarkdownLink}.\n`;
+const serverlessReleaseNotesTemplate = `## {{serverlessReleaseDate}} [serverless-changelog-{{version}}]
+
+{{#prs.featuresAndEnhancements}}
+### Features and enhancements [serverless-changelog-{{version}}-features-enhancements]
+
+{{{prs.featuresAndEnhancements}}}
+{{/prs.featuresAndEnhancements}}
+
+
+{{#prs.fixes}}
+### Fixes [serverless-changelog-{{version}}-fixes]
+
+{{{prs.fixes}}}
+{{/prs.fixes}}
+
+
+{{#prs.breaking}}
+# {{serverlessReleaseDate}} [elastic-cloud-serverless-{{version}}-breaking]
+{{{prs.breaking}}}
+{{/prs.breaking}}
+
+
+{{#prs.deprecations}}
+# {{serverlessReleaseDate}} [elastic-cloud-serverless-{{version}}-deprecations]
+{{{prs.deprecations}}}
+{{/prs.deprecations}}
+`;
 
 export const serverlessTemplate: Config = {
   repoName: 'kibana',
-  includedLabels: serverlessLabels,
   excludedLabels: ['backport', 'release_note:skip', 'reverted'],
-  areas: [
-    {
-      title: 'Elastic Security',
-      labels: serverlessLabels,
-    },
-  ],
+  areas: kibanaAreas.map((area) => {
+    // Remove the textOverwriteTemplate option from Security and Observability solutions
+    if (area.options && 'textOverwriteTemplate' in area.options) {
+      const { textOverwriteTemplate, ...restOptions } = area.options;
+      return { ...area, options: restOptions };
+    }
+    return area;
+  }),
   templates: {
-    pages: {
-      releaseNotes: `[discrete]
+    asciidoc: {
+      pages: {
+        releaseNotes: `[discrete]
 [[release-notes-{{version}}]]
 === {{serverlessReleaseDate}}
 {{#prs.breaking}}
@@ -59,14 +84,26 @@ export const serverlessTemplate: Config = {
 {{/prs.fixes}}
 
 `,
+      },
+      prGroup: '{{{prs}}}',
+      prs: {
+        breaking: `*{{{title}}}*\n\n!!TODO!!\n\nSee ({kibana-pull}{{number}}[#{{number}}]) for details.\n`,
+        deprecation: `*{{{title}}}*\n\n!!TODO!!\n\nSee ({kibana-pull}{{number}}[#{{number}}]) for details.\n`,
+        _other_:
+          '* {{{title}}} ({kibana-pull}{{number}}[#{{number}}]).' +
+          '{{#details}}\n////\n!!TODO!! The above PR had a lengthy release note description:\n{{{details}}}\n////{{/details}}',
+      },
     },
-    prGroup: '{{{prs}}}',
-    prs: {
-      breaking: `*{{{title}}}*\n\n!!TODO!!\n\nSee ({kibana-pull}{{number}}[#{{number}}]) for details.\n`,
-      deprecation: `*{{{title}}}*\n\n!!TODO!!\n\nSee ({kibana-pull}{{number}}[#{{number}}]) for details.\n`,
-      _other_:
-        '* {{{title}}} ({kibana-pull}{{number}}[#{{number}}]).' +
-        '{{#details}}\n////\n!!TODO!! The above PR had a lengthy release note description:\n{{{details}}}\n////{{/details}}',
+    markdown: {
+      pages: {
+        releaseNotes: serverlessReleaseNotesTemplate,
+      },
+      prGroup: '{{{prs}}}',
+      prs: {
+        breaking: serverlessBreakingOrDeprecationTemplate,
+        deprecation: serverlessBreakingOrDeprecationTemplate,
+        _other_: otherPRMarkdownTemplate,
+      },
     },
   },
 };
