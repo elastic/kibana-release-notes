@@ -22,7 +22,8 @@ export function groupByArea(prs: PrItem[], { areas }: Config): GroupedByArea {
   const grouped = prs.reduce<{ unknown: PrItem[]; areas: { [title: string]: PrItem[] } }>(
     (grouped, pr) => {
       const matchingAreas = areas.filter(
-        ({ labels }) => labels && pr.labels.some(({ name }) => name && labels.includes(name))
+        ({ labels }) =>
+          labels === '*' || (labels && pr.labels.some(({ name }) => name && labels.includes(name)))
       );
 
       if (matchingAreas.length === 0) {

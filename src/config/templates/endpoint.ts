@@ -7,6 +7,7 @@ export const endpointTemplate: Config = {
   areas: [
     {
       title: 'Elastic Endpoint',
+      labels: '*',
     },
   ],
   templates: {
