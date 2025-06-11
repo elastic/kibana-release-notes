@@ -6,7 +6,7 @@ export const endpointTemplate: Config = {
   excludedLabels: ['backport', 'release_note:skip'],
   areas: [
     {
-      title: 'Elastic Endpoint',
+      title: '',
       labels: '*',
     },
   ],
