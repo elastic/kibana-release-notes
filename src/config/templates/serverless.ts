@@ -1,5 +1,5 @@
 import type { Config } from './types';
-import { kibanaAreas, kibanaPRMarkdownLink, otherPRMarkdownTemplate } from './common';
+import { kibanaAreas, kibanaPRMarkdownLink, getOtherPRMarkdownTemplate } from './common';
 
 const serverlessBreakingOrDeprecationTemplate = `* {{{title}}} For more information, refer to ${kibanaPRMarkdownLink}.\n`;
 const serverlessReleaseNotesTemplate = `## {{serverlessReleaseDate}} [serverless-changelog-{{version}}]
@@ -102,7 +102,7 @@ export const serverlessTemplate: Config = {
       prs: {
         breaking: serverlessBreakingOrDeprecationTemplate,
         deprecation: serverlessBreakingOrDeprecationTemplate,
-        _other_: otherPRMarkdownTemplate,
+        _other_: getOtherPRMarkdownTemplate(),
       },
     },
   },

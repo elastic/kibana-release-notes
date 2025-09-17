@@ -61,6 +61,7 @@ const getFullMarkdownTemplate = ({
 
 const getBreakingOrDeprecationPRTemplate = ({
   name,
+  isPrivate,
   isBreaking,
 }: OutputTemplateOptions & { isBreaking?: boolean }) => {
   return `$$$${name}-{{number}}$$$
@@ -68,12 +69,12 @@ const getBreakingOrDeprecationPRTemplate = ({
 % **Details**<br> Description
 % **Impact**<br> Impact of the ${isBreaking ? 'breaking change' : 'deprecation'}.
 % **Action**<br> Steps for mitigating impact.
-View ${kibanaPRMarkdownLink}.
+${isPrivate ? '' : 'View ' + kibanaPRMarkdownLink}.
 ::::`;
 };
 
-export const otherPRMarkdownTemplate =
-  `* {{{title}}} ${kibanaPRMarkdownLink}.` +
+export const getOtherPRMarkdownTemplate = ({ isPrivate }: { isPrivate?: boolean } = {}) =>
+  `* {{{title}}}${isPrivate ? '' : ' ' + kibanaPRMarkdownLink}.` +
   '{{#details}}\n% !!TODO!! The above PR had a lengthy release note description:\n% {{{details}}}{{/details}}';
 
 const dynamicPRGroupTemplate = `{{#hasPRGroups}}\n\n**{{{groupTitle}}}**:\n{{{prs}}}{{/hasPRGroups}}{{^hasPRGroups}}{{{prs}}}{{/hasPRGroups}}`;
@@ -89,7 +90,7 @@ export const generateMarkdownTemplate = (options: OutputTemplateOptions): Output
     prs: {
       breaking: getBreakingOrDeprecationPRTemplate({ ...options, isBreaking: true }),
       deprecation: getBreakingOrDeprecationPRTemplate(options),
-      _other_: otherPRMarkdownTemplate,
+      _other_: getOtherPRMarkdownTemplate(options),
     },
     prGroup: dynamicPRGroupTemplate,
   };
