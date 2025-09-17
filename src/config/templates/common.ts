@@ -9,7 +9,7 @@ const createEscapedTag = (str: string) => `{{=<% %>=}}{{${str}}}<%={{ }}=%>`;
 const kibPullTag = createEscapedTag('kib-pull');
 export const kibanaPRMarkdownLink = `[#{{number}}](${kibPullTag}{{number}})`;
 
-const getPatchMarkdownTemplate = (name: string) => {
+const getPatchMarkdownTemplate = ({ name }: OutputTemplateOptions) => {
   return `% FEATURES, ENHANCEMENTS, FIXES
 % Paste in index.md
 
@@ -31,7 +31,10 @@ const getPatchMarkdownTemplate = (name: string) => {
 {{/prs.fixes}}`;
 };
 
-const getFullMarkdownTemplate = (name: string, patchTemplate: string) => {
+const getFullMarkdownTemplate = ({
+  name,
+  patchTemplate,
+}: OutputTemplateOptions & { patchTemplate: string }) => {
   return (
     patchTemplate +
     `
@@ -56,7 +59,10 @@ const getFullMarkdownTemplate = (name: string, patchTemplate: string) => {
   );
 };
 
-const getBreakingOrDeprecationPRTemplate = (name: string, isBreaking?: boolean) => {
+const getBreakingOrDeprecationPRTemplate = ({
+  name,
+  isBreaking,
+}: OutputTemplateOptions & { isBreaking?: boolean }) => {
   return `$$$${name}-{{number}}$$$
 ::::{dropdown} {{{title}}} 
 % **Details**<br> Description
@@ -72,17 +78,17 @@ export const otherPRMarkdownTemplate =
 
 const dynamicPRGroupTemplate = `{{#hasPRGroups}}\n\n**{{{groupTitle}}}**:\n{{{prs}}}{{/hasPRGroups}}{{^hasPRGroups}}{{{prs}}}{{/hasPRGroups}}`;
 
-export const generateMarkdownTemplate = ({ name }: OutputTemplateOptions): OutputTemplate => {
-  const patchTemplate = getPatchMarkdownTemplate(name);
+export const generateMarkdownTemplate = (options: OutputTemplateOptions): OutputTemplate => {
+  const patchTemplate = getPatchMarkdownTemplate(options);
 
   return {
     pages: {
-      releaseNotes: getFullMarkdownTemplate(name, patchTemplate),
+      releaseNotes: getFullMarkdownTemplate({ ...options, patchTemplate }),
       patchReleaseNotes: patchTemplate,
     },
     prs: {
-      breaking: getBreakingOrDeprecationPRTemplate(name, true),
-      deprecation: getBreakingOrDeprecationPRTemplate(name),
+      breaking: getBreakingOrDeprecationPRTemplate({ ...options, isBreaking: true }),
+      deprecation: getBreakingOrDeprecationPRTemplate(options),
       _other_: otherPRMarkdownTemplate,
     },
     prGroup: dynamicPRGroupTemplate,

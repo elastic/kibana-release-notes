@@ -43,4 +43,5 @@ export interface Config {
 
 export interface OutputTemplateOptions {
   name: string;
+  isPrivate?: boolean;
 }

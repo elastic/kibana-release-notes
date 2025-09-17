@@ -63,6 +63,6 @@ export const endpointTemplate: Config = {
           '{{#details}}\n////\n!!TODO!! The above PR had a lengthy release note description:\n{{{details}}}\n////{{/details}}',
       },
     },
-    markdown: generateMarkdownTemplate({ name: 'elastic-security' }),
+    markdown: generateMarkdownTemplate({ name: 'elastic-security', isPrivate: true }),
   },
 };
