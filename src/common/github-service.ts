@@ -298,7 +298,10 @@ class GitHubService {
 
     const shas = commits.data.items
       .slice(0, 2)
-      .map((item) => item.commit.message.split('See elastic/kibana@')[1]);
+      .map(
+        (item) =>
+          item.commit.message.split('Artifact promotion for kibana to git-')[1].split('\n')[0]
+      );
 
     // Need to retrieve all the tags because ref tags are always last
     const tags = await this.octokit
