@@ -279,9 +279,7 @@ class GitHubService {
     return progressSubject$.asObservable();
   }
 
-  public async getPrsForServerless(config: Config) {
-    const { excludedLabels = [], includedLabels = [] } = config;
-
+  public async getCommitsForServerless() {
     /**
      * Find the last two Kibana commits which were promoted to production-canary successfully. We
      * cannot use the deploy@ tags from the Kibana repo, since they do not always reach prod. We
@@ -297,11 +295,19 @@ class GitHubService {
       });
 
     const shas = commits.data.items
-      .slice(0, 2)
+      .slice(0, 10)
       .map(
         (item) =>
           item.commit.message.split('Artifact promotion for kibana to git-')[1].split('\n')[0]
       );
+
+    return shas;
+  }
+
+  public async getPrsForServerless(config: Config) {
+    const { excludedLabels = [], includedLabels = [] } = config;
+
+    const shas = await this.getCommitsForServerless();
 
     // Need to retrieve all the tags because ref tags are always last
     const tags = await this.octokit

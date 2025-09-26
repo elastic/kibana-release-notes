@@ -38,13 +38,23 @@ export const ReleaseNotesWizard: FC<Props> = ({ onVersionSelected }) => {
   const [isValidatingVersion, setIsValidatingVersion] = useState(false);
   const [previousMissingReleases, setPreviousMissingReleases] = useState<Record<string, boolean>>();
   const isServerless = getActiveTemplateId() === 'serverless';
+  const [serverlessShas, setServerlessShas] = useState<string[]>();
 
   useEffect(() => {
-    github.getUpcomingReleaseVersions().then(
-      (labels) => setLabels(labels),
-      (e) => errorHandler(e)
-    );
-  }, [errorHandler, github]);
+    if (isServerless) {
+      github.getCommitsForServerless().then(
+        (shas) => setServerlessShas(shas),
+        (e) => errorHandler(e)
+      );
+    } else {
+      github.getUpcomingReleaseVersions().then(
+        (labels) => setLabels(labels),
+        (e) => errorHandler(e)
+      );
+    }
+  }, [errorHandler, github, isServerless]);
+
+  console.log(serverlessShas);
 
   const onValidateVersion = useCallback(
     async (version: string): Promise<void> => {
@@ -138,6 +148,10 @@ export const ReleaseNotesWizard: FC<Props> = ({ onVersionSelected }) => {
 
     if (isServerless) {
       return baseSteps.concat([
+        {
+          title: 'Select Serverless versions',
+          children: <></>,
+        },
         {
           title: 'Generate notes for the most recent Serverless release',
           children: (
