@@ -6,7 +6,15 @@ module.exports = {
       ...webpackConfig.resolve.fallback,
       url: require.resolve('url/'),
       querystring: require.resolve('querystring-es3'),
+      buffer: require.resolve('buffer/'),
     };
+
+    // Add Buffer polyfill as a global
+    webpackConfig.plugins.push(
+      new webpack.ProvidePlugin({
+        Buffer: ['buffer', 'Buffer'],
+      })
+    );
 
     const basename = process.env.BASENAME;
     if (basename) {

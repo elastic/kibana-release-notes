@@ -363,7 +363,7 @@ class GitHubService {
         throw new Error(`File content not available for commit ${gitOpsSha}`);
       }
 
-      const content = Buffer.from(fileResponse.data.content, 'base64').toString('utf-8');
+      const content = atob(fileResponse.data.content);
       const regex = new RegExp(`${envSearch}:\\s*"([^"]+)"`);
       const match = content.match(regex);
 
