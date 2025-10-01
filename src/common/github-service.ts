@@ -279,35 +279,39 @@ class GitHubService {
     return progressSubject$.asObservable();
   }
 
-  public async getCommitsForServerless() {
-    /**
-     * Find the last two Kibana commits which were promoted to production-canary successfully. We
-     * cannot use the deploy@ tags from the Kibana repo, since they do not always reach prod. We
-     * need to be careful matching with this query because kibana-controller is managed in serverless-gitops as well.
-     */
-    const commits = await this.octokit.search
-      .commits({
-        q: `repo:${GITHUB_OWNER}/serverless-gitops "gitops: production-canary-ds" "Artifact promotion for kibana to git-"`,
-        sort: 'committer-date',
-      })
-      .catch((error) => {
-        throw error;
-      });
+  public async getCommitsForServerlessGitOps() {
+    const envSearch = 'production-noncanary-ds-1';
+    const commitsToFind = 5;
+    const matchingCommits = [];
 
-    const shas = commits.data.items
-      .slice(0, 10)
-      .map(
-        (item) =>
-          item.commit.message.split('Artifact promotion for kibana to git-')[1].split('\n')[0]
-      );
-
-    return shas;
+    for await (const response of this.octokit.paginate.iterator(
+      this.octokit.rest.repos.listCommits,
+      {
+        owner: GITHUB_OWNER,
+        repo: 'serverless-gitops',
+        path: 'services/kibana/versions.yaml',
+        per_page: 100,
+      }
+    )) {
+      for (const commit of response.data) {
+        if (commit.commit.message.includes(envSearch)) {
+          matchingCommits.push(commit);
+          if (matchingCommits.length === commitsToFind) {
+            return matchingCommits.map((commit) => commit.sha);
+          }
+        }
+      }
+    }
   }
 
   public async getPrsForServerless(config: Config) {
     const { excludedLabels = [], includedLabels = [] } = config;
 
-    const shas = await this.getCommitsForServerless();
+    const shas = await this.getCommitsForServerlessGitOps();
+
+    if (!shas || shas.length < 2) {
+      throw new Error('Could not find two deployment commits in serverless-gitops repo');
+    }
 
     // Need to retrieve all the tags because ref tags are always last
     const tags = await this.octokit

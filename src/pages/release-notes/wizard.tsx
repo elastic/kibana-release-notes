@@ -42,7 +42,7 @@ export const ReleaseNotesWizard: FC<Props> = ({ onVersionSelected }) => {
 
   useEffect(() => {
     if (isServerless) {
-      github.getCommitsForServerless().then(
+      github.getCommitsForServerlessGitOps().then(
         (shas) => setServerlessShas(shas),
         (e) => errorHandler(e)
       );
