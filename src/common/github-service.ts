@@ -28,6 +28,16 @@ interface GitHubServiceConfig {
   repoName: string;
 }
 
+interface ServerlessGitOpsParams {
+  envSearch: string;
+  repo: string;
+  filePath: string;
+}
+
+interface ExtractDeployedShaParams extends ServerlessGitOpsParams {
+  gitOpsSha: string;
+}
+
 const SEMVER_REGEX = /^v(\d+)\.(\d+)\.(\d+)$/;
 
 function filterPrsForVersion(
@@ -284,39 +294,33 @@ class GitHubService {
    */
   public async getCommitsForServerless(): Promise<string[]> {
     const envSearch = 'production-noncanary-ds-1';
-    const commitsToFind = 5;
     const serverlessGitOpsRepo = 'serverless-gitops';
     const versionsFilePath = 'services/kibana/versions.yaml';
 
-    const matchingCommits = await this.findMatchingCommits(
+    const matchingCommits = await this.findMatchingCommits({
       envSearch,
-      commitsToFind,
-      serverlessGitOpsRepo,
-      versionsFilePath
-    );
+      repo: serverlessGitOpsRepo,
+      filePath: versionsFilePath,
+    });
 
     if (matchingCommits.length === 0) {
       throw new Error(`Could not find matching commits for ${envSearch} in serverless-gitops repo`);
     }
 
     const deployedShaPromises = matchingCommits.map((commit) =>
-      this.extractDeployedShaFromCommit(
-        commit.sha,
+      this.extractDeployedShaFromCommit({
+        gitOpsSha: commit.sha,
         envSearch,
-        serverlessGitOpsRepo,
-        versionsFilePath
-      )
+        repo: serverlessGitOpsRepo,
+        filePath: versionsFilePath,
+      })
     );
 
     return Promise.all(deployedShaPromises);
   }
 
-  private async findMatchingCommits(
-    envSearch: string,
-    commitsToFind: number,
-    repo: string,
-    filePath: string
-  ) {
+  private async findMatchingCommits({ envSearch, repo, filePath }: ServerlessGitOpsParams) {
+    const commitsToFind = 5;
     const matchingCommits = [];
 
     for await (const response of this.octokit.paginate.iterator(
@@ -341,22 +345,22 @@ class GitHubService {
     return matchingCommits;
   }
 
-  private async extractDeployedShaFromCommit(
-    commitSha: string,
-    envSearch: string,
-    repo: string,
-    filePath: string
-  ): Promise<string> {
+  private async extractDeployedShaFromCommit({
+    gitOpsSha,
+    envSearch,
+    repo,
+    filePath,
+  }: ExtractDeployedShaParams): Promise<string> {
     try {
       const fileResponse = await this.octokit.repos.getContent({
         owner: GITHUB_OWNER,
         repo,
         path: filePath,
-        ref: commitSha,
+        ref: gitOpsSha,
       });
 
       if (!('content' in fileResponse.data)) {
-        throw new Error(`File content not available for commit ${commitSha}`);
+        throw new Error(`File content not available for commit ${gitOpsSha}`);
       }
 
       const content = Buffer.from(fileResponse.data.content, 'base64').toString('utf-8');
@@ -364,12 +368,12 @@ class GitHubService {
       const match = content.match(regex);
 
       if (!match || !match[1]) {
-        throw new Error(`Could not find ${envSearch} in ${filePath} for commit ${commitSha}`);
+        throw new Error(`Could not find ${envSearch} in ${filePath} for commit ${gitOpsSha}`);
       }
 
       return match[1];
     } catch (error) {
-      throw new Error(`Error extracting deployed SHA from commit ${commitSha}: ${error}`);
+      throw new Error(`Error extracting deployed SHA from commit ${gitOpsSha}: ${error}`);
     }
   }
 
