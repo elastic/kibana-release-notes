@@ -279,17 +279,52 @@ class GitHubService {
     return progressSubject$.asObservable();
   }
 
-  public async getCommitsForServerlessGitOps() {
+  /**
+   * Find commits which updated the production environment and extract the deployed Kibana SHAs
+   */
+  public async getCommitsForServerless(): Promise<string[]> {
     const envSearch = 'production-noncanary-ds-1';
     const commitsToFind = 5;
+    const serverlessGitOpsRepo = 'serverless-gitops';
+    const versionsFilePath = 'services/kibana/versions.yaml';
+
+    const matchingCommits = await this.findMatchingCommits(
+      envSearch,
+      commitsToFind,
+      serverlessGitOpsRepo,
+      versionsFilePath
+    );
+
+    if (matchingCommits.length === 0) {
+      throw new Error(`Could not find matching commits for ${envSearch} in serverless-gitops repo`);
+    }
+
+    const deployedShaPromises = matchingCommits.map((commit) =>
+      this.extractDeployedShaFromCommit(
+        commit.sha,
+        envSearch,
+        serverlessGitOpsRepo,
+        versionsFilePath
+      )
+    );
+
+    return Promise.all(deployedShaPromises);
+  }
+
+  private async findMatchingCommits(
+    envSearch: string,
+    commitsToFind: number,
+    repo: string,
+    filePath: string
+  ) {
     const matchingCommits = [];
 
     for await (const response of this.octokit.paginate.iterator(
       this.octokit.rest.repos.listCommits,
       {
         owner: GITHUB_OWNER,
-        repo: 'serverless-gitops',
-        path: 'services/kibana/versions.yaml',
+        repo,
+        path: filePath,
         per_page: 100,
       }
     )) {
@@ -297,21 +332,57 @@ class GitHubService {
         if (commit.commit.message.includes(envSearch)) {
           matchingCommits.push(commit);
           if (matchingCommits.length === commitsToFind) {
-            return matchingCommits.map((commit) => commit.sha);
+            return matchingCommits;
           }
         }
       }
+    }
+
+    return matchingCommits;
+  }
+
+  private async extractDeployedShaFromCommit(
+    commitSha: string,
+    envSearch: string,
+    repo: string,
+    filePath: string
+  ): Promise<string> {
+    try {
+      const fileResponse = await this.octokit.repos.getContent({
+        owner: GITHUB_OWNER,
+        repo,
+        path: filePath,
+        ref: commitSha,
+      });
+
+      if (!('content' in fileResponse.data)) {
+        throw new Error(`File content not available for commit ${commitSha}`);
+      }
+
+      const content = Buffer.from(fileResponse.data.content, 'base64').toString('utf-8');
+      const regex = new RegExp(`${envSearch}:\\s*"([^"]+)"`);
+      const match = content.match(regex);
+
+      if (!match || !match[1]) {
+        throw new Error(`Could not find ${envSearch} in ${filePath} for commit ${commitSha}`);
+      }
+
+      return match[1];
+    } catch (error) {
+      throw new Error(`Error extracting deployed SHA from commit ${commitSha}: ${error}`);
     }
   }
 
   public async getPrsForServerless(config: Config) {
     const { excludedLabels = [], includedLabels = [] } = config;
 
-    const shas = await this.getCommitsForServerlessGitOps();
+    const shas = await this.getCommitsForServerless();
 
     if (!shas || shas.length < 2) {
       throw new Error('Could not find two deployment commits in serverless-gitops repo');
     }
+
+    console.log(shas);
 
     // Need to retrieve all the tags because ref tags are always last
     const tags = await this.octokit
