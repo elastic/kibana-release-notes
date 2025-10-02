@@ -409,13 +409,14 @@ class GitHubService {
     });
   }
 
-  public async getPrsForServerless(config: Config) {
+  public async getPrsForServerless(
+    config: Config,
+    selectedServerlessReleases: ServerlessRelease[]
+  ) {
     const { excludedLabels = [], includedLabels = [] } = config;
 
-    await this.getServerlessReleases();
-
-    if (!this.serverlessReleases || this.serverlessReleases.length < 2) {
-      throw new Error('Could not find two deployment commits in serverless-gitops repo');
+    if (selectedServerlessReleases.length !== 2) {
+      throw new Error('Exactly two serverless releases must be selected');
     }
 
     // Get all the merge commit between the two releases
@@ -423,7 +424,7 @@ class GitHubService {
       .compareCommitsWithBasehead({
         owner: GITHUB_OWNER,
         repo: 'kibana',
-        basehead: `${this.serverlessReleases[1].kibanaSha}...${this.serverlessReleases[0].kibanaSha}`,
+        basehead: `${selectedServerlessReleases[1].kibanaSha}...${selectedServerlessReleases[0].kibanaSha}`,
       })
       .catch((error) => {
         throw error;

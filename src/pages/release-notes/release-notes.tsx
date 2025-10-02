@@ -11,7 +11,7 @@ import {
   EuiButtonEmpty,
 } from '@elastic/eui';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
-import { PrItem, useGitHubService } from '../../common';
+import { PrItem, ServerlessRelease, useGitHubService } from '../../common';
 import { useActiveConfig, getActiveTemplateId } from '../../config/config';
 import { GenerateSidebar, PrepareSidebar } from './sidebars';
 import { Subscription } from 'rxjs';
@@ -22,10 +22,16 @@ import { ConfigFlyout } from './components';
 interface Props {
   version: string;
   ignoredPriorReleases: string[];
+  selectedServerlessReleases: ServerlessRelease[];
   onVersionChange: () => void;
 }
 
-export const ReleaseNotes: FC<Props> = ({ version, onVersionChange, ignoredPriorReleases }) => {
+export const ReleaseNotes: FC<Props> = ({
+  version,
+  onVersionChange,
+  ignoredPriorReleases,
+  selectedServerlessReleases,
+}) => {
   const subscriptionRef = useRef<Subscription>();
   const [github, errorHandler] = useGitHubService();
   const config = useActiveConfig();
@@ -40,7 +46,7 @@ export const ReleaseNotes: FC<Props> = ({ version, onVersionChange, ignoredPrior
     setProgress(undefined);
 
     if (version === 'serverless') {
-      setPrs(await github.getPrsForServerless(config));
+      setPrs(await github.getPrsForServerless(config, selectedServerlessReleases));
       setLoading(false);
       setProgress(100);
       return;
