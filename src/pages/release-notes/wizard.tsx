@@ -4,6 +4,7 @@ import {
   EuiButtonEmpty,
   EuiCallOut,
   EuiCheckableCard,
+  EuiCheckboxGroup,
   EuiFieldText,
   EuiFlexGroup,
   EuiFlexItem,
@@ -26,9 +27,15 @@ import { ConfigFlyout } from './components';
 
 interface Props {
   onVersionSelected: (version: string, ignoreVersions?: string[]) => void;
+  selectedServerlessReleases: ServerlessRelease[];
+  setSelectedServerlessReleases: (releases: ServerlessRelease[]) => void;
 }
 
-export const ReleaseNotesWizard: FC<Props> = ({ onVersionSelected }) => {
+export const ReleaseNotesWizard: FC<Props> = ({
+  onVersionSelected,
+  selectedServerlessReleases,
+  setSelectedServerlessReleases,
+}) => {
   const [github, errorHandler] = useGitHubService();
   const [labels, setLabels] = useState<string[]>();
   const [manualLabel, setManualLabel] = useState<string>('');
@@ -38,14 +45,10 @@ export const ReleaseNotesWizard: FC<Props> = ({ onVersionSelected }) => {
   const [isValidatingVersion, setIsValidatingVersion] = useState(false);
   const [previousMissingReleases, setPreviousMissingReleases] = useState<Record<string, boolean>>();
   const isServerless = getActiveTemplateId() === 'serverless';
-  // const [serverlessShas, setServerlessShas] = useState<ServerlessRelease[]>();
 
   useEffect(() => {
     if (isServerless) {
-      github.getServerlessReleases().then(
-        () => console.log(github.serverlessReleases),
-        (e) => errorHandler(e)
-      );
+      github.getServerlessReleases().catch((e) => errorHandler(e));
     } else {
       github.getUpcomingReleaseVersions().then(
         (labels) => setLabels(labels),
@@ -83,6 +86,23 @@ export const ReleaseNotesWizard: FC<Props> = ({ onVersionSelected }) => {
       setManualLabel('');
     },
     [manualLabel, onValidateVersion]
+  );
+
+  const onServerlessReleaseToggle = useCallback(
+    (optionId: string) => {
+      const serverlessReleases = github.serverlessReleases || [];
+      const releaseIndex = parseInt(optionId, 10);
+      const release = serverlessReleases[releaseIndex];
+
+      if (selectedServerlessReleases.some((r) => r.kibanaSha === release.kibanaSha)) {
+        setSelectedServerlessReleases(
+          selectedServerlessReleases.filter((r) => r.kibanaSha !== release.kibanaSha)
+        );
+      } else if (selectedServerlessReleases.length < 2) {
+        setSelectedServerlessReleases([...selectedServerlessReleases, release]);
+      }
+    },
+    [selectedServerlessReleases, setSelectedServerlessReleases, github.serverlessReleases]
   );
 
   const onGenerateReleaseNotes = useCallback(() => {
@@ -145,18 +165,73 @@ export const ReleaseNotesWizard: FC<Props> = ({ onVersionSelected }) => {
     ];
 
     if (isServerless) {
+      const checkboxOptions = github.serverlessReleases.map((release, index) => {
+        const releaseDate = release.releaseDate?.toLocaleDateString() || 'No date';
+        const tagName = release.releaseTag?.name || 'No tag';
+        return {
+          id: index.toString(),
+          label: `${releaseDate} (${tagName})`,
+        };
+      });
+
       return baseSteps.concat([
         {
           title: 'Select two Serverless releases',
-          children: <></>,
+          status: github.serverlessReleases.length === 0 ? 'loading' : 'current',
+          children:
+            github.serverlessReleases.length === 0 ? (
+              'Loading serverless releases …'
+            ) : (
+              <>
+                <EuiFormRow
+                  label="Select exactly two releases to compare"
+                  isInvalid={selectedServerlessReleases.length !== 2}
+                  error={
+                    selectedServerlessReleases.length === 0
+                      ? 'Please select two releases'
+                      : selectedServerlessReleases.length === 1
+                      ? 'Please select one more release'
+                      : selectedServerlessReleases.length > 2
+                      ? 'Please select only two releases'
+                      : undefined
+                  }
+                >
+                  <EuiCheckboxGroup
+                    options={checkboxOptions}
+                    idToSelectedMap={Object.fromEntries(
+                      checkboxOptions.map((option) => {
+                        const releaseIndex = parseInt(option.id, 10);
+                        const release = github.serverlessReleases[releaseIndex];
+                        return [
+                          option.id,
+                          selectedServerlessReleases.some((r) => r.kibanaSha === release.kibanaSha),
+                        ];
+                      })
+                    )}
+                    onChange={(optionId) => onServerlessReleaseToggle(optionId)}
+                  />
+                </EuiFormRow>
+              </>
+            ),
         },
         {
-          title: 'Generate notes for PRs between the two Serverless release',
+          title: 'Generate notes for PRs between the two Serverless releases',
+          status: selectedServerlessReleases.length === 2 ? 'current' : 'incomplete',
           children: (
             <>
-              <EuiButton fill onClick={onGenerateReleaseNotes}>
-                Generate release notes
-              </EuiButton>
+              {selectedServerlessReleases.length !== 2 ? (
+                <EuiTextColor color="subdued">
+                  Please select exactly two releases above to continue.
+                </EuiTextColor>
+              ) : (
+                <EuiButton
+                  fill
+                  onClick={onGenerateReleaseNotes}
+                  disabled={selectedServerlessReleases.length !== 2}
+                >
+                  Generate release notes
+                </EuiButton>
+              )}
             </>
           ),
         },
@@ -335,14 +410,17 @@ export const ReleaseNotesWizard: FC<Props> = ({ onVersionSelected }) => {
       },
     ]);
   }, [
+    github.serverlessReleases,
     isServerless,
     isValidatingVersion,
     labels,
     manualLabel,
     onGenerateReleaseNotes,
+    onServerlessReleaseToggle,
     onSubmitManualLabel,
     onValidateVersion,
     previousMissingReleases,
+    selectedServerlessReleases,
     templates,
     validateVersion,
   ]);
