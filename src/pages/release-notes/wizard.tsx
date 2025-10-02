@@ -20,7 +20,7 @@ import {
   EuiTitle,
 } from '@elastic/eui';
 import React, { FC, useEffect, useMemo, useState, useCallback } from 'react';
-import { useGitHubService } from '../../common';
+import { ServerlessRelease, useGitHubService } from '../../common';
 import { getTemplateInfos, setActiveTemplate, TemplateId, getActiveTemplateId } from '../../config';
 import { ConfigFlyout } from './components';
 
@@ -38,7 +38,7 @@ export const ReleaseNotesWizard: FC<Props> = ({ onVersionSelected }) => {
   const [isValidatingVersion, setIsValidatingVersion] = useState(false);
   const [previousMissingReleases, setPreviousMissingReleases] = useState<Record<string, boolean>>();
   const isServerless = getActiveTemplateId() === 'serverless';
-  const [serverlessShas, setServerlessShas] = useState<string[]>();
+  const [serverlessShas, setServerlessShas] = useState<ServerlessRelease[]>();
 
   useEffect(() => {
     if (isServerless) {

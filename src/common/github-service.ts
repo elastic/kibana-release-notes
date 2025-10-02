@@ -299,7 +299,7 @@ class GitHubService {
   /**
    * Find commits which updated the production environment and extract the deployed Kibana SHAs
    */
-  public async getCommitsForServerless(): Promise<string[]> {
+  public async getCommitsForServerless(): Promise<ServerlessRelease[]> {
     const envSearch = 'production-noncanary-ds-1';
     const serverlessGitOpsRepo = 'serverless-gitops';
     const versionsFilePath = 'services/kibana/versions.yaml';
@@ -357,7 +357,7 @@ class GitHubService {
     envSearch,
     repo,
     filePath,
-  }: ExtractDeployedShaParams): Promise<string> {
+  }: ExtractDeployedShaParams): Promise<ServerlessRelease> {
     try {
       const fileResponse = await this.octokit.repos.getContent({
         owner: GITHUB_OWNER,
@@ -378,7 +378,7 @@ class GitHubService {
         throw new Error(`Could not find ${envSearch} in ${filePath} for commit ${gitOpsSha}`);
       }
 
-      return match[1];
+      return { gitOpsSha, kibanaSha: match[1] };
     } catch (error) {
       throw new Error(`Error extracting deployed SHA from commit ${gitOpsSha}: ${error}`);
     }
@@ -387,9 +387,9 @@ class GitHubService {
   public async getPrsForServerless(config: Config) {
     const { excludedLabels = [], includedLabels = [] } = config;
 
-    const shas = await this.getCommitsForServerless();
+    this.serverlessReleases = await this.getCommitsForServerless();
 
-    if (!shas || shas.length < 2) {
+    if (!this.serverlessReleases || this.serverlessReleases.length < 2) {
       throw new Error('Could not find two deployment commits in serverless-gitops repo');
     }
 
@@ -404,7 +404,9 @@ class GitHubService {
         throw error;
       });
 
-    const tagForReleaseCommit = tags.filter((tag) => tag.commit.sha.startsWith(shas[0])).pop();
+    const tagForReleaseCommit = tags
+      .filter((tag) => tag.commit.sha.startsWith(this.serverlessReleases[0].kibanaSha))
+      .pop();
 
     if (tagForReleaseCommit) {
       this.serverlessReleaseTag = tagForReleaseCommit.name;
@@ -418,7 +420,7 @@ class GitHubService {
       .compareCommitsWithBasehead({
         owner: GITHUB_OWNER,
         repo: 'kibana',
-        basehead: `${shas[1]}...${shas[0]}`,
+        basehead: `${this.serverlessReleases[1].kibanaSha}...${this.serverlessReleases[0].kibanaSha}`,
       })
       .catch((error) => {
         throw error;
