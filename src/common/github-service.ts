@@ -299,7 +299,7 @@ class GitHubService {
   /**
    * Find commits which updated the production environment and extract the deployed Kibana SHAs
    */
-  public async getCommitsForServerless(): Promise<ServerlessRelease[]> {
+  public async getServerlessReleases(): Promise<void> {
     const envSearch = 'production-noncanary-ds-1';
     const serverlessGitOpsRepo = 'serverless-gitops';
     const versionsFilePath = 'services/kibana/versions.yaml';
@@ -323,7 +323,8 @@ class GitHubService {
       })
     );
 
-    return Promise.all(deployedShaPromises);
+    this.serverlessReleases = await Promise.all(deployedShaPromises);
+    await this.matchKibanaTagsToReleaseCommits();
   }
 
   private async findServerlessGitOpsCommits({ envSearch, repo, filePath }: ServerlessGitOpsParams) {
@@ -384,15 +385,7 @@ class GitHubService {
     }
   }
 
-  public async getPrsForServerless(config: Config) {
-    const { excludedLabels = [], includedLabels = [] } = config;
-
-    this.serverlessReleases = await this.getCommitsForServerless();
-
-    if (!this.serverlessReleases || this.serverlessReleases.length < 2) {
-      throw new Error('Could not find two deployment commits in serverless-gitops repo');
-    }
-
+  private async matchKibanaTagsToReleaseCommits() {
     // Need to retrieve all the tags because ref tags are always last
     const tags = await this.octokit
       .paginate(this.octokit.repos.listTags, {
@@ -404,15 +397,27 @@ class GitHubService {
         throw error;
       });
 
-    const tagForReleaseCommit = tags
-      .filter((tag) => tag.commit.sha.startsWith(this.serverlessReleases[0].kibanaSha))
-      .pop();
+    this.serverlessReleases.forEach((release) => {
+      const tagForReleaseCommit = tags
+        .filter((tag) => tag.commit.sha.startsWith(release.kibanaSha))
+        .pop();
 
-    if (tagForReleaseCommit) {
-      this.serverlessReleaseTag = tagForReleaseCommit.name;
-      this.serverlessReleaseDate = new Date(Number(tagForReleaseCommit.name.split('@')[1]) * 1000);
-    } else {
-      throw new Error('No tag found for the release commit');
+      if (tagForReleaseCommit) {
+        release.releaseTag = tagForReleaseCommit;
+        release.releaseDate = new Date(Number(tagForReleaseCommit.name.split('@')[1]) * 1000);
+      } else {
+        throw new Error(`No tag found for the release commit ${release.kibanaSha}`);
+      }
+    });
+  }
+
+  public async getPrsForServerless(config: Config) {
+    const { excludedLabels = [], includedLabels = [] } = config;
+
+    await this.getServerlessReleases();
+
+    if (!this.serverlessReleases || this.serverlessReleases.length < 2) {
+      throw new Error('Could not find two deployment commits in serverless-gitops repo');
     }
 
     // Get all the merge commit between the two releases
