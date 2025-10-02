@@ -398,9 +398,7 @@ class GitHubService {
       });
 
     this.serverlessReleases.forEach((release) => {
-      const tagForReleaseCommit = tags
-        .filter((tag) => tag.commit.sha.startsWith(release.kibanaSha))
-        .pop();
+      const tagForReleaseCommit = tags.find((tag) => tag.commit.sha.startsWith(release.kibanaSha));
 
       if (tagForReleaseCommit) {
         release.releaseTag = tagForReleaseCommit;

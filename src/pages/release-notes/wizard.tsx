@@ -38,12 +38,12 @@ export const ReleaseNotesWizard: FC<Props> = ({ onVersionSelected }) => {
   const [isValidatingVersion, setIsValidatingVersion] = useState(false);
   const [previousMissingReleases, setPreviousMissingReleases] = useState<Record<string, boolean>>();
   const isServerless = getActiveTemplateId() === 'serverless';
-  const [serverlessShas, setServerlessShas] = useState<ServerlessRelease[]>();
+  // const [serverlessShas, setServerlessShas] = useState<ServerlessRelease[]>();
 
   useEffect(() => {
     if (isServerless) {
       github.getServerlessReleases().then(
-        (shas) => setServerlessShas(shas),
+        () => console.log(github.serverlessReleases),
         (e) => errorHandler(e)
       );
     } else {
@@ -53,8 +53,6 @@ export const ReleaseNotesWizard: FC<Props> = ({ onVersionSelected }) => {
       );
     }
   }, [errorHandler, github, isServerless]);
-
-  console.log(serverlessShas);
 
   const onValidateVersion = useCallback(
     async (version: string): Promise<void> => {
