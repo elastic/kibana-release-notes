@@ -67,6 +67,7 @@ class GitHubService {
   private octokit: Octokit;
   private repoId: number | undefined;
   public repoName: string;
+  public serverlessReleases: ServerlessRelease[] = [];
   public serverlessReleaseDate: Date | undefined;
   public serverlessReleaseTag: string = '';
 
@@ -303,7 +304,7 @@ class GitHubService {
     const serverlessGitOpsRepo = 'serverless-gitops';
     const versionsFilePath = 'services/kibana/versions.yaml';
 
-    const matchingCommits = await this.findMatchingCommits({
+    const matchingCommits = await this.findServerlessGitOpsCommits({
       envSearch,
       repo: serverlessGitOpsRepo,
       filePath: versionsFilePath,
@@ -314,7 +315,7 @@ class GitHubService {
     }
 
     const deployedShaPromises = matchingCommits.map((commit) =>
-      this.extractDeployedShaFromCommit({
+      this.findKibanaServerlessDeployedCommit({
         gitOpsSha: commit.sha,
         envSearch,
         repo: serverlessGitOpsRepo,
@@ -325,7 +326,7 @@ class GitHubService {
     return Promise.all(deployedShaPromises);
   }
 
-  private async findMatchingCommits({ envSearch, repo, filePath }: ServerlessGitOpsParams) {
+  private async findServerlessGitOpsCommits({ envSearch, repo, filePath }: ServerlessGitOpsParams) {
     const commitsToFind = 5;
     const matchingCommits = [];
 
@@ -351,7 +352,7 @@ class GitHubService {
     return matchingCommits;
   }
 
-  private async extractDeployedShaFromCommit({
+  private async findKibanaServerlessDeployedCommit({
     gitOpsSha,
     envSearch,
     repo,
@@ -370,7 +371,7 @@ class GitHubService {
       }
 
       const content = atob(fileResponse.data.content);
-      const regex = new RegExp(`${envSearch}:\\s*"([^"]+)"`);
+      const regex = new RegExp(`${envSearch}:\\s+"([a-f0-9]{7,40})"`);
       const match = content.match(regex);
 
       if (!match || !match[1]) {
@@ -402,8 +403,6 @@ class GitHubService {
       .catch((error) => {
         throw error;
       });
-
-    console.log(tags.length);
 
     const tagForReleaseCommit = tags.filter((tag) => tag.commit.sha.startsWith(shas[0])).pop();
 

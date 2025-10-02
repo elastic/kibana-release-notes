@@ -54,6 +54,8 @@ export const ReleaseNotesWizard: FC<Props> = ({ onVersionSelected }) => {
     }
   }, [errorHandler, github, isServerless]);
 
+  console.log(serverlessShas);
+
   const onValidateVersion = useCallback(
     async (version: string): Promise<void> => {
       setValidateVersion(version);
