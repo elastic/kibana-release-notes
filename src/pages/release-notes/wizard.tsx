@@ -147,11 +147,11 @@ export const ReleaseNotesWizard: FC<Props> = ({ onVersionSelected }) => {
     if (isServerless) {
       return baseSteps.concat([
         {
-          title: 'Select Serverless versions',
+          title: 'Select two Serverless releases',
           children: <></>,
         },
         {
-          title: 'Generate notes for the most recent Serverless release',
+          title: 'Generate notes for PRs between the two Serverless release',
           children: (
             <>
               <EuiButton fill onClick={onGenerateReleaseNotes}>
