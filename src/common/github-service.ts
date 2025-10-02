@@ -22,6 +22,12 @@ export type ServerlessPrItem = Pick<
   PullRequest,
   'id' | 'url' | 'title' | 'number' | 'body' | 'labels' | 'author'
 >;
+export interface ServerlessRelease {
+  gitOpsSha: string;
+  kibanaSha: string;
+  releaseTag?: Awaited<ReturnType<Octokit['repos']['listTags']>>['data'][number];
+  releaseDate?: Date;
+}
 
 interface GitHubServiceConfig {
   octokit: Octokit;
@@ -386,8 +392,6 @@ class GitHubService {
       throw new Error('Could not find two deployment commits in serverless-gitops repo');
     }
 
-    console.log(shas);
-
     // Need to retrieve all the tags because ref tags are always last
     const tags = await this.octokit
       .paginate(this.octokit.repos.listTags, {
@@ -398,6 +402,8 @@ class GitHubService {
       .catch((error) => {
         throw error;
       });
+
+    console.log(tags.length);
 
     const tagForReleaseCommit = tags.filter((tag) => tag.commit.sha.startsWith(shas[0])).pop();
 
