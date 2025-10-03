@@ -431,9 +431,11 @@ class GitHubService {
     this.setLoading?.(true);
 
     // TODO: order properly
-    const [first, second] = Array.from(selectedServerlessSHAs);
-
-    console.log(first, second);
+    const [first, second] = Array.from(selectedServerlessSHAs)
+      .map((sha) => {
+        return this.serverlessReleases.find(({ kibanaSha }) => kibanaSha === sha);
+      })
+      .sort((a, b) => a?.releaseDate?.getTime() - b?.releaseDate?.getTime());
 
     // Get all the merge commit between the two releases
     const compareResult = await this.octokit.repos
