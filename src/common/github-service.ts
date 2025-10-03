@@ -70,6 +70,7 @@ class GitHubService {
   public serverlessReleases: ServerlessRelease[] = [];
   public serverlessReleaseDate: Date | undefined;
   public serverlessReleaseTag: string = '';
+  public loading = false;
 
   constructor(config: GitHubServiceConfig) {
     this.octokit = config.octokit;
@@ -87,6 +88,11 @@ class GitHubService {
     } catch (error) {
       console.error('Error fetching repository info:', error);
     }
+  }
+
+  private handleError(error: unknown): never {
+    this.loading = false;
+    throw new Error(`${error}`);
   }
 
   public async getUpcomingReleaseVersions(): Promise<string[]> {
@@ -303,6 +309,7 @@ class GitHubService {
     const envSearch = 'production-noncanary-ds-1';
     const serverlessGitOpsRepo = 'serverless-gitops';
     const versionsFilePath = 'services/kibana/versions.yaml';
+    this.loading = true;
 
     const matchingCommits = await this.findServerlessGitOpsCommits({
       envSearch,
@@ -311,7 +318,9 @@ class GitHubService {
     });
 
     if (matchingCommits.length === 0) {
-      throw new Error(`Could not find matching commits for ${envSearch} in serverless-gitops repo`);
+      this.handleError(
+        `Could not find matching commits for ${envSearch} in serverless-gitops repo`
+      );
     }
 
     const deployedShaPromises = matchingCommits.map((commit) =>
@@ -323,8 +332,9 @@ class GitHubService {
       })
     );
 
-    this.serverlessReleases = await Promise.all(deployedShaPromises);
+    await Promise.all(deployedShaPromises);
     await this.matchKibanaTagsToReleaseCommits();
+    this.loading = false;
   }
 
   private async findServerlessGitOpsCommits({ envSearch, repo, filePath }: ServerlessGitOpsParams) {
@@ -358,7 +368,7 @@ class GitHubService {
     envSearch,
     repo,
     filePath,
-  }: ExtractDeployedShaParams): Promise<ServerlessRelease> {
+  }: ExtractDeployedShaParams): Promise<void> {
     try {
       const fileResponse = await this.octokit.repos.getContent({
         owner: GITHUB_OWNER,
@@ -368,7 +378,7 @@ class GitHubService {
       });
 
       if (!('content' in fileResponse.data)) {
-        throw new Error(`File content not available for commit ${gitOpsSha}`);
+        this.handleError(`File content not available for commit ${gitOpsSha}`);
       }
 
       const content = atob(fileResponse.data.content);
@@ -376,12 +386,12 @@ class GitHubService {
       const match = content.match(regex);
 
       if (!match || !match[1]) {
-        throw new Error(`Could not find ${envSearch} in ${filePath} for commit ${gitOpsSha}`);
+        this.handleError(`Could not find ${envSearch} in ${filePath} for commit ${gitOpsSha}`);
       }
 
-      return { gitOpsSha, kibanaSha: match[1] };
+      this.serverlessReleases.push({ gitOpsSha, kibanaSha: match[1] });
     } catch (error) {
-      throw new Error(`Error extracting deployed SHA from commit ${gitOpsSha}: ${error}`);
+      this.handleError(`Error extracting deployed SHA from commit ${gitOpsSha}: ${error}`);
     }
   }
 
@@ -404,7 +414,7 @@ class GitHubService {
         release.releaseTag = tagForReleaseCommit;
         release.releaseDate = new Date(Number(tagForReleaseCommit.name.split('@')[1]) * 1000);
       } else {
-        throw new Error(`No tag found for the release commit ${release.kibanaSha}`);
+        this.handleError(`No tag found for the release commit ${release.kibanaSha}`);
       }
     });
   }
@@ -416,9 +426,10 @@ class GitHubService {
     const { excludedLabels = [], includedLabels = [] } = config;
 
     if (selectedServerlessReleases.length !== 2) {
-      throw new Error('Exactly two serverless releases must be selected');
+      this.handleError('Exactly two serverless releases must be selected');
     }
 
+    this.loading = true;
     // Get all the merge commit between the two releases
     const compareResult = await this.octokit.repos
       .compareCommitsWithBasehead({
@@ -427,7 +438,7 @@ class GitHubService {
         basehead: `${selectedServerlessReleases[1].kibanaSha}...${selectedServerlessReleases[0].kibanaSha}`,
       })
       .catch((error) => {
-        throw error;
+        this.handleError(error);
       });
 
     // Find all the PRs which were associated with the merge commits
@@ -471,7 +482,7 @@ class GitHubService {
     });
 
     const results = await Promise.all(promises).catch((error) => {
-      throw error;
+      this.handleError(error);
     });
 
     results.forEach((result) => {
@@ -494,6 +505,8 @@ class GitHubService {
         }
       });
     });
+
+    this.loading = false;
 
     return pullRequests.map((pr) => {
       return {
