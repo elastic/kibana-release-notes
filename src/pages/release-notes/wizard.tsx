@@ -21,20 +21,20 @@ import {
   EuiTitle,
 } from '@elastic/eui';
 import React, { FC, useEffect, useMemo, useState, useCallback } from 'react';
-import { ServerlessRelease, useGitHubService } from '../../common';
+import { useGitHubService } from '../../common';
 import { getTemplateInfos, setActiveTemplate, TemplateId, getActiveTemplateId } from '../../config';
 import { ConfigFlyout } from './components';
 
 interface Props {
   onVersionSelected: (version: string, ignoreVersions?: string[]) => void;
-  selectedServerlessReleases: ServerlessRelease[];
-  setSelectedServerlessReleases: (releases: ServerlessRelease[]) => void;
+  selectedServerlessSHAs: Set<string>;
+  setSelectedServerlessSHAs: (sha: Set<string>) => void;
 }
 
 export const ReleaseNotesWizard: FC<Props> = ({
   onVersionSelected,
-  selectedServerlessReleases,
-  setSelectedServerlessReleases,
+  selectedServerlessSHAs,
+  setSelectedServerlessSHAs,
 }) => {
   const [github, errorHandler, githubLoading] = useGitHubService();
   const [labels, setLabels] = useState<string[]>();
@@ -88,21 +88,19 @@ export const ReleaseNotesWizard: FC<Props> = ({
     [manualLabel, onValidateVersion]
   );
 
-  const onServerlessReleaseToggle = useCallback(
+  const onServerlessReleaseChange = useCallback(
     (optionId: string) => {
-      const serverlessReleases = github.serverlessReleases || [];
-      const releaseIndex = parseInt(optionId, 10);
-      const release = serverlessReleases[releaseIndex];
+      const newIndices = new Set(selectedServerlessSHAs);
 
-      if (selectedServerlessReleases.some((r) => r.kibanaSha === release.kibanaSha)) {
-        setSelectedServerlessReleases(
-          selectedServerlessReleases.filter((r) => r.kibanaSha !== release.kibanaSha)
-        );
-      } else if (selectedServerlessReleases.length < 2) {
-        setSelectedServerlessReleases([...selectedServerlessReleases, release]);
+      if (selectedServerlessSHAs.has(optionId)) {
+        newIndices.delete(optionId);
+      } else if (selectedServerlessSHAs.size < 2) {
+        newIndices.add(optionId);
       }
+
+      setSelectedServerlessSHAs(newIndices);
     },
-    [selectedServerlessReleases, setSelectedServerlessReleases, github.serverlessReleases]
+    [selectedServerlessSHAs, setSelectedServerlessSHAs]
   );
 
   const onGenerateReleaseNotes = useCallback(() => {
@@ -165,11 +163,11 @@ export const ReleaseNotesWizard: FC<Props> = ({
     ];
 
     if (isServerless) {
-      const checkboxOptions = github.serverlessReleases.map((release, index) => {
-        const releaseDate = release.releaseDate?.toLocaleDateString() || 'No date';
-        const tagName = release.releaseTag?.name || 'No tag';
+      const checkboxOptions = github.serverlessReleases.map((release) => {
+        const releaseDate = release.releaseDate?.toLocaleDateString();
+        const tagName = release.releaseTag?.name;
         return {
-          id: index.toString(),
+          id: release.kibanaSha,
           label: `${releaseDate} (${tagName})`,
         };
       });
@@ -184,30 +182,19 @@ export const ReleaseNotesWizard: FC<Props> = ({
             <>
               <EuiFormRow
                 label="Select exactly two releases to compare"
-                isInvalid={selectedServerlessReleases.length !== 2}
+                isInvalid={selectedServerlessSHAs.size !== 2}
                 error={
-                  selectedServerlessReleases.length === 0
-                    ? 'Please select two releases'
-                    : selectedServerlessReleases.length === 1
-                    ? 'Please select one more release'
-                    : selectedServerlessReleases.length > 2
-                    ? 'Please select only two releases'
-                    : undefined
+                  selectedServerlessSHAs.size !== 2 ? 'Please select only two releases' : undefined
                 }
               >
                 <EuiCheckboxGroup
                   options={checkboxOptions}
                   idToSelectedMap={Object.fromEntries(
-                    checkboxOptions.map((option) => {
-                      const releaseIndex = parseInt(option.id, 10);
-                      const release = github.serverlessReleases[releaseIndex];
-                      return [
-                        option.id,
-                        selectedServerlessReleases.some((r) => r.kibanaSha === release.kibanaSha),
-                      ];
+                    checkboxOptions.map(({ id }) => {
+                      return [id, selectedServerlessSHAs.has(id)];
                     })
                   )}
-                  onChange={(optionId) => onServerlessReleaseToggle(optionId)}
+                  onChange={onServerlessReleaseChange}
                 />
               </EuiFormRow>
             </>
@@ -215,10 +202,10 @@ export const ReleaseNotesWizard: FC<Props> = ({
         },
         {
           title: 'Generate notes for PRs between the two Serverless releases',
-          status: selectedServerlessReleases.length === 2 ? 'current' : 'incomplete',
+          status: selectedServerlessSHAs.size === 2 ? 'current' : 'incomplete',
           children: (
             <>
-              {selectedServerlessReleases.length !== 2 ? (
+              {selectedServerlessSHAs.size !== 2 ? (
                 <EuiTextColor color="subdued">
                   Please select exactly two releases above to continue.
                 </EuiTextColor>
@@ -226,7 +213,7 @@ export const ReleaseNotesWizard: FC<Props> = ({
                 <EuiButton
                   fill
                   onClick={onGenerateReleaseNotes}
-                  disabled={selectedServerlessReleases.length !== 2}
+                  disabled={selectedServerlessSHAs.size !== 2}
                 >
                   Generate release notes
                 </EuiButton>
@@ -416,11 +403,11 @@ export const ReleaseNotesWizard: FC<Props> = ({
     labels,
     manualLabel,
     onGenerateReleaseNotes,
-    onServerlessReleaseToggle,
+    onServerlessReleaseChange,
     onSubmitManualLabel,
     onValidateVersion,
     previousMissingReleases,
-    selectedServerlessReleases,
+    selectedServerlessSHAs,
     templates,
     validateVersion,
   ]);

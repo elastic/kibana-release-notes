@@ -421,23 +421,26 @@ class GitHubService {
     });
   }
 
-  public async getPrsForServerless(
-    config: Config,
-    selectedServerlessReleases: ServerlessRelease[]
-  ) {
+  public async getPrsForServerless(config: Config, selectedServerlessSHAs: Set<string>) {
     const { excludedLabels = [], includedLabels = [] } = config;
 
-    if (selectedServerlessReleases.length !== 2) {
+    if (selectedServerlessSHAs.size !== 2) {
       this.handleError('Exactly two serverless releases must be selected');
     }
 
     this.setLoading?.(true);
+
+    // TODO: order properly
+    const [first, second] = Array.from(selectedServerlessSHAs);
+
+    console.log(first, second);
+
     // Get all the merge commit between the two releases
     const compareResult = await this.octokit.repos
       .compareCommitsWithBasehead({
         owner: GITHUB_OWNER,
         repo: 'kibana',
-        basehead: `${selectedServerlessReleases[1].kibanaSha}...${selectedServerlessReleases[0].kibanaSha}`,
+        basehead: `${second}...${first}`,
       })
       .catch((error) => {
         this.handleError(error);
