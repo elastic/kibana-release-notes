@@ -36,7 +36,7 @@ export const ReleaseNotesWizard: FC<Props> = ({
   selectedServerlessReleases,
   setSelectedServerlessReleases,
 }) => {
-  const [github, errorHandler] = useGitHubService();
+  const [github, errorHandler, githubLoading] = useGitHubService();
   const [labels, setLabels] = useState<string[]>();
   const [manualLabel, setManualLabel] = useState<string>('');
   const [showConfigFlyout, setShowConfigFlyout] = useState<TemplateId>();
@@ -177,42 +177,41 @@ export const ReleaseNotesWizard: FC<Props> = ({
       return baseSteps.concat([
         {
           title: 'Select two Serverless releases',
-          status: github.serverlessReleases.length === 0 ? 'loading' : 'current',
-          children:
-            github.serverlessReleases.length === 0 ? (
-              'Loading serverless releases …'
-            ) : (
-              <>
-                <EuiFormRow
-                  label="Select exactly two releases to compare"
-                  isInvalid={selectedServerlessReleases.length !== 2}
-                  error={
-                    selectedServerlessReleases.length === 0
-                      ? 'Please select two releases'
-                      : selectedServerlessReleases.length === 1
-                      ? 'Please select one more release'
-                      : selectedServerlessReleases.length > 2
-                      ? 'Please select only two releases'
-                      : undefined
-                  }
-                >
-                  <EuiCheckboxGroup
-                    options={checkboxOptions}
-                    idToSelectedMap={Object.fromEntries(
-                      checkboxOptions.map((option) => {
-                        const releaseIndex = parseInt(option.id, 10);
-                        const release = github.serverlessReleases[releaseIndex];
-                        return [
-                          option.id,
-                          selectedServerlessReleases.some((r) => r.kibanaSha === release.kibanaSha),
-                        ];
-                      })
-                    )}
-                    onChange={(optionId) => onServerlessReleaseToggle(optionId)}
-                  />
-                </EuiFormRow>
-              </>
-            ),
+          status: githubLoading ? 'loading' : 'current',
+          children: githubLoading ? (
+            'Loading serverless releases …'
+          ) : (
+            <>
+              <EuiFormRow
+                label="Select exactly two releases to compare"
+                isInvalid={selectedServerlessReleases.length !== 2}
+                error={
+                  selectedServerlessReleases.length === 0
+                    ? 'Please select two releases'
+                    : selectedServerlessReleases.length === 1
+                    ? 'Please select one more release'
+                    : selectedServerlessReleases.length > 2
+                    ? 'Please select only two releases'
+                    : undefined
+                }
+              >
+                <EuiCheckboxGroup
+                  options={checkboxOptions}
+                  idToSelectedMap={Object.fromEntries(
+                    checkboxOptions.map((option) => {
+                      const releaseIndex = parseInt(option.id, 10);
+                      const release = github.serverlessReleases[releaseIndex];
+                      return [
+                        option.id,
+                        selectedServerlessReleases.some((r) => r.kibanaSha === release.kibanaSha),
+                      ];
+                    })
+                  )}
+                  onChange={(optionId) => onServerlessReleaseToggle(optionId)}
+                />
+              </EuiFormRow>
+            </>
+          ),
         },
         {
           title: 'Generate notes for PRs between the two Serverless releases',
@@ -410,6 +409,7 @@ export const ReleaseNotesWizard: FC<Props> = ({
       },
     ]);
   }, [
+    githubLoading,
     github.serverlessReleases,
     isServerless,
     isValidatingVersion,

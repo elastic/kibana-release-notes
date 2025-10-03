@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Octokit } from '@octokit/rest';
 import uniq from 'lodash.uniq';
 import chunk from 'lodash.chunk';
@@ -32,6 +32,7 @@ export interface ServerlessRelease {
 interface GitHubServiceConfig {
   octokit: Octokit;
   repoName: string;
+  setLoading?: (loading: boolean) => void;
 }
 
 interface ServerlessGitOpsParams {
@@ -66,15 +67,16 @@ function filterPrsForVersion(
 class GitHubService {
   private octokit: Octokit;
   private repoId: number | undefined;
+  private setLoading?: (loading: boolean) => void;
   public repoName: string;
   public serverlessReleases: ServerlessRelease[] = [];
   public serverlessReleaseDate: Date | undefined;
   public serverlessReleaseTag: string = '';
-  public loading = false;
 
   constructor(config: GitHubServiceConfig) {
     this.octokit = config.octokit;
     this.repoName = config.repoName;
+    this.setLoading = config.setLoading;
     this.initializeRepo();
   }
 
@@ -91,7 +93,7 @@ class GitHubService {
   }
 
   private handleError(error: unknown): never {
-    this.loading = false;
+    this.setLoading?.(false);
     throw new Error(`${error}`);
   }
 
@@ -309,7 +311,7 @@ class GitHubService {
     const envSearch = 'production-noncanary-ds-1';
     const serverlessGitOpsRepo = 'serverless-gitops';
     const versionsFilePath = 'services/kibana/versions.yaml';
-    this.loading = true;
+    this.setLoading?.(true);
 
     const matchingCommits = await this.findServerlessGitOpsCommits({
       envSearch,
@@ -334,7 +336,7 @@ class GitHubService {
 
     await Promise.all(deployedShaPromises);
     await this.matchKibanaTagsToReleaseCommits();
-    this.loading = false;
+    this.setLoading?.(false);
   }
 
   private async findServerlessGitOpsCommits({ envSearch, repo, filePath }: ServerlessGitOpsParams) {
@@ -429,7 +431,7 @@ class GitHubService {
       this.handleError('Exactly two serverless releases must be selected');
     }
 
-    this.loading = true;
+    this.setLoading?.(true);
     // Get all the merge commit between the two releases
     const compareResult = await this.octokit.repos
       .compareCommitsWithBasehead({
@@ -506,7 +508,7 @@ class GitHubService {
       });
     });
 
-    this.loading = false;
+    this.setLoading?.(false);
 
     return pullRequests.map((pr) => {
       return {
@@ -529,13 +531,18 @@ export function clearGitHubService(): void {
   service = undefined;
 }
 
-export function useGitHubService(): [GitHubService, GitHubErrorHandler] {
+export function useGitHubService(): [GitHubService, GitHubErrorHandler, boolean] {
   const navigate = useNavigate();
   const config = useActiveConfig();
+  const [loading, setLoading] = useState(false);
 
-  return useMemo(() => {
+  const [githubService, errorHandler] = useMemo(() => {
     if (!service || service.repoName !== config.repoName) {
-      service = new GitHubService({ octokit: getOctokit(), repoName: config.repoName });
+      service = new GitHubService({
+        octokit: getOctokit(),
+        repoName: config.repoName,
+        setLoading,
+      });
     }
 
     const errorHandler = (error: Error | RequestError): void => {
@@ -554,4 +561,6 @@ export function useGitHubService(): [GitHubService, GitHubErrorHandler] {
     // while there's still a page open using this hook, that would need to be rerendered.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate, service, config.repoName]);
+
+  return [githubService, errorHandler, loading];
 }
