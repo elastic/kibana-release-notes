@@ -431,18 +431,24 @@ class GitHubService {
     this.setLoading?.(true);
 
     // TODO: order properly
-    const [first, second] = Array.from(selectedServerlessSHAs)
+    const [newer, older] = Array.from(selectedServerlessSHAs)
       .map((sha) => {
         return this.serverlessReleases.find(({ kibanaSha }) => kibanaSha === sha);
       })
-      .sort((a, b) => a?.releaseDate?.getTime() - b?.releaseDate?.getTime());
+      .sort((a, b) => {
+        if (a?.releaseDate && b?.releaseDate) {
+          return Number(b.releaseDate) - Number(a.releaseDate);
+        }
+
+        return 0;
+      });
 
     // Get all the merge commit between the two releases
     const compareResult = await this.octokit.repos
       .compareCommitsWithBasehead({
         owner: GITHUB_OWNER,
         repo: 'kibana',
-        basehead: `${second}...${first}`,
+        basehead: `${older?.kibanaSha}...${newer?.kibanaSha}`,
       })
       .catch((error) => {
         this.handleError(error);

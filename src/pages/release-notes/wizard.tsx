@@ -163,15 +163,24 @@ export const ReleaseNotesWizard: FC<Props> = ({
     ];
 
     if (isServerless) {
-      const checkboxOptions = github.serverlessReleases.map((release) => {
-        const releaseDate = release.releaseDate?.toLocaleDateString();
-        const tagName = release.releaseTag?.name;
-        return {
-          id: release.kibanaSha,
-          label: `${releaseDate} (${tagName})`,
-        };
-      });
+      const checkboxOptions = github.serverlessReleases
+        .sort((a, b) => {
+          if (a?.releaseDate && b?.releaseDate) {
+            return Number(b.releaseDate) - Number(a.releaseDate);
+          }
 
+          return 0;
+        })
+        .map((release) => {
+          const releaseDate = release.releaseDate?.toLocaleDateString();
+          const tagName = release.releaseTag?.name;
+          return {
+            id: release.kibanaSha,
+            label: `${releaseDate} (${tagName})`,
+          };
+        });
+
+      // TODO: fix loading
       return baseSteps.concat([
         {
           title: 'Select two Serverless releases',
