@@ -430,7 +430,6 @@ class GitHubService {
 
     this.setLoading?.(true);
 
-    // TODO: order properly
     const [newer, older] = Array.from(selectedServerlessSHAs)
       .map((sha) => {
         return this.serverlessReleases.find(({ kibanaSha }) => kibanaSha === sha);
