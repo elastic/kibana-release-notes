@@ -1,16 +1,14 @@
-import { useMemo, useState } from 'react';
 import { Octokit } from '@octokit/rest';
 import uniq from 'lodash.uniq';
 import chunk from 'lodash.chunk';
-import { Endpoints, RequestError } from '@octokit/types';
+import { Endpoints } from '@octokit/types';
 import { Commit, PullRequest, Label as GQLLabel } from '@octokit/graphql-schema';
 import { GITHUB_OWNER } from './constants';
-import { getOctokit } from './github';
 import semver, { SemVer } from 'semver';
 import parseLinkHeader from 'parse-link-header';
 import { Observable, Subject } from 'rxjs';
-import { useNavigate } from 'react-router-dom';
-import { Config, useActiveConfig } from '../config';
+import { Config } from '../config';
+import { useGitHubServiceContext, GitHubErrorHandler } from './github-service-context';
 
 type Progress<T> =
   | { type: 'progress'; items: T[]; percentage: number }
@@ -64,7 +62,7 @@ function filterPrsForVersion(
   });
 }
 
-class GitHubService {
+export class GitHubService {
   private octokit: Octokit;
   private repoId: number | undefined;
   private setLoading?: (loading: boolean) => void;
@@ -533,44 +531,7 @@ class GitHubService {
   }
 }
 
-let service: GitHubService | undefined;
-
-type GitHubErrorHandler = (error: Error) => void;
-
-export function clearGitHubService(): void {
-  service = undefined;
-}
-
 export function useGitHubService(): [GitHubService, GitHubErrorHandler, boolean] {
-  const navigate = useNavigate();
-  const config = useActiveConfig();
-  const [loading, setLoading] = useState(false);
-
-  const [githubService, errorHandler] = useMemo(() => {
-    if (!service || service.repoName !== config.repoName) {
-      service = new GitHubService({
-        octokit: getOctokit(),
-        repoName: config.repoName,
-        setLoading,
-      });
-    }
-
-    const errorHandler = (error: Error | RequestError): void => {
-      if (
-        'status' in error &&
-        (error.status === 401 || error.status === 403 || error.status === 422)
-      ) {
-        navigate('/github', { state: { statusCode: error.status } });
-        return;
-      }
-      throw error;
-    };
-    return [service, errorHandler];
-    // We're depending here on an "outside scope" variable service which will be reset
-    // via clearGitHubService. This is fine, since we're never calling clearGitHubService
-    // while there's still a page open using this hook, that would need to be rerendered.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigate, service, config.repoName]);
-
-  return [githubService, errorHandler, loading];
+  const { service, errorHandler, loading } = useGitHubServiceContext();
+  return [service, errorHandler, loading];
 }

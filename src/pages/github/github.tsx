@@ -11,7 +11,7 @@ import {
 } from '@elastic/eui';
 import { FC, useCallback, useEffect, useState } from 'react';
 import type { EuiStepsProps } from '@elastic/eui';
-import { clearGitHubService, GITHUB_TOKEN, TokenValidated, validateToken } from '../../common';
+import { GITHUB_TOKEN, TokenValidated, validateToken } from '../../common';
 import { Machine, assign, DoneInvokeEvent, State } from 'xstate';
 import { useMachine } from '@xstate/react';
 import { useLocation } from 'react-router-dom';
@@ -115,7 +115,6 @@ const stateMachine = Machine<Context, StateSchema, Events>(
     actions: {
       storeToken: (context) => {
         localStorage.setItem(GITHUB_TOKEN, context.token);
-        clearGitHubService();
       },
       clearToken: () => {
         localStorage.removeItem(GITHUB_TOKEN);

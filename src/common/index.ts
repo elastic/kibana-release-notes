@@ -1,5 +1,6 @@
 export * from './constants';
 export * from './github-service';
+export * from './github-service-context';
 export * from './pr-utils';
 export * from './output-utils';
 export { Pr } from './pr';
