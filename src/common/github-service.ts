@@ -406,7 +406,7 @@ export class GitHubService {
         per_page: 100,
       })
       .catch((error) => {
-        throw error;
+        this.handleError(error);
       });
 
     this.serverlessReleases.forEach((release) => {
@@ -443,18 +443,21 @@ export class GitHubService {
       });
 
     // Get all the merge commit between the two releases
-    const compareResult = await this.octokit.repos
-      .compareCommitsWithBasehead({
+    const compareResult = await this.octokit
+      .paginate(this.octokit.repos.compareCommitsWithBasehead, {
         owner: GITHUB_OWNER,
         repo: 'kibana',
         basehead: `${older?.kibanaSha}...${newer?.kibanaSha}`,
+        per_page: 250,
       })
       .catch((error) => {
         this.handleError(error);
       });
 
     // Find all the PRs which were associated with the merge commits
-    const commitNodeIds = compareResult.data.commits.map((commit) => commit.node_id);
+    const commitNodeIds = compareResult.reduce((acc, results) => {
+      return acc.concat(results.commits.map((commit) => commit.node_id));
+    }, []);
     const query = `
     query($commitNodeIds: [ID!]!) {
       nodes(ids: $commitNodeIds) {
