@@ -118,7 +118,7 @@ export const ReleaseNotesWizard: FC<Props> = ({
     }
   }, [isServerless, onVersionSelected, previousMissingReleases, validateVersion]);
 
-  const getSteps = useMemo(() => {
+  const steps = useMemo(() => {
     const baseSteps: EuiStepsProps['steps'] = [
       {
         title: 'Select release notes to generate',
@@ -417,7 +417,7 @@ export const ReleaseNotesWizard: FC<Props> = ({
 
   return (
     <EuiPageTemplate pageHeader={{ pageTitle: 'Release Notes' }}>
-      <EuiSteps steps={getSteps} />
+      <EuiSteps steps={steps} />
       {showConfigFlyout && (
         <ConfigFlyout
           templateId={showConfigFlyout}
