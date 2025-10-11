@@ -67,7 +67,7 @@ export class GitHubService {
   private repoId: number | undefined;
   private setLoading?: (loading: boolean) => void;
   public repoName: string;
-  public serverlessReleases: ServerlessRelease[] = [];
+  private serverlessReleases: ServerlessRelease[] = [];
   public serverlessReleaseDate: Date | undefined;
   public serverlessReleaseTag: string = '';
 
@@ -305,7 +305,7 @@ export class GitHubService {
   /**
    * Find commits which updated the production environment and extract the deployed Kibana SHAs
    */
-  public async getServerlessReleases(): Promise<void> {
+  public async getServerlessReleases(): Promise<ServerlessRelease[]> {
     const envSearch = 'production-noncanary-ds-1';
     const serverlessGitOpsRepo = 'serverless-gitops';
     const versionsFilePath = 'services/kibana/versions.yaml';
@@ -336,6 +336,7 @@ export class GitHubService {
     await Promise.all(deployedShaPromises);
     await this.matchKibanaTagsToReleaseCommits();
     this.setLoading?.(false);
+    return this.serverlessReleases;
   }
 
   private async findServerlessGitOpsCommits({ envSearch, repo, filePath }: ServerlessGitOpsParams) {

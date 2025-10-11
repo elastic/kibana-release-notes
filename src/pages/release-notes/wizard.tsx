@@ -21,7 +21,7 @@ import {
   EuiTitle,
 } from '@elastic/eui';
 import React, { FC, useEffect, useMemo, useState, useCallback } from 'react';
-import { useGitHubService } from '../../common';
+import { ServerlessRelease, useGitHubService } from '../../common';
 import { getTemplateInfos, setActiveTemplate, TemplateId, getActiveTemplateId } from '../../config';
 import { ConfigFlyout } from './components';
 
@@ -45,10 +45,14 @@ export const ReleaseNotesWizard: FC<Props> = ({
   const [isValidatingVersion, setIsValidatingVersion] = useState(false);
   const [previousMissingReleases, setPreviousMissingReleases] = useState<Record<string, boolean>>();
   const isServerless = getActiveTemplateId() === 'serverless';
+  const [serverlessReleases, setServerlessReleases] = useState<ServerlessRelease[]>([]);
 
   useEffect(() => {
     if (isServerless) {
-      github.getServerlessReleases().catch((e) => errorHandler(e));
+      github.getServerlessReleases().then(
+        (releases) => setServerlessReleases(releases),
+        (e) => errorHandler(e)
+      );
     } else {
       github.getUpcomingReleaseVersions().then(
         (labels) => setLabels(labels),
@@ -163,7 +167,7 @@ export const ReleaseNotesWizard: FC<Props> = ({
     ];
 
     if (isServerless) {
-      const checkboxOptions = github.serverlessReleases
+      const checkboxOptions = serverlessReleases
         .sort((a, b) => {
           if (a?.releaseDate && b?.releaseDate) {
             return Number(b.releaseDate) - Number(a.releaseDate);
@@ -400,7 +404,7 @@ export const ReleaseNotesWizard: FC<Props> = ({
     ]);
   }, [
     githubLoading,
-    github.serverlessReleases,
+    serverlessReleases,
     isServerless,
     isValidatingVersion,
     labels,
