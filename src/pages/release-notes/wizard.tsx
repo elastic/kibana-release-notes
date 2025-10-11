@@ -191,9 +191,6 @@ export const ReleaseNotesWizard: FC<Props> = ({
               <EuiFormRow
                 label="Select exactly two releases to compare"
                 isInvalid={selectedServerlessSHAs.size !== 2}
-                error={
-                  selectedServerlessSHAs.size !== 2 ? 'Please select only two releases' : undefined
-                }
               >
                 <EuiCheckboxGroup
                   options={checkboxOptions}
