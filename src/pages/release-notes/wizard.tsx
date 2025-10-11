@@ -48,7 +48,7 @@ export const ReleaseNotesWizard: FC<Props> = ({
 
   useEffect(() => {
     if (isServerless) {
-      // github.getServerlessReleases().catch((e) => errorHandler(e));
+      github.getServerlessReleases().catch((e) => errorHandler(e));
     } else {
       github.getUpcomingReleaseVersions().then(
         (labels) => setLabels(labels),

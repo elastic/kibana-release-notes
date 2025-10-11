@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+  ReactNode,
+} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RequestError } from '@octokit/types';
 import { GitHubService } from './github-service';
@@ -39,16 +46,19 @@ export const GitHubServiceContextProvider: React.FC<GitHubServiceContextProvider
     }
   }, [service, config.repoName]);
 
-  const errorHandler: GitHubErrorHandler = (error: Error | RequestError) => {
-    if (
-      'status' in error &&
-      (error.status === 401 || error.status === 403 || error.status === 422)
-    ) {
-      navigate('/github', { state: { statusCode: error.status } });
-      return;
-    }
-    throw error;
-  };
+  const errorHandler = useCallback(
+    (error: Error | RequestError) => {
+      if (
+        'status' in error &&
+        (error.status === 401 || error.status === 403 || error.status === 422)
+      ) {
+        navigate('/github', { state: { statusCode: error.status } });
+        return;
+      }
+      throw error;
+    },
+    [navigate]
+  );
 
   // Don't render children until we have a service
   if (!service) {
