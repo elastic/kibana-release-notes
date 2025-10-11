@@ -311,6 +311,7 @@ export class GitHubService {
     const versionsFilePath = 'services/kibana/versions.yaml';
     this.setLoading?.(true);
 
+    this.serverlessReleases = [];
     const matchingCommits = await this.findServerlessGitOpsCommits({
       envSearch,
       repo: serverlessGitOpsRepo,

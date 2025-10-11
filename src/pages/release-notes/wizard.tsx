@@ -180,7 +180,6 @@ export const ReleaseNotesWizard: FC<Props> = ({
           };
         });
 
-      // TODO: fix loading and returning to form
       return baseSteps.concat([
         {
           title: 'Select two Serverless releases',
