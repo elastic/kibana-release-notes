@@ -34,7 +34,7 @@ export const GitHubServiceContextProvider: React.FC<GitHubServiceContextProvider
   const [loading, setLoading] = useState(false);
   const [service, setService] = useState<GitHubService | null>(null);
 
-  // Create or update service when config changes
+  // Create or update service when repoName changes
   useEffect(() => {
     if (!service || service.repoName !== config.repoName) {
       const newService = new GitHubService({
