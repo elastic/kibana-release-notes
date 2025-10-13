@@ -443,7 +443,7 @@ export class GitHubService {
       });
 
     // Get all the merge commit between the two releases
-    const compareResult = await this.octokit
+    const compareResult = (await this.octokit
       .paginate(this.octokit.repos.compareCommitsWithBasehead, {
         owner: GITHUB_OWNER,
         repo: 'kibana',
@@ -452,12 +452,15 @@ export class GitHubService {
       })
       .catch((error) => {
         this.handleError(error);
-      });
+      })) as unknown as Array<
+      Awaited<ReturnType<typeof this.octokit.repos.compareCommitsWithBasehead>>['data']
+    >; // There is a bug with Octokit types coercion here when using pagination
 
     // Find all the PRs which were associated with the merge commits
-    const commitNodeIds = compareResult.reduce((acc, results) => {
+    const commitNodeIds = compareResult.reduce((acc: string[], results) => {
       return acc.concat(results.commits.map((commit) => commit.node_id));
     }, []);
+
     const query = `
     query($commitNodeIds: [ID!]!) {
       nodes(ids: $commitNodeIds) {
