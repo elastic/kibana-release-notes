@@ -25,6 +25,8 @@ import { ServerlessRelease, useGitHubService } from '../../common';
 import { getTemplateInfos, setActiveTemplate, TemplateId, getActiveTemplateId } from '../../config';
 import { ConfigFlyout } from './components';
 
+const DEFAULT_SERVERLESS_SHAS = 2;
+
 interface Props {
   onVersionSelected: (version: string, ignoreVersions?: string[]) => void;
   selectedServerlessSHAs: Set<string>;
@@ -98,7 +100,7 @@ export const ReleaseNotesWizard: FC<Props> = ({
 
       if (selectedServerlessSHAs.has(optionId)) {
         newIndices.delete(optionId);
-      } else if (selectedServerlessSHAs.size < 2) {
+      } else if (selectedServerlessSHAs.size < DEFAULT_SERVERLESS_SHAS) {
         newIndices.add(optionId);
       }
 
@@ -192,7 +194,7 @@ export const ReleaseNotesWizard: FC<Props> = ({
             <>
               <EuiFormRow
                 label="Select exactly two releases to compare"
-                isInvalid={selectedServerlessSHAs.size !== 2}
+                isInvalid={selectedServerlessSHAs.size !== DEFAULT_SERVERLESS_SHAS}
               >
                 <EuiCheckboxGroup
                   options={checkboxOptions}
@@ -209,10 +211,11 @@ export const ReleaseNotesWizard: FC<Props> = ({
         },
         {
           title: 'Generate notes for PRs between the two Serverless releases',
-          status: selectedServerlessSHAs.size === 2 ? 'current' : 'incomplete',
+          status:
+            selectedServerlessSHAs.size === DEFAULT_SERVERLESS_SHAS ? 'current' : 'incomplete',
           children: (
             <>
-              {selectedServerlessSHAs.size !== 2 ? (
+              {selectedServerlessSHAs.size !== DEFAULT_SERVERLESS_SHAS ? (
                 <EuiTextColor color="subdued">
                   Please select exactly two releases above to continue.
                 </EuiTextColor>
@@ -220,7 +223,7 @@ export const ReleaseNotesWizard: FC<Props> = ({
                 <EuiButton
                   fill
                   onClick={onGenerateReleaseNotes}
-                  disabled={selectedServerlessSHAs.size !== 2}
+                  disabled={selectedServerlessSHAs.size !== DEFAULT_SERVERLESS_SHAS}
                 >
                   Generate release notes
                 </EuiButton>
