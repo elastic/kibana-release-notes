@@ -4,6 +4,7 @@ import {
   EuiButtonEmpty,
   EuiCallOut,
   EuiCheckableCard,
+  EuiCheckboxGroup,
   EuiFieldText,
   EuiFlexGroup,
   EuiFlexItem,
@@ -20,16 +21,24 @@ import {
   EuiTitle,
 } from '@elastic/eui';
 import React, { FC, useEffect, useMemo, useState, useCallback } from 'react';
-import { useGitHubService } from '../../common';
+import { ServerlessRelease, useGitHubService } from '../../common';
 import { getTemplateInfos, setActiveTemplate, TemplateId, getActiveTemplateId } from '../../config';
 import { ConfigFlyout } from './components';
 
+const DEFAULT_SERVERLESS_SHAS = 2;
+
 interface Props {
   onVersionSelected: (version: string, ignoreVersions?: string[]) => void;
+  selectedServerlessSHAs: Set<string>;
+  setSelectedServerlessSHAs: (sha: Set<string>) => void;
 }
 
-export const ReleaseNotesWizard: FC<Props> = ({ onVersionSelected }) => {
-  const [github, errorHandler] = useGitHubService();
+export const ReleaseNotesWizard: FC<Props> = ({
+  onVersionSelected,
+  selectedServerlessSHAs,
+  setSelectedServerlessSHAs,
+}) => {
+  const [github, errorHandler, githubLoading] = useGitHubService();
   const [labels, setLabels] = useState<string[]>();
   const [manualLabel, setManualLabel] = useState<string>('');
   const [showConfigFlyout, setShowConfigFlyout] = useState<TemplateId>();
@@ -38,13 +47,21 @@ export const ReleaseNotesWizard: FC<Props> = ({ onVersionSelected }) => {
   const [isValidatingVersion, setIsValidatingVersion] = useState(false);
   const [previousMissingReleases, setPreviousMissingReleases] = useState<Record<string, boolean>>();
   const isServerless = getActiveTemplateId() === 'serverless';
+  const [serverlessReleases, setServerlessReleases] = useState<ServerlessRelease[]>([]);
 
   useEffect(() => {
-    github.getUpcomingReleaseVersions().then(
-      (labels) => setLabels(labels),
-      (e) => errorHandler(e)
-    );
-  }, [errorHandler, github]);
+    if (isServerless) {
+      github.getServerlessReleases().then(
+        (releases) => setServerlessReleases(releases),
+        (e) => errorHandler(e)
+      );
+    } else {
+      github.getUpcomingReleaseVersions().then(
+        (labels) => setLabels(labels),
+        (e) => errorHandler(e)
+      );
+    }
+  }, [errorHandler, github, isServerless]);
 
   const onValidateVersion = useCallback(
     async (version: string): Promise<void> => {
@@ -77,6 +94,21 @@ export const ReleaseNotesWizard: FC<Props> = ({ onVersionSelected }) => {
     [manualLabel, onValidateVersion]
   );
 
+  const onServerlessReleaseChange = useCallback(
+    (optionId: string) => {
+      const newIndices = new Set(selectedServerlessSHAs);
+
+      if (selectedServerlessSHAs.has(optionId)) {
+        newIndices.delete(optionId);
+      } else if (selectedServerlessSHAs.size < DEFAULT_SERVERLESS_SHAS) {
+        newIndices.add(optionId);
+      }
+
+      setSelectedServerlessSHAs(newIndices);
+    },
+    [selectedServerlessSHAs, setSelectedServerlessSHAs]
+  );
+
   const onGenerateReleaseNotes = useCallback(() => {
     if (isServerless) {
       onVersionSelected('serverless');
@@ -92,7 +124,7 @@ export const ReleaseNotesWizard: FC<Props> = ({ onVersionSelected }) => {
     }
   }, [isServerless, onVersionSelected, previousMissingReleases, validateVersion]);
 
-  const getSteps = useMemo(() => {
+  const steps = useMemo(() => {
     const baseSteps: EuiStepsProps['steps'] = [
       {
         title: 'Select release notes to generate',
@@ -137,14 +169,65 @@ export const ReleaseNotesWizard: FC<Props> = ({ onVersionSelected }) => {
     ];
 
     if (isServerless) {
+      const checkboxOptions = serverlessReleases
+        .sort((a, b) => {
+          if (a?.releaseDate && b?.releaseDate) {
+            return Number(b.releaseDate) - Number(a.releaseDate);
+          }
+
+          return 0;
+        })
+        .map(({ releaseDate, releaseTag, kibanaSha }) => {
+          return {
+            id: kibanaSha,
+            label: `${releaseDate?.toLocaleDateString()} (${releaseTag?.name}, ${kibanaSha})`,
+          };
+        });
+
       return baseSteps.concat([
         {
-          title: 'Generate notes for the most recent Serverless release',
+          title: 'Select two Serverless releases',
+          status: githubLoading ? 'loading' : 'current',
+          children: githubLoading ? (
+            'Loading serverless releases …'
+          ) : (
+            <>
+              <EuiFormRow
+                label="Select exactly two releases to compare"
+                isInvalid={selectedServerlessSHAs.size !== DEFAULT_SERVERLESS_SHAS}
+              >
+                <EuiCheckboxGroup
+                  options={checkboxOptions}
+                  idToSelectedMap={Object.fromEntries(
+                    checkboxOptions.map(({ id }) => {
+                      return [id, selectedServerlessSHAs.has(id)];
+                    })
+                  )}
+                  onChange={onServerlessReleaseChange}
+                />
+              </EuiFormRow>
+            </>
+          ),
+        },
+        {
+          title: 'Generate notes for PRs between the two Serverless releases',
+          status:
+            selectedServerlessSHAs.size === DEFAULT_SERVERLESS_SHAS ? 'current' : 'incomplete',
           children: (
             <>
-              <EuiButton fill onClick={onGenerateReleaseNotes}>
-                Generate release notes
-              </EuiButton>
+              {selectedServerlessSHAs.size !== DEFAULT_SERVERLESS_SHAS ? (
+                <EuiTextColor color="subdued">
+                  Please select exactly two releases above to continue.
+                </EuiTextColor>
+              ) : (
+                <EuiButton
+                  fill
+                  onClick={onGenerateReleaseNotes}
+                  disabled={selectedServerlessSHAs.size !== DEFAULT_SERVERLESS_SHAS}
+                >
+                  Generate release notes
+                </EuiButton>
+              )}
             </>
           ),
         },
@@ -323,21 +406,25 @@ export const ReleaseNotesWizard: FC<Props> = ({ onVersionSelected }) => {
       },
     ]);
   }, [
+    githubLoading,
+    serverlessReleases,
     isServerless,
     isValidatingVersion,
     labels,
     manualLabel,
     onGenerateReleaseNotes,
+    onServerlessReleaseChange,
     onSubmitManualLabel,
     onValidateVersion,
     previousMissingReleases,
+    selectedServerlessSHAs,
     templates,
     validateVersion,
   ]);
 
   return (
     <EuiPageTemplate pageHeader={{ pageTitle: 'Release Notes' }}>
-      <EuiSteps steps={getSteps} />
+      <EuiSteps steps={steps} />
       {showConfigFlyout && (
         <ConfigFlyout
           templateId={showConfigFlyout}

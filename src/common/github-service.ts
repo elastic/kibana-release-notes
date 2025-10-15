@@ -1,16 +1,14 @@
-import { useMemo } from 'react';
 import { Octokit } from '@octokit/rest';
 import uniq from 'lodash.uniq';
 import chunk from 'lodash.chunk';
-import { Endpoints, RequestError } from '@octokit/types';
+import { Endpoints } from '@octokit/types';
 import { Commit, PullRequest, Label as GQLLabel } from '@octokit/graphql-schema';
 import { GITHUB_OWNER } from './constants';
-import { getOctokit } from './github';
 import semver, { SemVer } from 'semver';
 import parseLinkHeader from 'parse-link-header';
 import { Observable, Subject } from 'rxjs';
-import { useNavigate } from 'react-router-dom';
-import { Config, useActiveConfig } from '../config';
+import { Config } from '../config';
+import { useGitHubServiceContext, GitHubErrorHandler } from './github-service-context';
 
 type Progress<T> =
   | { type: 'progress'; items: T[]; percentage: number }
@@ -22,10 +20,27 @@ export type ServerlessPrItem = Pick<
   PullRequest,
   'id' | 'url' | 'title' | 'number' | 'body' | 'labels' | 'author'
 >;
+export interface ServerlessRelease {
+  gitOpsSha: string;
+  kibanaSha: string;
+  releaseTag?: Awaited<ReturnType<Octokit['repos']['listTags']>>['data'][number];
+  releaseDate?: Date;
+}
 
 interface GitHubServiceConfig {
   octokit: Octokit;
   repoName: string;
+  setLoading?: (loading: boolean) => void;
+}
+
+interface ServerlessGitOpsParams {
+  envSearch: string;
+  repo: string;
+  filePath: string;
+}
+
+interface ExtractDeployedShaParams extends ServerlessGitOpsParams {
+  gitOpsSha: string;
 }
 
 const SEMVER_REGEX = /^v(\d+)\.(\d+)\.(\d+)$/;
@@ -47,16 +62,19 @@ function filterPrsForVersion(
   });
 }
 
-class GitHubService {
+export class GitHubService {
   private octokit: Octokit;
   private repoId: number | undefined;
+  private setLoading?: (loading: boolean) => void;
   public repoName: string;
+  private serverlessReleases: ServerlessRelease[] = [];
   public serverlessReleaseDate: Date | undefined;
   public serverlessReleaseTag: string = '';
 
   constructor(config: GitHubServiceConfig) {
     this.octokit = config.octokit;
     this.repoName = config.repoName;
+    this.setLoading = config.setLoading;
     this.initializeRepo();
   }
 
@@ -70,6 +88,11 @@ class GitHubService {
     } catch (error) {
       console.error('Error fetching repository info:', error);
     }
+  }
+
+  private handleError(error: unknown): never {
+    this.setLoading?.(false);
+    throw new Error(`${error}`);
   }
 
   public async getUpcomingReleaseVersions(): Promise<string[]> {
@@ -279,30 +302,102 @@ class GitHubService {
     return progressSubject$.asObservable();
   }
 
-  public async getPrsForServerless(config: Config) {
-    const { excludedLabels = [], includedLabels = [] } = config;
+  /**
+   * Find commits which updated the production environment and extract the deployed Kibana SHAs
+   */
+  public async getServerlessReleases(): Promise<ServerlessRelease[]> {
+    const envSearch = 'production-noncanary-ds-1';
+    const serverlessGitOpsRepo = 'serverless-gitops';
+    const versionsFilePath = 'services/kibana/versions.yaml';
+    this.setLoading?.(true);
 
-    /**
-     * Find the last two Kibana commits which were promoted to production-canary successfully. We
-     * cannot use the deploy@ tags from the Kibana repo, since they do not always reach prod. We
-     * need to be careful matching with this query because kibana-controller is managed in serverless-gitops as well.
-     */
-    const commits = await this.octokit.search
-      .commits({
-        q: `repo:${GITHUB_OWNER}/serverless-gitops "gitops: production-canary-ds" "Artifact promotion for kibana to git-"`,
-        sort: 'committer-date',
+    this.serverlessReleases = [];
+    const matchingCommits = await this.findServerlessGitOpsCommits({
+      envSearch,
+      repo: serverlessGitOpsRepo,
+      filePath: versionsFilePath,
+    });
+
+    if (matchingCommits.length === 0) {
+      this.handleError(
+        `Could not find matching commits for ${envSearch} in serverless-gitops repo`
+      );
+    }
+
+    const deployedShaPromises = matchingCommits.map((commit) =>
+      this.findKibanaServerlessDeployedCommit({
+        gitOpsSha: commit.sha,
+        envSearch,
+        repo: serverlessGitOpsRepo,
+        filePath: versionsFilePath,
       })
-      .catch((error) => {
-        throw error;
+    );
+
+    await Promise.all(deployedShaPromises);
+    await this.matchKibanaTagsToReleaseCommits();
+    this.setLoading?.(false);
+    return this.serverlessReleases;
+  }
+
+  private async findServerlessGitOpsCommits({ envSearch, repo, filePath }: ServerlessGitOpsParams) {
+    const commitsToFind = 5;
+    const matchingCommits = [];
+
+    for await (const response of this.octokit.paginate.iterator(
+      this.octokit.rest.repos.listCommits,
+      {
+        owner: GITHUB_OWNER,
+        repo,
+        path: filePath,
+        per_page: 100,
+      }
+    )) {
+      for (const commit of response.data) {
+        if (commit.commit.message.includes(envSearch)) {
+          matchingCommits.push(commit);
+          if (matchingCommits.length === commitsToFind) {
+            return matchingCommits;
+          }
+        }
+      }
+    }
+
+    return matchingCommits;
+  }
+
+  private async findKibanaServerlessDeployedCommit({
+    gitOpsSha,
+    envSearch,
+    repo,
+    filePath,
+  }: ExtractDeployedShaParams): Promise<void> {
+    try {
+      const fileResponse = await this.octokit.repos.getContent({
+        owner: GITHUB_OWNER,
+        repo,
+        path: filePath,
+        ref: gitOpsSha,
       });
 
-    const shas = commits.data.items
-      .slice(0, 2)
-      .map(
-        (item) =>
-          item.commit.message.split('Artifact promotion for kibana to git-')[1].split('\n')[0]
-      );
+      if (!('content' in fileResponse.data)) {
+        this.handleError(`File content not available for commit ${gitOpsSha}`);
+      }
 
+      const content = atob(fileResponse.data.content);
+      const regex = new RegExp(`${envSearch}:\\s+"([a-f0-9]{7,40})"`);
+      const match = content.match(regex);
+
+      if (!match || !match[1]) {
+        this.handleError(`Could not find ${envSearch} in ${filePath} for commit ${gitOpsSha}`);
+      }
+
+      this.serverlessReleases.push({ gitOpsSha, kibanaSha: match[1] });
+    } catch (error) {
+      this.handleError(`Error extracting deployed SHA from commit ${gitOpsSha}: ${error}`);
+    }
+  }
+
+  private async matchKibanaTagsToReleaseCommits() {
     // Need to retrieve all the tags because ref tags are always last
     const tags = await this.octokit
       .paginate(this.octokit.repos.listTags, {
@@ -311,31 +406,61 @@ class GitHubService {
         per_page: 100,
       })
       .catch((error) => {
-        throw error;
+        this.handleError(error);
       });
 
-    const tagForReleaseCommit = tags.filter((tag) => tag.commit.sha.startsWith(shas[0])).pop();
+    this.serverlessReleases.forEach((release) => {
+      const tagForReleaseCommit = tags.find((tag) => tag.commit.sha.startsWith(release.kibanaSha));
 
-    if (tagForReleaseCommit) {
-      this.serverlessReleaseTag = tagForReleaseCommit.name;
-      this.serverlessReleaseDate = new Date(Number(tagForReleaseCommit.name.split('@')[1]) * 1000);
-    } else {
-      throw new Error('No tag found for the release commit');
+      if (tagForReleaseCommit) {
+        release.releaseTag = tagForReleaseCommit;
+        release.releaseDate = new Date(Number(tagForReleaseCommit.name.split('@')[1]) * 1000);
+      } else {
+        this.handleError(`No tag found for the release commit ${release.kibanaSha}`);
+      }
+    });
+  }
+
+  public async getPrsForServerless(config: Config, selectedServerlessSHAs: Set<string>) {
+    const { excludedLabels = [], includedLabels = [] } = config;
+
+    if (selectedServerlessSHAs.size !== 2) {
+      this.handleError('Exactly two serverless releases must be selected');
     }
 
-    // Get all the merge commit between the two releases
-    const compareResult = await this.octokit.repos
-      .compareCommitsWithBasehead({
-        owner: GITHUB_OWNER,
-        repo: 'kibana',
-        basehead: `${shas[1]}...${shas[0]}`,
+    this.setLoading?.(true);
+
+    const [newer, older] = Array.from(selectedServerlessSHAs)
+      .map((sha) => {
+        return this.serverlessReleases.find(({ kibanaSha }) => kibanaSha === sha);
       })
-      .catch((error) => {
-        throw error;
+      .sort((a, b) => {
+        if (a?.releaseDate && b?.releaseDate) {
+          return Number(b.releaseDate) - Number(a.releaseDate);
+        }
+
+        return 0;
       });
 
+    // Get all the merge commit between the two releases
+    const compareResult = (await this.octokit
+      .paginate(this.octokit.repos.compareCommitsWithBasehead, {
+        owner: GITHUB_OWNER,
+        repo: 'kibana',
+        basehead: `${older?.kibanaSha}...${newer?.kibanaSha}`,
+        per_page: 250,
+      })
+      .catch((error) => {
+        this.handleError(error);
+      })) as unknown as Array<
+      Awaited<ReturnType<typeof this.octokit.repos.compareCommitsWithBasehead>>['data']
+    >; // There is a bug with Octokit types coercion here when using pagination
+
     // Find all the PRs which were associated with the merge commits
-    const commitNodeIds = compareResult.data.commits.map((commit) => commit.node_id);
+    const commitNodeIds = compareResult.reduce((acc: string[], results) => {
+      return acc.concat(results.commits.map((commit) => commit.node_id));
+    }, []);
+
     const query = `
     query($commitNodeIds: [ID!]!) {
       nodes(ids: $commitNodeIds) {
@@ -375,7 +500,7 @@ class GitHubService {
     });
 
     const results = await Promise.all(promises).catch((error) => {
-      throw error;
+      this.handleError(error);
     });
 
     results.forEach((result) => {
@@ -399,6 +524,8 @@ class GitHubService {
       });
     });
 
+    this.setLoading?.(false);
+
     return pullRequests.map((pr) => {
       return {
         ...pr,
@@ -412,37 +539,7 @@ class GitHubService {
   }
 }
 
-let service: GitHubService | undefined;
-
-type GitHubErrorHandler = (error: Error) => void;
-
-export function clearGitHubService(): void {
-  service = undefined;
-}
-
-export function useGitHubService(): [GitHubService, GitHubErrorHandler] {
-  const navigate = useNavigate();
-  const config = useActiveConfig();
-
-  return useMemo(() => {
-    if (!service || service.repoName !== config.repoName) {
-      service = new GitHubService({ octokit: getOctokit(), repoName: config.repoName });
-    }
-
-    const errorHandler = (error: Error | RequestError): void => {
-      if (
-        'status' in error &&
-        (error.status === 401 || error.status === 403 || error.status === 422)
-      ) {
-        navigate('/github', { state: { statusCode: error.status } });
-        return;
-      }
-      throw error;
-    };
-    return [service, errorHandler];
-    // We're depending here on an "outside scope" variable service which will be reset
-    // via clearGitHubService. This is fine, since we're never calling clearGitHubService
-    // while there's still a page open using this hook, that would need to be rerendered.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigate, service, config.repoName]);
+export function useGitHubService(): [GitHubService, GitHubErrorHandler, boolean] {
+  const { service, errorHandler, loading } = useGitHubServiceContext();
+  return [service, errorHandler, loading];
 }

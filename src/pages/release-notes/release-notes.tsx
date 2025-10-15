@@ -22,10 +22,16 @@ import { ConfigFlyout } from './components';
 interface Props {
   version: string;
   ignoredPriorReleases: string[];
+  selectedServerlessSHAs: Set<string>;
   onVersionChange: () => void;
 }
 
-export const ReleaseNotes: FC<Props> = ({ version, onVersionChange, ignoredPriorReleases }) => {
+export const ReleaseNotes: FC<Props> = ({
+  version,
+  onVersionChange,
+  ignoredPriorReleases,
+  selectedServerlessSHAs,
+}) => {
   const subscriptionRef = useRef<Subscription>();
   const [github, errorHandler] = useGitHubService();
   const config = useActiveConfig();
@@ -40,7 +46,7 @@ export const ReleaseNotes: FC<Props> = ({ version, onVersionChange, ignoredPrior
     setProgress(undefined);
 
     if (version === 'serverless') {
-      setPrs(await github.getPrsForServerless(config));
+      setPrs(await github.getPrsForServerless(config, selectedServerlessSHAs));
       setLoading(false);
       setProgress(100);
       return;

@@ -5,6 +5,7 @@ import { ReleaseNotesWizard } from './wizard';
 export const ReleaseNotesPage: FC = () => {
   const [selectedVersion, setSelectedVersion] = useState<string>();
   const [ignoredVersions, setIgnoredVersions] = useState<string[]>([]);
+  const [selectedServerlessSHAs, setSelectedServerlessSHAs] = useState<Set<string>>(new Set());
 
   const onVersionChange = useCallback((version: string, ignoreVersions: string[] = []) => {
     setSelectedVersion(version);
@@ -13,11 +14,18 @@ export const ReleaseNotesPage: FC = () => {
 
   return (
     <>
-      {!selectedVersion && <ReleaseNotesWizard onVersionSelected={onVersionChange} />}
+      {!selectedVersion && (
+        <ReleaseNotesWizard
+          onVersionSelected={onVersionChange}
+          selectedServerlessSHAs={selectedServerlessSHAs}
+          setSelectedServerlessSHAs={setSelectedServerlessSHAs}
+        />
+      )}
       {selectedVersion && (
         <ReleaseNotes
           version={selectedVersion}
           ignoredPriorReleases={ignoredVersions}
+          selectedServerlessSHAs={selectedServerlessSHAs}
           onVersionChange={() => setSelectedVersion(undefined)}
         />
       )}
