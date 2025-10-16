@@ -442,6 +442,8 @@ export class GitHubService {
         return 0;
       });
 
+    this.serverlessReleaseDate = new Date(Number(newer?.releaseTag?.name.split('@')[1]) * 1000);
+
     // Get all the merge commit between the two releases
     const compareResult = (await this.octokit
       .paginate(this.octokit.repos.compareCommitsWithBasehead, {
