@@ -69,7 +69,6 @@ export class GitHubService {
   public repoName: string;
   private serverlessReleases: ServerlessRelease[] = [];
   public serverlessReleaseDate: Date | undefined;
-  public serverlessReleaseTag: string = '';
 
   constructor(config: GitHubServiceConfig) {
     this.octokit = config.octokit;
