@@ -21,6 +21,11 @@ export const templates: TemplateInfo[] = [
   { id: 'kibana', name: 'Kibana', icon: 'logoKibana', config: kibanaTemplate },
   { id: 'security', name: 'Security', icon: 'logoSecurity', config: securityTemplate },
   { id: 'endpoint', name: 'Endpoint', icon: 'logoElastic', config: endpointTemplate },
+  {
+    id: 'observability',
+    name: 'Observability',
+    icon: 'logoObservability',
+    config: observabilityTemplate,
+  },
   { id: 'serverless', name: 'Serverless', icon: 'logoKibana', config: serverlessTemplate },
-  { id: 'observability', name: 'Observability', icon: 'logoObservability', config: observabilityTemplate },
 ];
