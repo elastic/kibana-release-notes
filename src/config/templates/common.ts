@@ -127,6 +127,27 @@ export const securityLabels = [
   'Feature:AutomaticImport',
 ];
 
+export const observabilityLabels = [
+  'Feature:Observability Home',
+  'Feature:SLO',
+  'Team:obs-ux-management',
+  'Team:Obs AI Assistant',
+  'Team:obs-ux-infra_services',
+  'Team:obs-ux-logs',
+  'Team:obs-knowledge',
+  'Team:obs-entities',
+  'ci:project-deploy-observability',
+  'Feature:Uptime',
+  'Team:uptime',
+  'Team:apm',
+  'Team:APM',
+  'Feature:Metrics UI',
+  'Team:logs-metrics-ui',
+  'Feature:Logs UI',
+  'Feature:Infra UI',
+  'Feature:Service Maps',
+];
+
 export const kibanaAreas: AreaDefinition[] = [
   {
     title: 'Theme',
@@ -304,26 +325,7 @@ export const kibanaAreas: AreaDefinition[] = [
   },
   {
     title: 'Elastic Observability solution',
-    labels: [
-      'Feature:Observability Home',
-      'Feature:SLO',
-      'Team:obs-ux-management',
-      'Team:Obs AI Assistant',
-      'Team:obs-ux-infra_services',
-      'Team:obs-ux-logs',
-      'Team:obs-knowledge',
-      'Team:obs-entities',
-      'ci:project-deploy-observability',
-      'Feature:Uptime',
-      'Team:uptime',
-      'Team:apm',
-      'Team:APM',
-      'Feature:Metrics UI',
-      'Team:logs-metrics-ui',
-      'Feature:Logs UI',
-      'Feature:Infra UI',
-      'Feature:Service Maps',
-    ],
+    labels: observabilityLabels,
     options: {
       textOverwriteTemplate:
         'For the Elastic Observability {{version}} release information, refer to [Elastic Observability Solution Release Notes](docs-content://release-notes/elastic-observability/index.md).',
