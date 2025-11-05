@@ -305,7 +305,7 @@ export class GitHubService {
    * Find commits which updated the production environment and extract the deployed Kibana SHAs
    */
   public async getServerlessReleases(): Promise<ServerlessRelease[]> {
-    const envSearch = 'production-noncanary-ds-1';
+    const envSearch = 'production-canary-ds-1';
     const serverlessGitOpsRepo = 'serverless-gitops';
     const versionsFilePath = 'services/kibana/versions.yaml';
     this.setLoading?.(true);
