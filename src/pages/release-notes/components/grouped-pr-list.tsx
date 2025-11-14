@@ -7,9 +7,10 @@ interface Props {
   groupedPrs: { [group: string]: PrItem[] };
   groups: Config['areas'];
   keyPrefix: string;
+  version: string;
 }
 
-export const GroupedPrList: FC<Props> = memo(({ groupedPrs, groups, keyPrefix }) => {
+export const GroupedPrList: FC<Props> = memo(({ groupedPrs, groups, keyPrefix, version }) => {
   const sortedGroups = useMemo(
     () => [...groups].sort((a, b) => a.title.localeCompare(b.title)),
     [groups]
@@ -37,7 +38,12 @@ export const GroupedPrList: FC<Props> = memo(({ groupedPrs, groups, keyPrefix })
             <ul>
               {prs.map((pr) => (
                 <li key={pr.id}>
-                  <Pr pr={pr} showTransformedTitle={true} normalizeOptions={group.options} />
+                  <Pr
+                    pr={pr}
+                    showTransformedTitle={true}
+                    normalizeOptions={group.options}
+                    version={version}
+                  />
                 </li>
               ))}
             </ul>

@@ -1,6 +1,6 @@
 import { EuiLink, EuiIconTip } from '@elastic/eui';
 import { FC, memo } from 'react';
-import { PrItem } from './github-service';
+import { PrItem, hasDuplicatePatchLabels } from './github-service';
 import { extractReleaseNotes, NormalizeOptions, ReleaseNoteDetails } from './pr-utils';
 
 interface PrProps {
@@ -8,13 +8,15 @@ interface PrProps {
   showAuthor?: boolean;
   showTransformedTitle?: boolean;
   normalizeOptions?: NormalizeOptions;
+  version?: string;
 }
 
 export const Pr: FC<PrProps> = memo(
-  ({ pr, showAuthor, showTransformedTitle, normalizeOptions }) => {
+  ({ pr, showAuthor, showTransformedTitle, normalizeOptions, version }) => {
     const title: ReleaseNoteDetails = showTransformedTitle
       ? extractReleaseNotes(pr, normalizeOptions)
       : { type: 'title', title: pr.title };
+    const hasDuplicates = version ? hasDuplicatePatchLabels(pr, version) : false;
     return (
       <>
         {title.title} (
@@ -27,6 +29,19 @@ export const Pr: FC<PrProps> = memo(
           </>
         )}
         ){' '}
+        {hasDuplicates && (
+          <EuiIconTip
+            color="warning"
+            type="alert"
+            size="m"
+            content={
+              <>
+                This PR has multiple patch version labels for the same major.minor version. It may
+                have already been documented in a previous patch release.
+              </>
+            }
+          />
+        )}
         {title.type === 'releaseNoteTitle' && (
           <EuiIconTip
             color="secondary"

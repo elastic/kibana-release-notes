@@ -160,7 +160,7 @@ export const ReleaseNotes: FC<Props> = ({
             </>
           )}
           {step === 'prepare' ? (
-            <PrepareReleaseNotes prs={prs} />
+            <PrepareReleaseNotes prs={prs} version={version} />
           ) : (
             <ReleaseNoteOutput prs={prs} version={version} />
           )}

@@ -50,16 +50,33 @@ function filterPrsForVersion(
   version: string,
   ignoredVersionLabels: readonly string[] = []
 ): PrItem[] {
-  return prs.filter((pr) => {
-    const prVersions = pr.labels
-      .filter((label) => label.name?.match(SEMVER_REGEX))
-      .filter((label) => label.name && !ignoredVersionLabels.includes(label.name))
-      .map((label) => semver.clean(label.name ?? '') ?? '');
-    // Check if there is any version label below the one we are looking for
-    // which would mean this PR has already been released (and blogged about)
-    // in an earlier dev documentation blog post.
-    return !prVersions.some((verLabel) => semver.lt(verLabel, version));
-  });
+  // No longer filtering out PRs with lower version labels
+  // Just return all PRs, the warning logic is handled separately
+  return prs;
+}
+
+/**
+ * Checks if a PR has multiple patch version labels for the same major.minor version.
+ * This indicates the PR may have been documented in multiple patch releases.
+ */
+export function hasDuplicatePatchLabels(pr: PrItem, targetVersion: string): boolean {
+  const targetSemVer = semver.parse(targetVersion);
+  if (!targetSemVer) {
+    return false;
+  }
+
+  const prVersions = pr.labels
+    .filter((label) => label.name?.match(SEMVER_REGEX))
+    .map((label) => semver.parse(label.name ?? ''))
+    .filter((ver): ver is semver.SemVer => ver !== null);
+
+  // Find all version labels that match the same major.minor as target
+  const sameMajorMinor = prVersions.filter(
+    (ver) => ver.major === targetSemVer.major && ver.minor === targetSemVer.minor
+  );
+
+  // If there are 2 or more patch versions for the same major.minor, return true
+  return sameMajorMinor.length >= 2;
 }
 
 export class GitHubService {
