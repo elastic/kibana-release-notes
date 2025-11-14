@@ -45,11 +45,7 @@ interface ExtractDeployedShaParams extends ServerlessGitOpsParams {
 
 const SEMVER_REGEX = /^v(\d+)\.(\d+)\.(\d+)$/;
 
-function filterPrsForVersion(
-  prs: PrItem[],
-  version: string,
-  ignoredVersionLabels: readonly string[] = []
-): PrItem[] {
+function filterPrsForVersion(prs: PrItem[]): PrItem[] {
   // No longer filtering out PRs with lower version labels
   // Just return all PRs, the warning logic is handled separately
   return prs;
@@ -249,14 +245,13 @@ export class GitHubService {
       q: `repo:${GITHUB_OWNER}/${this.repoName} label:release_note:plugin_api_changes label:${version}`,
     });
     const items = await this.octokit.paginate<PrItem>(options);
-    return filterPrsForVersion(items, version);
+    return filterPrsForVersion(items);
   }
 
   public async getPrsForVersion(
     version: string,
     excludedLabels: readonly string[] = [],
-    includedLabels: readonly string[] = [],
-    ignoredVersionLabels: readonly string[] = []
+    includedLabels: readonly string[] = []
   ): Promise<Observable<Progress<PrItem>>> {
     const semVer = semver.parse(version);
 
@@ -298,7 +293,7 @@ export class GitHubService {
     (async () => {
       const items: PrItem[] = [];
       for await (const response of this.octokit.paginate.iterator<PrItem>(options)) {
-        items.push(...filterPrsForVersion(response.data, version, ignoredVersionLabels));
+        items.push(...filterPrsForVersion(response.data));
         if (response.headers.link) {
           const links = parseLinkHeader(response.headers.link);
           if (links?.last?.page) {
