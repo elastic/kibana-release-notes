@@ -22,6 +22,7 @@ import { getTemplateInfos, setActiveTemplate, TemplateId, getActiveTemplateId } 
 import { ConfigFlyout } from './components';
 
 const DEFAULT_SERVERLESS_SHAS = 2;
+const SEMVER_REGEX = /^v(\d+)\.(\d+)\.(\d+)$/;
 
 interface Props {
   onVersionSelected: (version: string) => void;
@@ -218,20 +219,20 @@ export const ReleaseNotesWizard: FC<Props> = ({
                   <EuiFormRow
                     label="or enter a version"
                     error={'Version must be in format vX.Y.Z'}
-                    isInvalid={!!manualLabel && !manualLabel.match(/^v\d+\.\d+\.\d+$/)}
+                    isInvalid={!!manualLabel && !manualLabel.match(SEMVER_REGEX)}
                   >
                     <EuiFieldText
                       placeholder="e.g. v7.12.0"
                       value={manualLabel}
                       onChange={(ev) => setManualLabel(ev.target.value)}
-                      isInvalid={!!manualLabel && !manualLabel.match(/^v\d+\.\d+\.\d+$/)}
+                      isInvalid={!!manualLabel && !manualLabel.match(SEMVER_REGEX)}
                     />
                   </EuiFormRow>
                 </EuiFlexItem>
                 <EuiFlexItem grow={false}>
                   <EuiFormRow hasEmptyLabelSpace>
                     <EuiButton
-                      disabled={!manualLabel || !manualLabel?.match(/^v\d+\.\d+\.\d+$/)}
+                      disabled={!manualLabel || !manualLabel?.match(SEMVER_REGEX)}
                       type="submit"
                     >
                       Apply
