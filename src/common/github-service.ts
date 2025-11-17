@@ -45,12 +45,6 @@ interface ExtractDeployedShaParams extends ServerlessGitOpsParams {
 
 const SEMVER_REGEX = /^v(\d+)\.(\d+)\.(\d+)$/;
 
-function filterPrsForVersion(prs: PrItem[]): PrItem[] {
-  // No longer filtering out PRs with lower version labels
-  // Just return all PRs, the warning logic is handled separately
-  return prs;
-}
-
 /**
  * Checks if a PR has multiple patch version labels for the same major.minor version.
  * This indicates the PR may have been documented in multiple patch releases.
@@ -244,8 +238,7 @@ export class GitHubService {
     const options = this.octokit.search.issuesAndPullRequests.endpoint.merge({
       q: `repo:${GITHUB_OWNER}/${this.repoName} label:release_note:plugin_api_changes label:${version}`,
     });
-    const items = await this.octokit.paginate<PrItem>(options);
-    return filterPrsForVersion(items);
+    return await this.octokit.paginate<PrItem>(options);
   }
 
   public async getPrsForVersion(
@@ -293,7 +286,7 @@ export class GitHubService {
     (async () => {
       const items: PrItem[] = [];
       for await (const response of this.octokit.paginate.iterator<PrItem>(options)) {
-        items.push(...filterPrsForVersion(response.data));
+        items.push(...response.data);
         if (response.headers.link) {
           const links = parseLinkHeader(response.headers.link);
           if (links?.last?.page) {
