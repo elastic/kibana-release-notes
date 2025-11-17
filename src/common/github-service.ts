@@ -43,8 +43,6 @@ interface ExtractDeployedShaParams extends ServerlessGitOpsParams {
   gitOpsSha: string;
 }
 
-const SEMVER_REGEX = /^v(\d+)\.(\d+)\.(\d+)$/;
-
 /**
  * Checks if a PR has multiple patch version labels for the same major.minor version.
  * This indicates the PR may have been documented in multiple patch releases.
@@ -56,9 +54,8 @@ export function hasDuplicatePatchLabels(pr: PrItem, targetVersion: string): bool
   }
 
   const prVersions = pr.labels
-    .filter((label) => label.name?.match(SEMVER_REGEX))
-    .map((label) => semver.parse(label.name ?? ''))
-    .filter((ver): ver is semver.SemVer => ver !== null);
+    .map(({ name }) => semver.parse(name ?? ''))
+    .filter<SemVer>((ver): ver is SemVer => ver !== null);
 
   // Find all version labels that match the same major.minor as target
   const sameMajorMinor = prVersions.filter(

@@ -20,6 +20,7 @@ import React, { FC, useEffect, useMemo, useState, useCallback } from 'react';
 import { ServerlessRelease, useGitHubService } from '../../common';
 import { getTemplateInfos, setActiveTemplate, TemplateId, getActiveTemplateId } from '../../config';
 import { ConfigFlyout } from './components';
+import semver, { SemVer } from 'semver';
 
 const DEFAULT_SERVERLESS_SHAS = 2;
 
@@ -41,6 +42,13 @@ export const ReleaseNotesWizard: FC<Props> = ({
   const [templates, setTemplates] = useState(getTemplateInfos());
   const isServerless = getActiveTemplateId() === 'serverless';
   const [serverlessReleases, setServerlessReleases] = useState<ServerlessRelease[]>([]);
+
+  console.log(semver.parse('v1.2.3'), 'v1.2.3');
+  console.log(semver.parse('1.2.3'), '1.2.3');
+  console.log(semver.parse(null), 'null');
+  console.log(semver.parse(undefined), 'undef');
+  console.log(semver.parse(''), 'empty');
+  console.log(semver.parse('a.b.c'), 'a.b.c');
 
   useEffect(() => {
     if (isServerless) {
