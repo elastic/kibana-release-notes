@@ -47,7 +47,7 @@ interface ExtractDeployedShaParams extends ServerlessGitOpsParams {
  * Checks if a PR has multiple patch version labels for the same major.minor version.
  * This indicates the PR may have been documented in multiple patch releases.
  */
-export function hasDuplicatePatchLabels(pr: PrItem, targetVersion: string): boolean {
+export function hasDuplicatePatchLabels(pr: PrItem, targetVersion: string | undefined): boolean {
   const targetSemVer = semver.parse(targetVersion);
   if (!targetSemVer) {
     return false;

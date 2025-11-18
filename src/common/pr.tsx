@@ -16,7 +16,10 @@ export const Pr: FC<PrProps> = memo(
     const title: ReleaseNoteDetails = showTransformedTitle
       ? extractReleaseNotes(pr, normalizeOptions)
       : { type: 'title', title: pr.title };
-    const hasDuplicates = version ? hasDuplicatePatchLabels(pr, version) : false;
+    const hasDuplicates = hasDuplicatePatchLabels(pr, version);
+    const majorMinorVersion =
+      version?.substring(0, version?.lastIndexOf('.')) ?? 'this major and minor version';
+
     return (
       <>
         {title.title} (
@@ -34,12 +37,7 @@ export const Pr: FC<PrProps> = memo(
             color="warning"
             type="alert"
             size="m"
-            content={
-              <>
-                This PR has multiple patch version labels for the same major.minor version. It may
-                have already been documented in a previous patch release.
-              </>
-            }
+            content={`This PR has multiple patch version labels for ${majorMinorVersion} and may have already been documented in a previous patch release.`}
           />
         )}
         {title.type === 'releaseNoteTitle' && (
