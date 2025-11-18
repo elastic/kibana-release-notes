@@ -1,5 +1,10 @@
 import { PrItem } from '../github-service';
-import { normalizeTitle, findReleaseNote, extractReleaseNotes } from './extracting';
+import {
+  normalizeTitle,
+  findReleaseNote,
+  extractReleaseNotes,
+  hasDuplicatePatchLabels,
+} from './extracting';
 
 describe('extraction tools', () => {
   describe('normalizeTitle', () => {
@@ -140,6 +145,52 @@ Next paragraph
 
       expect(actual.type).toBe('releaseNoteTitle');
       expect(actual.title).toBe('Adds cool feature in *TSVB*');
+    });
+  });
+
+  describe('hasDuplicatePatchLabels', () => {
+    it('should return false for invalid or missing target versions', () => {
+      const labels = [{ name: '8.12.0' }, { name: '8.12.1' }];
+
+      expect(hasDuplicatePatchLabels(labels, undefined)).toBe(false);
+      expect(hasDuplicatePatchLabels(labels, 'invalid-version')).toBe(false);
+    });
+
+    it('should return false when there are no matching labels', () => {
+      expect(hasDuplicatePatchLabels([{ name: '7.11.0' }, { name: '8.11.1' }], '8.12.0')).toBe(
+        false
+      );
+    });
+
+    it('should return false when there is only one matching label', () => {
+      expect(hasDuplicatePatchLabels([{ name: '8.12.0' }, { name: '7.11.1' }], '8.12.0')).toBe(
+        false
+      );
+    });
+
+    it('should return true when there are multiple matching patch labels', () => {
+      expect(hasDuplicatePatchLabels([{ name: '8.12.5' }, { name: '8.12.9' }], '8.12.0')).toBe(
+        true
+      );
+    });
+
+    it('should handle invalid and undefined label names correctly', () => {
+      expect(
+        hasDuplicatePatchLabels(
+          [
+            { name: '8.12.0' },
+            { name: 'bug' },
+            { name: '8.12.1' },
+            { name: 'feature' },
+            { name: undefined },
+          ],
+          '8.12.0'
+        )
+      ).toBe(true);
+    });
+
+    it('should handle empty array of labels correctly', () => {
+      expect(hasDuplicatePatchLabels([], '8.12.0')).toBe(false);
     });
   });
 });
