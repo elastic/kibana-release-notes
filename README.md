@@ -4,7 +4,7 @@ Tool to generate the Kibana release notes. Deployed at [release-notes.kibanateam
 
 ## Steps to test locally
 
-1. Install dependencies (if not already installed):
+1. Install dependencies:
 
 ```sh
 yarn install
