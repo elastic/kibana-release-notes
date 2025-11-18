@@ -16,6 +16,12 @@ yarn install
 yarn start
 ```
 
+3. Run tests:
+
+```sh
+yarn test
+```
+
 The app runs on port 4000 (configured in `package.json`).
 After starting, it should open at http://localhost:4000.
 
