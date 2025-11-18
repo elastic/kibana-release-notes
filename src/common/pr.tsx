@@ -1,7 +1,12 @@
 import { EuiLink, EuiIconTip } from '@elastic/eui';
 import { FC, memo } from 'react';
-import { PrItem, hasDuplicatePatchLabels } from './github-service';
-import { extractReleaseNotes, NormalizeOptions, ReleaseNoteDetails } from './pr-utils';
+import { PrItem } from './github-service';
+import {
+  extractReleaseNotes,
+  NormalizeOptions,
+  ReleaseNoteDetails,
+  hasDuplicatePatchLabels,
+} from './pr-utils';
 
 interface PrProps {
   pr: PrItem;
@@ -16,7 +21,7 @@ export const Pr: FC<PrProps> = memo(
     const title: ReleaseNoteDetails = showTransformedTitle
       ? extractReleaseNotes(pr, normalizeOptions)
       : { type: 'title', title: pr.title };
-    const hasDuplicates = hasDuplicatePatchLabels(pr, version);
+    const hasDuplicates = hasDuplicatePatchLabels(pr.labels, version);
     const majorMinorVersion =
       version?.substring(0, version?.lastIndexOf('.')) ?? 'this major and minor version';
 

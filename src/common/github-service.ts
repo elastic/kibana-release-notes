@@ -43,35 +43,6 @@ interface ExtractDeployedShaParams extends ServerlessGitOpsParams {
   gitOpsSha: string;
 }
 
-/**
- * Checks if a PR has multiple patch version labels for the same major.minor version.
- * This indicates the PR may have been documented in multiple patch releases.
- */
-export function hasDuplicatePatchLabels(pr: PrItem, targetVersion: string | undefined): boolean {
-  const targetSemVer = semver.parse(targetVersion);
-  if (!targetSemVer) {
-    return false;
-  }
-
-  // Find all version labels that match the same major.minor as target
-  const sameMajorMinor = pr.labels.reduce<number>((acc, { name }) => {
-    const ver = semver.parse(name ?? '');
-
-    if (ver === null) {
-      return acc;
-    }
-
-    // tilde matches exactly on major.minor but allows for any patch version
-    if (semver.intersects(`~${ver.version}`, `~${targetSemVer.version}`)) {
-      acc++;
-    }
-
-    return acc;
-  }, 0);
-
-  return sameMajorMinor >= 2;
-}
-
 export class GitHubService {
   private octokit: Octokit;
   private repoId: number | undefined;
