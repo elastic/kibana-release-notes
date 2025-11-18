@@ -53,17 +53,23 @@ export function hasDuplicatePatchLabels(pr: PrItem, targetVersion: string): bool
     return false;
   }
 
-  const prVersions = pr.labels
-    .map(({ name }) => semver.parse(name ?? ''))
-    .filter<SemVer>((ver): ver is SemVer => ver !== null);
-
   // Find all version labels that match the same major.minor as target
-  const sameMajorMinor = prVersions.filter(
-    (ver) => ver.major === targetSemVer.major && ver.minor === targetSemVer.minor
-  );
+  const sameMajorMinor = pr.labels.reduce<number>((acc, { name }) => {
+    const ver = semver.parse(name ?? '');
 
-  // If there are 2 or more patch versions for the same major.minor, return true
-  return sameMajorMinor.length >= 2;
+    if (ver === null) {
+      return acc;
+    }
+
+    // tilde matches exactly on major.minor but allows for any patch version
+    if (semver.intersects(`~${ver.version}`, `~${targetSemVer.version}`)) {
+      acc++;
+    }
+
+    return acc;
+  }, 0);
+
+  return sameMajorMinor >= 2;
 }
 
 export class GitHubService {
