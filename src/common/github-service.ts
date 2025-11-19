@@ -43,25 +43,6 @@ interface ExtractDeployedShaParams extends ServerlessGitOpsParams {
   gitOpsSha: string;
 }
 
-const SEMVER_REGEX = /^v(\d+)\.(\d+)\.(\d+)$/;
-
-function filterPrsForVersion(
-  prs: PrItem[],
-  version: string,
-  ignoredVersionLabels: readonly string[] = []
-): PrItem[] {
-  return prs.filter((pr) => {
-    const prVersions = pr.labels
-      .filter((label) => label.name?.match(SEMVER_REGEX))
-      .filter((label) => label.name && !ignoredVersionLabels.includes(label.name))
-      .map((label) => semver.clean(label.name ?? '') ?? '');
-    // Check if there is any version label below the one we are looking for
-    // which would mean this PR has already been released (and blogged about)
-    // in an earlier dev documentation blog post.
-    return !prVersions.some((verLabel) => semver.lt(verLabel, version));
-  });
-}
-
 export class GitHubService {
   private octokit: Octokit;
   private repoId: number | undefined;
@@ -231,15 +212,13 @@ export class GitHubService {
     const options = this.octokit.search.issuesAndPullRequests.endpoint.merge({
       q: `repo:${GITHUB_OWNER}/${this.repoName} label:release_note:plugin_api_changes label:${version}`,
     });
-    const items = await this.octokit.paginate<PrItem>(options);
-    return filterPrsForVersion(items, version);
+    return await this.octokit.paginate<PrItem>(options);
   }
 
   public async getPrsForVersion(
     version: string,
     excludedLabels: readonly string[] = [],
-    includedLabels: readonly string[] = [],
-    ignoredVersionLabels: readonly string[] = []
+    includedLabels: readonly string[] = []
   ): Promise<Observable<Progress<PrItem>>> {
     const semVer = semver.parse(version);
 
@@ -281,7 +260,7 @@ export class GitHubService {
     (async () => {
       const items: PrItem[] = [];
       for await (const response of this.octokit.paginate.iterator<PrItem>(options)) {
-        items.push(...filterPrsForVersion(response.data, version, ignoredVersionLabels));
+        items.push(...response.data);
         if (response.headers.link) {
           const links = parseLinkHeader(response.headers.link);
           if (links?.last?.page) {

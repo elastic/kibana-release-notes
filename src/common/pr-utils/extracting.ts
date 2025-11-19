@@ -1,5 +1,6 @@
 import { Config } from '../../config';
 import { PrItem } from '../github-service';
+import semver from 'semver';
 
 export type NormalizeOptions = Config['areas'][number]['options'];
 
@@ -116,4 +117,36 @@ export function extractReleaseNotes(
     title: normalizeTitle(releaseNote, options, pr.title),
     originalTitle: pr.title,
   };
+}
+
+/**
+ * Checks if a PR has multiple patch version labels for the same major.minor version.
+ * This indicates the PR may have been documented in multiple patch releases.
+ */
+export function hasDuplicatePatchLabels(
+  prLabels: PrItem['labels'],
+  targetVersion: string | undefined
+): boolean {
+  const targetSemVer = semver.parse(targetVersion);
+  if (!targetSemVer) {
+    return false;
+  }
+
+  // Find all version labels that match the same major.minor as target
+  const sameMajorMinor = prLabels.reduce<number>((acc, { name }) => {
+    const ver = semver.parse(name ?? '');
+
+    if (ver === null) {
+      return acc;
+    }
+
+    // tilde matches exactly on major.minor but allows for any patch version
+    if (semver.intersects(`~${ver.version}`, `~${targetSemVer.version}`)) {
+      acc++;
+    }
+
+    return acc;
+  }, 0);
+
+  return sameMajorMinor >= 2;
 }

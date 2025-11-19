@@ -21,17 +21,11 @@ import { ConfigFlyout } from './components';
 
 interface Props {
   version: string;
-  ignoredPriorReleases: string[];
   selectedServerlessSHAs: Set<string>;
   onVersionChange: () => void;
 }
 
-export const ReleaseNotes: FC<Props> = ({
-  version,
-  onVersionChange,
-  ignoredPriorReleases,
-  selectedServerlessSHAs,
-}) => {
+export const ReleaseNotes: FC<Props> = ({ version, onVersionChange, selectedServerlessSHAs }) => {
   const subscriptionRef = useRef<Subscription>();
   const [github, errorHandler] = useGitHubService();
   const config = useActiveConfig();
@@ -54,12 +48,7 @@ export const ReleaseNotes: FC<Props> = ({
 
     try {
       subscriptionRef.current = (
-        await github.getPrsForVersion(
-          version,
-          config.excludedLabels,
-          config.includedLabels,
-          ignoredPriorReleases
-        )
+        await github.getPrsForVersion(version, config.excludedLabels, config.includedLabels)
       ).subscribe((status) => {
         if (status.type === 'complete') {
           setLoading(false);
@@ -160,7 +149,7 @@ export const ReleaseNotes: FC<Props> = ({
             </>
           )}
           {step === 'prepare' ? (
-            <PrepareReleaseNotes prs={prs} />
+            <PrepareReleaseNotes prs={prs} version={version} />
           ) : (
             <ReleaseNoteOutput prs={prs} version={version} />
           )}
