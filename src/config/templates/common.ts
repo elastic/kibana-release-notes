@@ -133,7 +133,7 @@ export const observabilityLabels = [
   'Team:obs-ux-management',
   'Team:Obs AI Assistant',
   'Team:obs-ux-infra_services',
-  'Team:obs-ux-logs',
+  'Team:obs-onboarding',
   'Team:obs-knowledge',
   'Team:obs-entities',
   'ci:project-deploy-observability',
