@@ -146,6 +146,7 @@ export const observabilityLabels = [
   'Feature:Logs UI',
   'Feature:Infra UI',
   'Feature:Service Maps',
+  'Team:actionable-obs',
 ];
 
 export const kibanaAreas: AreaDefinition[] = [
