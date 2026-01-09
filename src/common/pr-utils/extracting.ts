@@ -75,14 +75,42 @@ export function normalizeTitle(
 }
 
 /**
+ * Strips HTML comments from markdown text.
+ * This handles both single-line and multi-line comments.
+ * Also collapses excessive blank lines that may result from comment removal,
+ * to prevent creating artificial section breaks.
+ */
+function stripHtmlComments(markdown: string): string {
+  return (
+    markdown
+      // Remove HTML comments
+      .replace(/<!--[\s\S]*?-->/g, '')
+      // Collapse 3+ consecutive newlines into 2 (preserving paragraph breaks but not creating extra ones)
+      .replace(/(\r?\n){3,}/g, '\n\n')
+  );
+}
+
+/**
  * Finds and retrieves the actual "release note" details from a PR description (in markdown format).
  * It will look for:
  * - paragraphs beginning with release note (or slight variations of that) and the sentence till the end of line.
+ *
+ * HTML comments are stripped before extraction to avoid picking up template instructions.
  */
 export function findReleaseNote(markdown: string): string | undefined {
-  const match = markdown.match(
-    /(?:\n|^)\s*#*\s*release[\s-]?notes?[\s\W]+(.*?)(?:(\r?\n|\r){2}|$|((\r?\n|\r)\s*#+))/is
+  // Strip HTML comments first to avoid extracting template instructions
+  const cleanedMarkdown = stripHtmlComments(markdown);
+
+  // Regex breakdown:
+  // - (?:\n|^)\s*#*\s* - start of line, optional whitespace and markdown headers
+  // - release[\s-]?notes? - matches "release note", "release notes", "release-note", etc.
+  // - [:\s-]* - matches separator after "release note" (colon, dash, whitespace) but NOT other non-word chars like {
+  // - (.*?) - lazily capture the release note content
+  // - Terminator: double newline, end of string, or new markdown header
+  const match = cleanedMarkdown.match(
+    /(?:\n|^)\s*#*\s*release[\s-]?notes?[:\s-]*(.*?)(?:(\r?\n|\r){2}|$|((\r?\n|\r)\s*#+))/is
   );
+
   return match?.[1].trim() ?? undefined;
 }
 

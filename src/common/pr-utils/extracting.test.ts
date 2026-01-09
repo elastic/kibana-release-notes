@@ -127,6 +127,51 @@ Next paragraph
         'This is the extracted sentence.'
       );
     });
+
+    it('should ignore HTML comments and extract the actual release note', () => {
+      expect(
+        findReleaseNote(`
+## Release Note
+<!-- 
+Use mandatory template {elastic-defend} which will be substituted with proper brand name, i.e Elastic Defend
+-->
+This is the actual release note.
+
+## Checklist
+      `)
+      ).toBe('This is the actual release note.');
+    });
+
+    it('should extract release note even when comment creates extra blank lines', () => {
+      // This simulates the endpoint-dev PR template where the comment
+      // is on its own lines, creating blank lines when stripped
+      expect(
+        findReleaseNote(`
+## Release Note
+<!-- 
+Use mandatory template {elastic-defend} which will be substituted with proper brand name, i.e Elastic Defend
+-->
+{elastic-defend} Fixed Mark of the Web parsing on Windows so file origin information is parsed correctly.
+
+## Checklist
+      `)
+      ).toBe(
+        '{elastic-defend} Fixed Mark of the Web parsing on Windows so file origin information is parsed correctly.'
+      );
+    });
+
+    it('should strip multiple HTML comments', () => {
+      expect(
+        findReleaseNote(`
+## Release Note
+<!-- comment 1 -->
+Actual note here
+<!-- comment 2 -->
+
+## Next section
+      `)
+      ).toBe('Actual note here');
+    });
   });
 
   describe('extractReleaseNotes', () => {
