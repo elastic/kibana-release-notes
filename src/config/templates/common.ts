@@ -119,6 +119,8 @@ export const securityLabels = [
   'Team:Defend Workflows',
   'Team:Detection Rules',
   'Team:Security-Scalability',
+  'Team:Automatic Migrations',
+  'Feature:SIEMMigrations',
   'Feature:Timeline',
   'Feature:Detection Rules',
   'Feature:Detection Alerts',
