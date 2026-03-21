@@ -135,15 +135,25 @@ export const ReleaseNotesWizard: FC<Props> = ({
       const checkboxOptions = serverlessReleases
         .sort((a, b) => {
           if (a?.releaseDate && b?.releaseDate) {
-            return Number(b.releaseDate) - Number(a.releaseDate);
+            const releaseDateDiff = Number(b.releaseDate) - Number(a.releaseDate);
+
+            if (releaseDateDiff !== 0) {
+              return releaseDateDiff;
+            }
           }
 
-          return 0;
+          // Release dates are based on the Unix timestamp in the tag name, so a deploy-fix can have the same date as a new release
+          // Fallback to comparing the tag names so that deploy-fix is newer
+          return (a.releaseTag?.name ?? '').localeCompare(b.releaseTag?.name ?? '');
         })
         .map(({ releaseDate, releaseTag, kibanaSha }) => {
           return {
             id: kibanaSha,
-            label: `${releaseDate?.toLocaleDateString()} (${releaseTag?.name}, ${kibanaSha})`,
+            label: `${releaseDate?.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: '2-digit',
+            })} (${releaseTag?.name}, ${kibanaSha})`,
           };
         });
 
