@@ -149,7 +149,11 @@ export const ReleaseNotesWizard: FC<Props> = ({
         .map(({ releaseDate, releaseTag, kibanaSha }) => {
           return {
             id: kibanaSha,
-            label: `${releaseDate?.toLocaleDateString()} (${releaseTag?.name}, ${kibanaSha})`,
+            label: `${releaseDate?.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: '2-digit',
+            })} (${releaseTag?.name}, ${kibanaSha})`,
           };
         });
 
