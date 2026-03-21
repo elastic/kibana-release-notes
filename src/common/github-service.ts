@@ -394,7 +394,10 @@ export class GitHubService {
         release.releaseTag = tagForReleaseCommit;
         release.releaseDate = new Date(Number(tagForReleaseCommit.name.split('@')[1]) * 1000);
       } else {
-        this.handleError(`No tag found for the release commit ${release.kibanaSha}`);
+        console.warn(`No tag found for the release commit ${release.kibanaSha}, removing.`);
+        this.serverlessReleases = this.serverlessReleases.filter(
+          (r) => r.kibanaSha !== release.kibanaSha
+        );
       }
     });
   }
