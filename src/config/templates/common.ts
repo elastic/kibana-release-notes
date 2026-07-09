@@ -134,7 +134,7 @@ export const observabilityLabels = [
   'Feature:Observability Home',
   'Feature:SLO',
   'Team:obs-ux-management',
-  'Team:Obs AI Assistant',
+  'Team:nightshift-context-and-research',
   'Team:obs-ux-infra_services - DEPRECATED',
   'Team:obs-ux-logs',
   'Team:obs-onboarding',
