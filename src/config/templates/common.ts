@@ -120,6 +120,9 @@ export const securityLabels = [
   'Team:Detection Rules',
   'Team:Security-Scalability',
   'Team:Detection Rule Management',
+  'Team:Detection Engineering',
+  'Team:Security Deployment',
+  'Team:Automatic Migrations',
   'Feature:SIEMMigrations',
   'Feature:Timeline',
   'Feature:Detection Rules',
@@ -128,6 +131,7 @@ export const securityLabels = [
   'Feature:Rule Exceptions',
   'Feature:AutomaticImport',
   'Feature:Event Correlation (EQL) Rule',
+  'Feature:Security ML Jobs',
 ];
 
 export const observabilityLabels = [
@@ -140,7 +144,6 @@ export const observabilityLabels = [
   'Team:obs-onboarding',
   'Team:obs-knowledge',
   'Team:obs-entities',
-  'ci:project-deploy-observability',
   'Feature:Uptime',
   'Team:uptime',
   'Team:apm',
@@ -157,6 +160,9 @@ export const observabilityLabels = [
   'Team:Observability',
   'author:actionable-obs',
   'Feature:Streams',
+  'Team:streams-ui',
+  'Feature:SigEvents',
+  'Team:obs-ai - DEPRECATED',
 ];
 
 export const kibanaAreas: AreaDefinition[] = [
@@ -165,9 +171,15 @@ export const kibanaAreas: AreaDefinition[] = [
     labels: ['Feature:Logstash Pipelines'],
   },
   {
-    title: 'Machine Learning',
+    title: 'Agent Builder',
+    labels: ['Team:agent-builder', 'feature:agent-builder'],
+    priority: 20,
+  },
+  {
+    title: 'Machine learning and inference',
     labels: [
       ':ml',
+      'Team:AI Infra',
       'Feature:Anomaly Detection',
       'Feature:Data Frames',
       'Feature:File Data Viz',
@@ -176,6 +188,12 @@ export const kibanaAreas: AreaDefinition[] = [
       'Feature:Inference UI',
       'Feature:ML/AIOps',
     ],
+    priority: 10,
+  },
+  {
+    title: 'Workflows',
+    labels: ['Team:One Workflow'],
+    priority: 10,
   },
   {
     title: 'Maps',
@@ -240,7 +258,8 @@ export const kibanaAreas: AreaDefinition[] = [
   },
   {
     title: 'ES|QL',
-    labels: ['Team:ESQL'],
+    labels: ['Team:ESQL', 'Feature:ES|QL'],
+    priority: 10,
   },
   {
     title: 'Sharing and reporting',
@@ -254,6 +273,7 @@ export const kibanaAreas: AreaDefinition[] = [
   {
     title: 'Elastic Security solution',
     labels: securityLabels,
+    priority: 100,
     options: {
       textOverwriteTemplate:
         'For the Elastic Security {{version}} release information, refer to [Elastic Security Solution Release Notes](docs-content://release-notes/elastic-security/index.md).',
@@ -266,6 +286,7 @@ export const kibanaAreas: AreaDefinition[] = [
   {
     title: 'Elastic Observability solution',
     labels: observabilityLabels,
+    priority: 100,
     options: {
       textOverwriteTemplate:
         'For the Elastic Observability {{version}} release information, refer to [Elastic Observability Solution Release Notes](docs-content://release-notes/elastic-observability/index.md).',
