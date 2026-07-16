@@ -22,6 +22,7 @@ describe('Kibana release note areas', () => {
         'Team:Security Deployment',
         'Team:Automatic Migrations',
         'Feature:Security ML Jobs',
+        'Feature:Endpoint',
       ])
     );
   });
@@ -44,6 +45,7 @@ describe('Kibana release note areas', () => {
 
   it.each([
     [['Feature:Security ML Jobs', 'Feature:ML/AIOps'], 'Elastic Security solution'],
+    [['Feature:Endpoint', 'Team:Fleet'], 'Elastic Security solution'],
     [['Feature:SigEvents', 'Team:Presentation'], 'Elastic Observability solution'],
   ])('prioritizes solution routing for %j', (labels, expectedArea) => {
     expect(getAreaTitle(labels)).toBe(expectedArea);

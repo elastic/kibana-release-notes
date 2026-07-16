@@ -128,6 +128,7 @@ export const securityLabels = [
   'Feature:Detection Rules',
   'Feature:Detection Alerts',
   'Feature:Entity Analytics',
+  'Feature:Endpoint',
   'Feature:Rule Exceptions',
   'Feature:AutomaticImport',
   'Feature:Event Correlation (EQL) Rule',
