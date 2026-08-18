@@ -306,6 +306,7 @@ export const kibanaAreas: AreaDefinition[] = [
       'Team:ResponseOps',
       'Team:Cases',
       'Feature:Cases',
+      'Feature:AlertingV2'
     ],
   },
   {
