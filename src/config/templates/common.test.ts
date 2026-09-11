@@ -23,15 +23,17 @@ describe('Kibana release note areas', () => {
         'Team:Automatic Migrations',
         'Feature:Security ML Jobs',
         'Feature:Endpoint',
+        'Team: Security Investigations',
       ])
     );
   });
 
   it('recognizes current Observability solution labels', () => {
     expect(observabilityLabels).toEqual(
-      expect.arrayContaining(['Team:streams-ui', 'Feature:SigEvents', 'Team:obs-ai - DEPRECATED'])
+      expect.arrayContaining(['Feature:Streams', 'Feature:SigEvents', 'Team:obs-ai - DEPRECATED'])
     );
     expect(observabilityLabels).not.toContain('ci:project-deploy-observability');
+    expect(observabilityLabels).not.toContain('Team:streams-ui');
   });
 
   it.each([
@@ -39,6 +41,10 @@ describe('Kibana release note areas', () => {
     [['Feature:Inference UI', 'Team:Search'], 'Machine learning and inference'],
     [['Feature:ES|QL', 'Team:DataDiscovery'], 'ES|QL'],
     [['Team:One Workflow'], 'Workflows'],
+    [['Feature:AlertingV2'], 'Alerting'],
+    [['Feature:Security/User Profile'], 'Kibana platform'],
+    [['Feature:Users/Roles/API Keys'], 'Kibana platform'],
+    [['Feature:Fleet', 'Team:streams-ui'], 'Data ingestion and Fleet'],
   ])('routes %j to %s', (labels, expectedArea) => {
     expect(getAreaTitle(labels)).toBe(expectedArea);
   });
@@ -47,7 +53,15 @@ describe('Kibana release note areas', () => {
     [['Feature:Security ML Jobs', 'Feature:ML/AIOps'], 'Elastic Security solution'],
     [['Feature:Endpoint', 'Team:Fleet'], 'Elastic Security solution'],
     [['Feature:SigEvents', 'Team:Presentation'], 'Elastic Observability solution'],
+    [['Team: Security Investigations', 'Team:agent-builder'], 'Elastic Security solution'],
+    [['Feature:Streams', 'Team:streams-ui'], 'Elastic Observability solution'],
   ])('prioritizes solution routing for %j', (labels, expectedArea) => {
     expect(getAreaTitle(labels)).toBe(expectedArea);
+  });
+
+  it('leaves Team:streams-ui uncategorized when no feature label is present', () => {
+    const [, ungrouped] = groupByArea([createPr(['Team:streams-ui'])], kibanaTemplate);
+
+    expect(ungrouped).toHaveLength(1);
   });
 });
