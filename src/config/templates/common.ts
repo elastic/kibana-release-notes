@@ -123,7 +123,7 @@ export const securityLabels = [
   'Team:Detection Engineering',
   'Team:Security Deployment',
   'Team:Automatic Migrations',
-  'Team: Security Investigations',
+  'Team:Security Investigations',
   'Feature:SIEMMigrations',
   'Feature:Timeline',
   'Feature:Detection Rules',
