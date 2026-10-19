@@ -134,6 +134,8 @@ export const securityLabels = [
   'Feature:AutomaticImport',
   'Feature:Event Correlation (EQL) Rule',
   'Feature:Security ML Jobs',
+  'Team:security-siem-conduit',
+  'Team:Security Solution',
 ];
 
 export const observabilityLabels = [
@@ -164,6 +166,21 @@ export const observabilityLabels = [
   'Feature:Streams',
   'Feature:SigEvents',
   'Team:obs-ai - DEPRECATED',
+  'Team:obs-signals-metrics',
+  'Team:obs-signals-logs',
+  'Team:obs-signals-traces',
+  'Feature:Synthetics',
+  'Feature:Metrics in Discover',
+  'Team:nightshift',
+  'Team:nightshift-investigations',
+  'Team:nightshift-sre-agent',
+  'Team:nightshift-ux',
+  'Feature: Nightshift Context Engine',
+  'Feature: Nightshift Detection Engine',
+  'Feature: Nightshift Interfaces',
+  'Feature: Nightshift Investigation Engine',
+  'Feature: Nightshift Remediation Engine',
+  'Feature: Nightshift UX',
 ];
 
 export const kibanaAreas: AreaDefinition[] = [
@@ -188,6 +205,7 @@ export const kibanaAreas: AreaDefinition[] = [
       'Feature:Data Frame Analytics',
       'Feature:Inference UI',
       'Feature:ML/AIOps',
+      'Team:Search & ML UX',
     ],
     priority: 10,
   },
@@ -239,6 +257,8 @@ export const kibanaAreas: AreaDefinition[] = [
       'Team:Visualizations',
       'Feature:Canvas',
       'Feature:Maps',
+      'Team:Dashboards',
+      'Project:Dashboards API',
     ],
     options: {
       bracketHandling: 'visualizations',
@@ -255,11 +275,12 @@ export const kibanaAreas: AreaDefinition[] = [
       'Feature:UnifiedDataTable',
       'Feature:UnifiedDocViewer',
       'Feature:UnifiedFieldList',
+      'Team:Discover',
     ],
   },
   {
     title: 'ES|QL',
-    labels: ['Team:ESQL', 'Feature:ES|QL'],
+    labels: ['Team:ESQL', 'Feature:ES|QL', 'Feature:ES|QL editor'],
     priority: 10,
   },
   {
@@ -269,6 +290,9 @@ export const kibanaAreas: AreaDefinition[] = [
       'Feature:SharingURLs',
       'Feature:Reporting',
       'Team:Reporting Services',
+      'Feature:Reporting:CSV',
+      'Feature:Reporting:Framework',
+      'Feature:Reporting:Screenshot',
     ],
   },
   {
@@ -382,6 +406,8 @@ export const kibanaAreas: AreaDefinition[] = [
       'Feature:http',
       'Feature:OAS',
       'Feature:logging',
+      'Team:Kibana Management',
+      'Feature:CCR and Remote Clusters',
     ],
   },
   {
