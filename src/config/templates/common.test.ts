@@ -24,13 +24,24 @@ describe('Kibana release note areas', () => {
         'Feature:Security ML Jobs',
         'Feature:Endpoint',
         'Team:Security Investigations',
+        'Team:security-siem-conduit',
+        'Team:Security Solution',
       ])
     );
   });
 
   it('recognizes current Observability solution labels', () => {
     expect(observabilityLabels).toEqual(
-      expect.arrayContaining(['Feature:Streams', 'Feature:SigEvents', 'Team:obs-ai - DEPRECATED'])
+      expect.arrayContaining([
+        'Feature:Streams',
+        'Feature:SigEvents',
+        'Team:obs-ai - DEPRECATED',
+        'Team:obs-signals-metrics',
+        'Team:obs-signals-logs',
+        'Feature:Synthetics',
+        'Team:nightshift-sre-agent',
+        'Feature: Nightshift Detection Engine',
+      ])
     );
     expect(observabilityLabels).not.toContain('ci:project-deploy-observability');
     expect(observabilityLabels).not.toContain('Team:streams-ui');
@@ -45,6 +56,12 @@ describe('Kibana release note areas', () => {
     [['Feature:Security/User Profile'], 'Kibana platform'],
     [['Feature:Users/Roles/API Keys'], 'Kibana platform'],
     [['Feature:Fleet', 'Team:streams-ui'], 'Data ingestion and Fleet'],
+    [['Team:Search & ML UX'], 'Machine learning and inference'],
+    [['Team:Discover'], 'Discover'],
+    [['Feature:ES|QL editor'], 'ES|QL'],
+    [['Team:Dashboards'], 'Dashboards and Visualizations'],
+    [['Team:Kibana Management'], 'Kibana platform'],
+    [['Feature:Reporting:CSV'], 'Sharing and reporting'],
   ])('routes %j to %s', (labels, expectedArea) => {
     expect(getAreaTitle(labels)).toBe(expectedArea);
   });
@@ -55,6 +72,12 @@ describe('Kibana release note areas', () => {
     [['Feature:SigEvents', 'Team:Presentation'], 'Elastic Observability solution'],
     [['Team:Security Investigations', 'Team:agent-builder'], 'Elastic Security solution'],
     [['Feature:Streams', 'Team:streams-ui'], 'Elastic Observability solution'],
+    [['Team:obs-signals-metrics', 'Team:Discover'], 'Elastic Observability solution'],
+    [
+      ['Feature: Nightshift Detection Engine', 'Team:nightshift-sre-agent'],
+      'Elastic Observability solution',
+    ],
+    [['Team:security-siem-conduit'], 'Elastic Security solution'],
   ])('prioritizes solution routing for %j', (labels, expectedArea) => {
     expect(getAreaTitle(labels)).toBe(expectedArea);
   });
