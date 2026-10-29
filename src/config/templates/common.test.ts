@@ -82,9 +82,19 @@ describe('Kibana release note areas', () => {
     expect(getAreaTitle(labels)).toBe(expectedArea);
   });
 
-  it('leaves Team:streams-ui uncategorized when no feature label is present', () => {
-    const [, ungrouped] = groupByArea([createPr(['Team:streams-ui'])], kibanaTemplate);
-
-    expect(ungrouped).toHaveLength(1);
+  it.each([
+    [['Team:streams-ui'], 'Data ingestion and Fleet'],
+    [['Team:streams-ui', 'Feature:Streams'], 'Elastic Observability solution'],
+    [['Team:streams-ui', 'Feature: Observability Onboarding'], 'Elastic Observability solution'],
+    [['Feature: AI Infra'], 'Machine learning and inference'],
+    [['Feature: AI Infra', 'Team:Search'], 'Machine learning and inference'],
+    [['feature:agent-builder', 'Feature: AI Infra'], 'Agent Builder'],
+    [['Team:context', 'feature:agent-builder'], 'Context Engine'],
+    [['Team:Security Investigations', 'Team:Cases'], 'Elastic Security solution'],
+    [['Team:ResponseOps', 'author:actionable-obs'], 'Alerting'],
+    [['Feature:AlertingV2', 'author:actionable-obs'], 'Alerting'],
+    [['Team:rna-project', 'author:actionable-obs'], 'Alerting'],
+  ])('routes %j to %s by priority', (labels, expectedArea) => {
+    expect(getAreaTitle(labels)).toBe(expectedArea);
   });
 });
