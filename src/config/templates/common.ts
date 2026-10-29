@@ -164,6 +164,7 @@ export const observabilityLabels = [
   'Team:Observability',
   'author:actionable-obs',
   'Feature:Streams',
+  'Feature: Observability Onboarding',
   'Feature:SigEvents',
   'Team:obs-ai - DEPRECATED',
   'Team:obs-signals-metrics',
@@ -194,10 +195,16 @@ export const kibanaAreas: AreaDefinition[] = [
     priority: 20,
   },
   {
+    title: 'Context Engine',
+    labels: ['Team:context'],
+    priority: 30,
+  },
+  {
     title: 'Machine learning and inference',
     labels: [
       ':ml',
       'Team:AI Infra',
+      'Feature: AI Infra',
       'Feature:Anomaly Detection',
       'Feature:Data Frames',
       'Feature:File Data Viz',
@@ -298,7 +305,7 @@ export const kibanaAreas: AreaDefinition[] = [
   {
     title: 'Elastic Security solution',
     labels: securityLabels,
-    priority: 100,
+    priority: 120,
     options: {
       textOverwriteTemplate:
         'For the Elastic Security {{version}} release information, refer to [Elastic Security Solution Release Notes](docs-content://release-notes/elastic-security/index.md).',
@@ -331,11 +338,19 @@ export const kibanaAreas: AreaDefinition[] = [
       'Team:Cases',
       'Feature:Cases',
       'Feature:AlertingV2',
+      'Team:rna-project',
     ],
+    priority: 110,
   },
   {
     title: 'Data ingestion and Fleet',
-    labels: ['Team:Fleet', 'Feature:Fleet', 'Ingest', 'Feature:Ingest Node Pipelines'],
+    labels: [
+      'Team:Fleet',
+      'Feature:Fleet',
+      'Team:streams-ui',
+      'Ingest',
+      'Feature:Ingest Node Pipelines',
+    ],
   },
   {
     title: 'Data management',
