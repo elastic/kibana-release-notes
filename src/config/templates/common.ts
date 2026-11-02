@@ -191,7 +191,7 @@ export const kibanaAreas: AreaDefinition[] = [
   },
   {
     title: 'Agent Builder',
-    labels: ['Team:agent-builder', 'feature:agent-builder'],
+    labels: ['Team:agent-builder', 'feature:agent-builder', 'Team:Agent'],
     priority: 20,
   },
   {
@@ -213,6 +213,9 @@ export const kibanaAreas: AreaDefinition[] = [
       'Feature:Inference UI',
       'Feature:ML/AIOps',
       'Team:Search & ML UX',
+      'Team:ML',
+      'Feature:3rd Party Models',
+      'Feature:File Upload',
     ],
     priority: 10,
   },
@@ -231,7 +234,7 @@ export const kibanaAreas: AreaDefinition[] = [
   },
   {
     title: 'Connectivity',
-    labels: ['Feature:Actions/ConnectorTypes'],
+    labels: ['Feature:Actions/ConnectorTypes', 'connectors-v2'],
   },
   {
     title: 'Dashboards and Visualizations',
@@ -266,6 +269,8 @@ export const kibanaAreas: AreaDefinition[] = [
       'Feature:Maps',
       'Team:Dashboards',
       'Project:Dashboards API',
+      'Team:Presentation - DEPRECATED',
+      'Project:Controls',
     ],
     options: {
       bracketHandling: 'visualizations',
@@ -283,6 +288,8 @@ export const kibanaAreas: AreaDefinition[] = [
       'Feature:UnifiedDocViewer',
       'Feature:UnifiedFieldList',
       'Team:Discover',
+      'Project:OneDiscover',
+      'Feature:UnifiedHistogram',
     ],
   },
   {
@@ -339,6 +346,9 @@ export const kibanaAreas: AreaDefinition[] = [
       'Feature:Cases',
       'Feature:AlertingV2',
       'Team:rna-project',
+      'Feature:Maintenance Window',
+      'Feature - improved case templates',
+      'Team:actionable-obs - DEPRECATED',
     ],
     priority: 110,
   },
@@ -348,6 +358,7 @@ export const kibanaAreas: AreaDefinition[] = [
       'Team:Fleet',
       'Feature:Fleet',
       'Team:streams-ui',
+      'Team:Fleet - DEPRECATED',
       'Ingest',
       'Feature:Ingest Node Pipelines',
     ],
@@ -361,6 +372,7 @@ export const kibanaAreas: AreaDefinition[] = [
       'Feature:FieldFormatters',
       'Feature:ILM',
       'Feature:Transforms',
+      'Feature:Runtime Fields',
     ],
   },
   {
@@ -423,6 +435,9 @@ export const kibanaAreas: AreaDefinition[] = [
       'Feature:logging',
       'Team:Kibana Management',
       'Feature:CCR and Remote Clusters',
+      'Feature:Security/Audit',
+      'Feature:Security/CSP',
+      'Feature:Hardening',
     ],
   },
   {
