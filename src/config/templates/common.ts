@@ -141,9 +141,6 @@ export const securityLabels = [
   'Feature:Detection Rule Preview',
   'Feature:Security Alert Page',
   'Feature:Osquery',
-  'Osquery',
-  'Theme: entity_analytics',
-  'Entity Store (Next)',
 ];
 
 export const observabilityLabels = [

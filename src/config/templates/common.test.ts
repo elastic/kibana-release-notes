@@ -31,9 +31,6 @@ describe('Kibana release note areas', () => {
         'Feature:Detection Rule Preview',
         'Feature:Security Alert Page',
         'Feature:Osquery',
-        'Osquery',
-        'Theme: entity_analytics',
-        'Entity Store (Next)',
       ])
     );
   });
@@ -79,7 +76,6 @@ describe('Kibana release note areas', () => {
     [['Feature:Endpoint', 'Team:Fleet'], 'Elastic Security solution'],
     [['Feature:Osquery', 'Team:Fleet'], 'Elastic Security solution'],
     [['Feature:Prebuilt Detection Rules'], 'Elastic Security solution'],
-    [['Theme: entity_analytics', 'Team:Cases'], 'Elastic Security solution'],
     [['Team: Endpoint Protections'], 'Elastic Security solution'],
     [['Feature:SigEvents', 'Team:Presentation'], 'Elastic Observability solution'],
     [['Team:Security Investigations', 'Team:agent-builder'], 'Elastic Security solution'],
