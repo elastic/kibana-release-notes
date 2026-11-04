@@ -26,6 +26,11 @@ describe('Kibana release note areas', () => {
         'Team:Security Investigations',
         'Team:security-siem-conduit',
         'Team:Security Solution',
+        'Team: Endpoint Protections',
+        'Feature:Prebuilt Detection Rules',
+        'Feature:Detection Rule Preview',
+        'Feature:Security Alert Page',
+        'Feature:Osquery',
       ])
     );
   });
@@ -69,6 +74,9 @@ describe('Kibana release note areas', () => {
   it.each([
     [['Feature:Security ML Jobs', 'Feature:ML/AIOps'], 'Elastic Security solution'],
     [['Feature:Endpoint', 'Team:Fleet'], 'Elastic Security solution'],
+    [['Feature:Osquery', 'Team:Fleet'], 'Elastic Security solution'],
+    [['Feature:Prebuilt Detection Rules'], 'Elastic Security solution'],
+    [['Team: Endpoint Protections'], 'Elastic Security solution'],
     [['Feature:SigEvents', 'Team:Presentation'], 'Elastic Observability solution'],
     [['Team:Security Investigations', 'Team:agent-builder'], 'Elastic Security solution'],
     [['Feature:Streams', 'Team:streams-ui'], 'Elastic Observability solution'],
