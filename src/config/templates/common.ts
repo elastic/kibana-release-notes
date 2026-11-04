@@ -136,6 +136,11 @@ export const securityLabels = [
   'Feature:Security ML Jobs',
   'Team:security-siem-conduit',
   'Team:Security Solution',
+  'Team: Endpoint Protections',
+  'Feature:Prebuilt Detection Rules',
+  'Feature:Detection Rule Preview',
+  'Feature:Security Alert Page',
+  'Feature:Osquery',
 ];
 
 export const observabilityLabels = [
